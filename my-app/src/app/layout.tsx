@@ -1,5 +1,6 @@
+import NavBar from './components/NavBar';
+import { AuthProvider } from './context/AuthContext';
 
-import NavBar from './components/NavBar'; 
 
 export default function RootLayout({
   children,
@@ -11,9 +12,13 @@ export default function RootLayout({
       <head>
         <title>Cinema E-Booking System</title>
       </head>
+ 
       <body>
-        <NavBar />
-        {children}
+        <AuthProvider>
+        <NavBar></NavBar>
+          {children}
+        </AuthProvider>
+
       </body>
     </html>
   );
