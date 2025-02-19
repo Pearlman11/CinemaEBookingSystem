@@ -1,4 +1,5 @@
 
+import MovieCard from '../components/movieCard/MovieCard';
 import styles from './home.module.css';
 import Script from 'next/script';
 export default function Home() {
@@ -25,11 +26,7 @@ export default function Home() {
             </div>
 
             {/* Movies Section */}
-            <div className={styles.moviesContainer}>
-                <div id="movie-list" className={styles.movieList}>
-                    {/* Movies will be dynamically loaded here */}
-                </div>
-            </div>
+            <MovieCard></MovieCard>
             {/* Bootstrap Bundle JS */}
             <Script
                 src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
