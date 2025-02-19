@@ -75,7 +75,7 @@
     padding: 0.75rem;
     font-size: 1rem;
     cursor: pointer;
-    background-color: #4CAF50;
+    background-color: var(--highlight-color);
     color: white;
     border: none;
     border-radius: 4px;
@@ -84,7 +84,7 @@
   }
   
   .saveButton:hover {
-    background-color: #45a049;
+    background-color: var(--hover-darken);
   }
   
   .cancelButton {

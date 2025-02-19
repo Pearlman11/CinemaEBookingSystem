@@ -14,7 +14,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({children}: {children:ReactNode}) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const router = useRouter();
-    const login = () => setIsLoggedIn(true);
+    const login = () => {
+        setIsLoggedIn(true);
+        router.push('/')
+    }
     const logout = () => {
         setIsLoggedIn(false);
         router.push('/');

@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import styles from './AuthForm.module.css';
 
+
 export default function AuthFrom() {
     // need to track if were in "Login (True)" mode or "Signup Mode (False)"
     const [isLogin, setIsLogin] = useState(true);
@@ -15,11 +16,13 @@ export default function AuthFrom() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const {login} = useAuth();
 
+
     //allow toggeling between modes
     const toggleMode = () => {
         setIsLogin(!isLogin);
         setPassword('');
         setConfirmPassword('');
+
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -93,6 +96,7 @@ export default function AuthFrom() {
                 )}
                 <button type='submit' className={styles.formbutton}>
                     {isLogin? 'Login': 'Sign Up'}
+                    
                 </button>
             </form>
             <p className={styles.loginbuttoncontiner}>

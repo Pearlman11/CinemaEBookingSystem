@@ -44,18 +44,20 @@
   }
   
   .editButton {
-    display: inline-block;
+    text-decoration: underline;
     padding: 0.75rem 1.5rem;
     font-size: 1rem;
     cursor: pointer;
-    background-color: #eee;
+    background-color:var(--highlight-color);
     border: none;
     border-radius: 4px;
     transition: background-color 0.3s ease;
     margin: 0 auto;
     display: block;
+    color: var(--text-color);
+
   }
   
   .editButton:hover {
-    background-color: #ddd;
+    background-color: var(--hover-darken);
   }
