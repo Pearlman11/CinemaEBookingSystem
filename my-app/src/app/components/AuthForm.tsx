@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import styles from './AuthForm.module.css';
 
 export default function AuthFrom() {
     // need to track if were in "Login (True)" mode or "Signup Mode (False)"
@@ -43,9 +44,9 @@ export default function AuthFrom() {
     };
 
     return (
-        <div style={{ maxWidth: '400px', margin: '0 auto' }}>
+        <div className={styles.formContainer}>
             <h2>{isLogin ? 'Login' : 'Sign Up'}</h2>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className={styles.form}>
                 <div style={{ marginBottom: '1rem' }}>
                     <label htmlFor="email" style={{ display: 'block' }}>
                         Email:
@@ -90,13 +91,13 @@ export default function AuthFrom() {
                     />
                 </div>
                 )}
-                <button type='submit' style={{padding: '0.5rem 1rem'}}>
+                <button type='submit' className={styles.formbutton}>
                     {isLogin? 'Login': 'Sign Up'}
                 </button>
             </form>
-            <p style={{marginTop: '1rem'}}>
+            <p className={styles.loginbuttoncontiner}>
                 {isLogin? "Don't have an account?" : 'Already Have an account?'}{' '}
-                <button onClick={toggleMode} style={{textDecoration: 'underline', background: 'none', border: 'none', color: 'blue', cursor: 'pointer'}}>
+                <button onClick={toggleMode} className={styles.loginbutton}>
                     {isLogin?'Sign Up':'Login'}
                 </button>
             </p>

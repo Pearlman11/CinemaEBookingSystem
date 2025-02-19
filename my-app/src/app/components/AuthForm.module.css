@@ -1,0 +1,56 @@
+.formbutton {
+  background-color: var(--highlight-color);
+  border: none;
+  padding: 10px;
+  width: 100%;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--text-color);
+  transition: background-color 0.3s ease-in-out;
+}
+
+.formbutton:hover {
+  background-color: var(--hover-darken);
+}
+
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--secondary-color);
+  padding: 20px;
+  margin: 20px 20px 20px 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 40px;
+  align-items: center;
+
+}
+
+.form {
+    min-width: 600px;
+}
+.loginbuttoncontiner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.loginbutton {
+    background-color: var(--highlight-color);
+    border: none;
+    padding: 10px;
+    width: 60%;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: background-color 0.3s ease-in-out;
+    margin-top: 10px;
+  }
+  
+  .loginbutton:hover {
+    background-color: var(--hover-darken);
+  }
+
+

@@ -1,6 +1,7 @@
 'use client';
 
 import {createContext, useContext, useState, ReactNode} from 'react'
+import { useRouter } from 'next/navigation';
 
 type AuthContextType = {
     isLoggedIn: boolean;
@@ -12,8 +13,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({children}: {children:ReactNode}) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const router = useRouter();
     const login = () => setIsLoggedIn(true);
-    const logout = () => setIsLoggedIn(false);
+    const logout = () => {
+        setIsLoggedIn(false);
+        router.push('/');
+    };
 
     return (
         <AuthContext.Provider value = {{isLoggedIn, login, logout}}>

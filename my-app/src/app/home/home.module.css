@@ -1,0 +1,116 @@
+/* Navbar Styles */
+.header {
+  background-color: #343a40;
+  padding: 1rem 0;
+}
+
+.navbar {
+  display: flex;
+  justify-content: center;
+}
+
+.navContainer {
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+
+.navToggler {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+
+
+.navCollapse {
+  display: flex;
+}
+
+.navList {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+}
+
+.navLink {
+  color: #fff;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.navLink:hover {
+  text-decoration: underline;
+}
+
+/* Main Content Styles */
+.main {
+  padding: 2rem 0;
+}
+
+/* Search Bar Styles */
+.searchContainer {
+  margin-bottom: 2rem;
+}
+
+.searchForm {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+}
+
+.inputGroup {
+  display: flex;
+  width: 100%;
+}
+
+.searchInput {
+  flex: 1;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-right: none;
+  border-radius: 4px 0 0 4px;
+  margin-top: 25px;
+}
+
+.searchButton {
+  background-color: var(--highlight-color);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 0 5px 5px 0;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--text-color);
+  transition: background-color 0.3s ease-in-out;
+  margin-top: 25px;
+}
+
+.searchButton:hover {
+  background-color: var(--hover-darken);
+}
+
+/* Movies Section Styles */
+.moviesContainer {
+  padding: 0 1rem;
+}
+
+.movieList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}

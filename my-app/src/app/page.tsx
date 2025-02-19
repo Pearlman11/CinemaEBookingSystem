@@ -1,11 +1,13 @@
 // Main landing page for application "Homepage"
 
+import Home from "./home/page"
+import './/globals.css'
+
 
 export default function Homepage() {
     return (
         <main>
-            <h1>welcome to the cinema E-booking System</h1>
-            <p>this is the homepage for the app</p>
+            <Home/>
         </main>
     );
 }

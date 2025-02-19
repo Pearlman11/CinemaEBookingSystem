@@ -1,0 +1,92 @@
+/* NavBar.module.css */
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: var(--dark-bg-color);
+}
+
+/* Three columns for left, center, and right */
+.left,
+.center,
+.right {
+  flex: 1;
+}
+
+/* Center the title text in the middle section */
+.center {
+  text-align: center;
+}
+
+/* Left and right sections are aligned to the start and end respectively */
+.left {
+  text-align: left;
+}
+.right {
+  text-align: right;
+}
+
+/* Styling for the title */
+.title {
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: var(--highlight-color);
+}
+
+/* Nav list styling */
+.navList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* Standard link styling with increased padding for a button-like appearance */
+.link {
+  color: var(--text-color);
+  padding: 10px 20px;
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+  
+}
+
+.right .navList {
+  justify-content: flex-end;
+}
+
+.loginButton {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  font-size: 1.1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #0070f3;
+  border-radius: 4px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  text-decoration: underline;
+}
+.logoutButton {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color:var(--text-color);
+  border-radius: 4px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  text-decoration: underline;
+}
+
+.link:hover {
+  text-decoration: underline;
+  color: var(--hover-darken);
+}
+
+.logoutButton:hover {
+  text-decoration: underline;
+  color: var(--hover-darken);
+}
