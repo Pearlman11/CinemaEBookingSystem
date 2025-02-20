@@ -59,7 +59,7 @@ export default function MovieCard() {
           <div className={style.posterContainer}>
             <Image src={movie.poster} alt="image for movie" width={100} height={100} id={style.poster}></Image>
           </div>
-          <p id={style.title}> {movie.title}</p>
+          <p className={style.title}> {movie.title}</p>
           <div className={style.movieinfocontainer}>
             <p id={style.status}> {movie.status}</p>
             <p id={style.rating}>Rating: {movie.rating}</p>

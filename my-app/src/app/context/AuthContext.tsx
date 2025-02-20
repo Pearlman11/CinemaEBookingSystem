@@ -27,11 +27,13 @@ export function AuthProvider({children}: {children:ReactNode}) {
 
     const login = () => {
         setIsLoggedIn(true);
-            router.push('/');
+        setIsAdmin(false);
+        router.push('/');
     }
     const logout = () => {
         setIsLoggedIn(false);
         setAdmin(false);
+        setIsAdmin(false);
         router.push('/');
     };
     const setAdmin = (admin: boolean) => {

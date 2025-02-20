@@ -1,116 +1,76 @@
-/* Navbar Styles */
+/* Cinematic, modern homepage styling */
+
+/* Header with a dark gradient for a cinematic vibe */
 .header {
-  background-color: #343a40;
-  padding: 1rem 0;
+  background: linear-gradient(135deg, #1f1f2e, #2c2c3c);
+  padding: 1.2rem 0;
+  box-shadow: 0 3px 20px rgba(0, 0, 0, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
-.navbar {
+
+
+.main {
+  padding: 3rem 1.5rem;
+  background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+  min-height: calc(100vh - 80px);
+}
+
+
+.searchContainer {
+  margin-top: 20px;
+  margin-bottom: 3rem;
   display: flex;
   justify-content: center;
 }
 
-.navContainer {
-  width: 100%;
-  max-width: 1200px;
-  padding: 0 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-
-
-.navToggler {
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-
-
-.navCollapse {
-  display: flex;
-}
-
-.navList {
-  list-style: none;
-  display: flex;
-  gap: 1rem;
-  margin: 0;
-  padding: 0;
-}
-
-.navItem {
-  display: flex;
-  align-items: center;
-}
-
-.navLink {
-  color: #fff;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.navLink:hover {
-  text-decoration: underline;
-}
-
-/* Main Content Styles */
-.main {
-  padding: 2rem 0;
-}
-
-/* Search Bar Styles */
-.searchContainer {
-  margin-bottom: 2rem;
-}
-
+/* Search Form with refined box-shadow and rounded corners */
 .searchForm {
-  max-width: 600px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 800px;
   display: flex;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
 }
 
+/* Input group takes full width */
 .inputGroup {
   display: flex;
   width: 100%;
 }
 
+/* Search Input with comfortable padding and focus state */
 .searchInput {
   flex: 1;
-  padding: 0.5rem;
+  padding: 0.9rem 1.2rem;
   font-size: 1rem;
-  border: 1px solid #ccc;
-  border-right: none;
-  border-radius: 4px 0 0 4px;
-  margin-top: 25px;
+  border: none;
+  border-radius: 10px 0 0 10px;
+  background-color: #ffffff;
+  transition: all 0.3s ease;
 }
 
+.searchInput:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px #1f1f2e;
+}
+
+/* Search Button with a dark base and accent on hover */
 .searchButton {
-  background-color: var(--highlight-color);
+  background-color: #1f1f2e;
   border: none;
-  padding: 10px 20px;
-  border-radius: 0 5px 5px 0;
+  padding: 0.9rem 1.5rem;
+  border-radius: 0 10px 10px 0;
   font-size: 1rem;
   cursor: pointer;
-  color: var(--text-color);
-  transition: background-color 0.3s ease-in-out;
-  margin-top: 25px;
+  color: #ffffff;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .searchButton:hover {
-  background-color: var(--hover-darken);
-}
-
-/* Movies Section Styles */
-.moviesContainer {
-  padding: 0 1rem;
-}
-
-.movieList {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+  background-color: #e94560;
+  transform: translateY(-2px);
 }
