@@ -52,5 +52,24 @@
   .loginbutton:hover {
     background-color: var(--hover-darken);
   }
+  .adminContainer {
+    display: flex;
+    flex-direction: row;
 
+  }
+
+  .adminLoginButton {
+    background-color: var(--primary-color);
+    border: none;
+    width: 100%;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: background-color 0.3s ease-in-out;
+    margin-top: 50px;
+  }
+  .adminLoginButton:hover {
+    background-color: var(--hover-darken);
+  }
 

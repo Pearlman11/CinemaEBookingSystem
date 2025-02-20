@@ -1,0 +1,26 @@
+.container {
+    padding: 20px;
+    display: flex;
+    flex-direction: row;
+
+
+}
+
+.addButton {
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: auto;
+    width: 5%;
+    justify-content: right;
+   
+}
+
+.addButton:hover {
+    background-color: var(--highlight-color);
+}
+

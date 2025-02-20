@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import style from './MovieCard.module.css'
+import { useAuth } from "@/app/context/AuthContext";
 
 /**
  *  *Defined the movie interface to represent a single movie
@@ -21,7 +22,9 @@ interface Movie {
   status: string;
 }
 
-const MovieCard: React.FC = () => {
+export default function MovieCard() {
+
+ 
   const dummyMovies: Movie[] = [
     {
       title: "The Monkey",
@@ -35,7 +38,7 @@ const MovieCard: React.FC = () => {
       status: "Now playing",
     },
     {
-      title: "The Monkey",
+      title: "Flight Risk",
       showTimes: [
         { date: "02/19/2025", theatre: "University 16 cinemas", time: "4:45" },
       ],
@@ -48,31 +51,28 @@ const MovieCard: React.FC = () => {
   ];
   //* state to keep track of list of exercises
   const [movies, setMovies] = useState<Movie[]>(dummyMovies);
-
-
+  const {isAdmin} = useAuth();
   return (
     <div className={style.container}>
       {movies.map((movie, movieIndex) => (
         <div className={style.movie} key={movieIndex}>
           <div className={style.posterContainer}>
-          <Image
-            src={movie.poster}
-            alt="image for movie"
-            width={100}
-            height={100}
-            id={style.poster}
-          ></Image>
+            <Image src={movie.poster} alt="image for movie" width={100} height={100} id={style.poster}></Image>
           </div>
-     
           <p id={style.title}> {movie.title}</p>
           <div className={style.movieinfocontainer}>
             <p id={style.status}> {movie.status}</p>
             <p id={style.rating}>Rating: {movie.rating}</p>
           </div>
+          {isAdmin && (
+            <div className={style.adminControls}>
+              <button className={style.editButton}>Edit</button>
+              <button className={style.deleteButton}>Delete</button>
+            </div>
+          )}
         </div>
       ))}
     </div>
   );
 };
 
-export default MovieCard;

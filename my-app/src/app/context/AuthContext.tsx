@@ -5,26 +5,41 @@ import { useRouter } from 'next/navigation';
 
 type AuthContextType = {
     isLoggedIn: boolean;
+    isAdmin: boolean;
     login: () => void;
     logout: () => void;
+    setAdmin: (admin: boolean) => void;
+    adminLogin: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({children}: {children:ReactNode}) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
     const router = useRouter();
+
+    const adminLogin =() => {
+        setIsLoggedIn(true);
+        setIsAdmin(true);
+        router.push('/admin/manage/movies');
+    }
+
     const login = () => {
         setIsLoggedIn(true);
-        router.push('/')
+            router.push('/');
     }
     const logout = () => {
         setIsLoggedIn(false);
+        setAdmin(false);
         router.push('/');
     };
-
+    const setAdmin = (admin: boolean) => {
+        setIsAdmin(admin);
+    };
+  
     return (
-        <AuthContext.Provider value = {{isLoggedIn, login, logout}}>
+        <AuthContext.Provider value = {{isLoggedIn, isAdmin, login, logout, adminLogin,setAdmin}}>
             {children}
         </AuthContext.Provider>
     );

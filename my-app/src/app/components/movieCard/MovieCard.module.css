@@ -1,81 +1,100 @@
-
 .container {
-   
   display: flex;
   flex-direction: row;
   column-gap: 18px;
-
 }
 
+#title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+  color: var(--primary-color);
+  text-decoration: underline;
+}
+.movie {
+  background-color: #ffffff;
+  padding: 0px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 20%;
+  max-width: 600px;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-self: center;
+  margin-left: 15px;
+}
 
-  #title {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    text-align: center;
-    color: var(--primary-color);
-    text-decoration: underline;
-  }
-  .movie {
-
-    background-color: #ffffff;
-    padding: 0px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 20%;
-    max-width: 600px;
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-self: center;
-    margin-left: 15px;
-
-  }
 .posterContainer {
   border: 1px blue solid;
   display: flex;
   align-self: center;
-
-
 }
 
+#poster {
+  min-width: 200px;
+  min-height: 200px;
+}
 
-  #poster {
-    min-width: 200px;
-    min-height: 200px;
+.movieinfocontainer {
+  display: grid;
+  align-self: left;
+  background-color: #f7f7f7;
+  text-transform: capitalize;
+  padding-left: 10px;
+}
 
-  }
+#rating,
+#status {
+  font-size: 18px;
+  margin-bottom: 10px;
+  background-color: #f7f7f7;
+  align-self: center;
+}
 
-  
- 
-  .movieinfocontainer {
-    display: grid;
-    align-self: left;
-    background-color: #f7f7f7;
-    text-transform: capitalize;
-    padding-left: 10px;
-  
-  }
-  
-  #rating, #status {
-    font-size: 18px;
-    margin-bottom: 10px;
-    background-color: #f7f7f7;
-    align-self: center;
+#showtimes {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 600px;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-self: center;
+}
 
-  }
+.adminControls {
+  background-color: #f7f7f7;
+  margin-top: 0px;
+  display: flex;
+  justify-content: space-between;
+}
 
-  #showtimes {
+.editButton,
+.deleteButton {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
 
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 600px;
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-self: center;
-  
-  }
+.editButton {
+  background-color: var(--highlight-color);
+  color: white;
+}
+
+.deleteButton {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.editButton:hover {
+  background-color: var(--primary-color);
+}
+
+.deleteButton:hover {
+  background-color: var(--highlight-color);
+}
