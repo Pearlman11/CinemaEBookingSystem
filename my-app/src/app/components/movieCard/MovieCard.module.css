@@ -1,13 +1,15 @@
-/* Container holds all the movie cards in a responsive grid */
+
 .container {
+
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-rows: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: auto auto;
   gap: 20px;
-  padding: 20px;
+  padding-right: 20px;
 
-}
+  }
 
-/* Individual movie card styling using grid layout */
+
 .movie {
   background-color: #ffffff;
   border-radius: 12px;
@@ -15,83 +17,94 @@
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   display: grid;
-  grid-template-columns: 120px auto;
-  grid-template-rows: auto auto 1fr auto;
-  gap: 10px;
-  min-height: 60px;
-  min-width: auto;
-
-
-
+  grid-template-columns: 1fr 2.5fr;
+  grid-template-rows: auto auto auto;
 
 
 }
 
-/* Lift effect on hover */
-.movie:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-}
 
 .posterContainer {
   grid-row: 1 / span 3;
   grid-column: 1 / 2;
   position: relative;
   overflow: hidden;
-  width: 150%;
-  height: 110%;
+  
+
+  padding-bottom: 100%;
+
 }
 
 .posterContainer img {
-
-  height: 100%;
+  
+  position: absolute;
+  top: 0;
+  left: 0;
   width: auto;
-  display: block;
+  height: auto;
+  object-fit: fill;
   transition: transform 0.3s ease;
 }
 
-/* Slight zoom on hover */
+
 .movie:hover .posterContainer img {
   transform: scale(1.05);
 }
 
-/* Title is placed at the top of the right column */
-.title {
-  grid-row: 1 / 2;
-  grid-column: 2 / 3;
-  font-size: 1.7rem;
-  font-weight: 600;
-  margin: 10px 0;
-  color: var(--primary-color, #333333);
-  align-self: center;
-  text-align: center;
-  text-decoration: 1px var(--primary-color) underline;
-}
 
-/* Movie info container in the right column */
 .movieinfocontainer {
-  grid-row: 2 / 3;
+  grid-row: 1 / span 3;
   grid-column: 2 / 3;
-  text-transform: capitalize;
   display: flex;
   flex-direction: column;
+  padding: 10px;
   color: #333333;
-  font-weight: bold;
-  font-size: 1.2rem;
+}
+
+
+.titleRatingContainer {
+  font-size: calc(1rem + 0.5vw);
+  font-weight: 600;
+  margin-bottom: 10px;
   text-align: center;
-
-
 }
 
-#status {
-  font-size: 1.2rem;
+.title {
+  margin: 0;
 }
 
-#rating {
-  font-size: 1.1rem;
+.category {
+  font-size: calc(0.9rem + 0.3vw);
+  color: black;
 }
 
-/* Admin controls span the full width at the bottom */
+.filmRatingCode {
+  font-size: calc(0.8rem + 0.3vw);
+  color: black;
+}
+
+
+.additionalInfo p {
+  font-size: calc(0.8rem + 0.3vw);
+  margin: 5px 0;
+}
+
+
+.reviews {
+  margin-top: 10px;
+  text-align: left;
+}
+
+.reviews strong {
+  font-size: calc(0.9rem + 0.3vw);
+}
+
+.reviews p {
+  font-size: calc(0.8rem + 0.3vw);
+  margin: 4px 0;
+}
+
+
 .adminControls {
   grid-row: 4 / 5;
   grid-column: 1 / span 2;
@@ -102,7 +115,6 @@
   background-color: #f7f7f7;
 }
 
-/* Button styles with smooth transitions */
 .editButton,
 .deleteButton {
   padding: 6px 12px;
@@ -130,3 +142,34 @@
 .deleteButton:hover {
   background-color: var(--highlight-color, #007bff);
 }
+
+@media (max-width: 768px) {
+  .movie {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+  }
+
+  .posterContainer {
+    grid-row: 1 / span 2;
+    padding-bottom: 60%; 
+  }
+
+  .movieinfocontainer {
+    grid-row: 2 / span 3;
+  }
+  
+  .container {
+    grid-template-columns: 1fr;
+  }
+  
+  .posterContainer img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;    
+    height: 100%;  
+    object-fit: contain;
+    transition: transform 0.3s ease;
+  }
+}
+
