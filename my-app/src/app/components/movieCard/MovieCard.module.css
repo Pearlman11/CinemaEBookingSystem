@@ -1,14 +1,10 @@
-
 .container {
-
   display: grid;
   grid-template-rows: repeat(auto-fit, minmax(350px, 1fr));
-  grid-template-columns: auto auto;
+  grid-template-columns: 1fr 1fr;
   gap: 20px;
   padding-right: 20px;
-
-  }
-
+}
 
 .movie {
   background-color: #ffffff;
@@ -19,24 +15,18 @@
   display: grid;
   grid-template-columns: 1fr 2.5fr;
   grid-template-rows: auto auto auto;
-
-
+  min-height: fit-content;
 }
-
 
 .posterContainer {
   grid-row: 1 / span 3;
   grid-column: 1 / 2;
   position: relative;
   overflow: hidden;
-  
-
   padding-bottom: 100%;
-
 }
 
 .posterContainer img {
-  
   position: absolute;
   top: 0;
   left: 0;
@@ -46,11 +36,9 @@
   transition: transform 0.3s ease;
 }
 
-
 .movie:hover .posterContainer img {
   transform: scale(1.05);
 }
-
 
 .movieinfocontainer {
   grid-row: 1 / span 3;
@@ -60,7 +48,6 @@
   padding: 10px;
   color: #333333;
 }
-
 
 .titleRatingContainer {
   font-size: calc(1rem + 0.5vw);
@@ -83,12 +70,42 @@
   color: black;
 }
 
+/* Flip Container */
+.flipContainer {
+  position: relative;
+  flex-grow: 1;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+  cursor: pointer;
+  min-height: f;
+  
+}
+
+.flipContainer.flipped {
+  transform: rotateY(180deg);
+}
+
+.front,
+.back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  overflow-y: auto;
+}
+
+.front {
+  z-index: 2;
+}
+
+.back {
+  transform: rotateY(180deg);
+}
 
 .additionalInfo p {
   font-size: calc(0.8rem + 0.3vw);
   margin: 5px 0;
 }
-
 
 .reviews {
   margin-top: 10px;
@@ -103,7 +120,6 @@
   font-size: calc(0.8rem + 0.3vw);
   margin: 4px 0;
 }
-
 
 .adminControls {
   grid-row: 4 / 5;
@@ -151,25 +167,24 @@
 
   .posterContainer {
     grid-row: 1 / span 2;
-    padding-bottom: 60%; 
+    padding-bottom: 60%;
   }
 
   .movieinfocontainer {
     grid-row: 2 / span 3;
   }
-  
+
   .container {
     grid-template-columns: 1fr;
   }
-  
+
   .posterContainer img {
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;    
-    height: 100%;  
+    width: 100%;
+    height: 100%;
     object-fit: contain;
     transition: transform 0.3s ease;
   }
 }
-
