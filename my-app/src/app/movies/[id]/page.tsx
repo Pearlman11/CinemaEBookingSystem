@@ -1,5 +1,7 @@
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+"use client"; // ✅ Marks this as a Client Component
+
+import { useParams } from "next/navigation"; // ✅ Use useParams instead of useRouter().query
+import { useEffect, useState } from "react";
 
 interface Movie {
   title: string;
@@ -7,13 +9,12 @@ interface Movie {
 }
 
 const MovieDetailPage = () => {
-  const router = useRouter();
-  const { id } = router.query; // Get the movie ID from the URL
+  const { id } = useParams(); // ✅ Correct way to get the dynamic route parameter
   const [movie, setMovie] = useState<Movie | null>(null);
   const [trailerLink, setTrailerLink] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch movie data by ID from an API or mock backend
+  // Fetch movie data by ID
   useEffect(() => {
     if (id) {
       fetch(`/api/movies/${id}`)
@@ -23,13 +24,13 @@ const MovieDetailPage = () => {
           fetchTrailer(data.title); // Fetch trailer using the movie title
         })
         .catch((error) => {
-          console.error('Error fetching movie:', error);
-          setError('Failed to load movie details.');
+          console.error("Error fetching movie:", error);
+          setError("Failed to load movie details.");
         });
     }
   }, [id]);
 
-  // Fetch trailer link from our backend API
+  // Fetch trailer link from backend API
   const fetchTrailer = (movieTitle: string) => {
     fetch(`/api/trailer?title=${encodeURIComponent(movieTitle)}`)
       .then((response) => response.json())
@@ -37,12 +38,12 @@ const MovieDetailPage = () => {
         if (data.trailerLink) {
           setTrailerLink(data.trailerLink);
         } else {
-          setError('Trailer not found.');
+          setError("Trailer not found.");
         }
       })
       .catch((error) => {
-        console.error('Error fetching trailer:', error);
-        setError('Failed to load trailer.');
+        console.error("Error fetching trailer:", error);
+        setError("Failed to load trailer.");
       });
   };
 
@@ -80,4 +81,3 @@ const MovieDetailPage = () => {
 };
 
 export default MovieDetailPage;
-
