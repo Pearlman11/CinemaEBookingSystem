@@ -1,0 +1,170 @@
+/* Container for the entire authentication form card */
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, var(--secondary-color), var(--secondary-color-light));
+  padding: 2rem;
+  margin: 40px 20px;
+  border-radius: 12px;
+  align-items: center;
+
+}
+
+/* Form styling with a controlled max-width */
+.form {
+  width: 100%;
+  max-width: 600px;
+
+}
+
+/* Input group for spacing between label and input */
+.inputGroup {
+  margin-bottom: 1.5rem;
+
+
+
+}
+
+
+/* Label styling for clarity */
+.inputLabel {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--text-color-dark);
+  width: 100%;
+
+
+}
+
+/* Input field styling for a modern look */
+.inputField {
+  width: 100%;
+  padding-top: 0.75rem;
+  padding-bottom:0.75rem ;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+
+}
+
+.inputField:focus {
+  outline: none;
+  border-color: var(--highlight-color);
+}
+
+/* Primary form button with a smooth hover lift effect */
+.formbutton {
+  background-color: var(--highlight-color);
+  border: none;
+  padding: 12px;
+  width: 100%;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--text-color);
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease;
+}
+
+.formbutton:hover {
+  background-color: var(--hover-darken);
+  transform: translateY(-2px);
+}
+
+/* Container for the login/signup toggle button */
+.loginbuttoncontiner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+/* Toggle button styling with consistent colors and lift effect */
+.loginbutton {
+  background-color: var(--highlight-color);
+  border: none;
+  padding: 10px;
+  width: 60%;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--text-color);
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease;
+  margin-top: 10px;
+}
+
+.loginbutton:hover {
+  background-color: var(--hover-darken);
+  transform: translateY(-2px);
+}
+
+/* Admin container to center the admin login button */
+.adminContainer {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Admin login button styling */
+.adminLoginButton {
+  background-color: var(--primary-color);
+  border: none;
+  width: 100%;
+  max-width: 600px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--text-color);
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease;
+  padding: 12px;
+}
+
+.adminLoginButton:hover {
+  background-color: var(--hover-darken);
+  transform: translateY(-2px);
+}
+
+
+
+
+
+.toggleIcon {
+  font-size: 1.5rem;
+  line-height: 1;
+  padding: 1rem 1rem;
+}
+
+
+
+
+.sectionHeader {
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, var(--secondary-color), var(--secondary-color-light));
+  padding: 1rem 1rem 0 0;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-size: 1.25rem;
+  color: #333;
+
+
+}
+
+.toggleIcon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.optionalSection {
+  .inputGroup {
+    margin-top: 18px;
+    margin-bottom: 0px;
+  }
+}

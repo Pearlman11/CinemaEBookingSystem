@@ -1,21 +1,26 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Global Styles */
+body, html {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Arial', sans-serif;
+  background-color: #f7f7f7;
+}
 
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Dark Burgundy Color Scheme */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary-color: #800020; /* Burgundy */
+  --secondary-color: #f4f4f4; /* Light background */
+  --highlight-color: #ffc107; /* Accent color for highlights (yellow) */
+  --text-color: #ffffff; /* White text */
+  --dark-bg-color: #1c1c1c; /* Dark background for navbar and footer */
+  --hover-darken: #70001c; /* Darker burgundy for hover */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
