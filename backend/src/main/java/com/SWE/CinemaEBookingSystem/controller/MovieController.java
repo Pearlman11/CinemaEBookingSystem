@@ -37,17 +37,24 @@ public class MovieController {
     }
 
     // Update a movie
-    @PutMapping("/{id}")
-    public Movie updateMovie(@PathVariable Long id, @RequestBody Movie movieDetails) {
-        return movieRepository.findById(id).map(movie -> {
-            movie.setTitle(movieDetails.getTitle());
-            movie.setCategory(movieDetails.getCategory());
-            movie.setCast(movieDetails.getCast());
-            movie.setDirector(movieDetails.getDirector());
-            movie.setProducer(movieDetails.getProducer());
-            return movieRepository.save(movie);
-        }).orElseThrow(() -> new RuntimeException("Movie not found with id " + id));
-    }
+    @PutMapping("/movies/{id}")
+public Movie updateMovie(@PathVariable Long id, @RequestBody Movie movieDetails) {
+    return movieRepository.findById(id).map(movie -> {
+        movie.setTitle(movieDetails.getTitle());
+        movie.setCategory(movieDetails.getCategory());
+        movie.setCast(movieDetails.getCast());
+        movie.setDirector(movieDetails.getDirector());
+        movie.setProducer(movieDetails.getProducer());
+        movie.setTrailer(movieDetails.getTrailer());  // New field
+        movie.setPoster(movieDetails.getPoster());    // New field
+        movie.setDescription(movieDetails.getDescription()); // New field
+        movie.setReviews(movieDetails.getReviews());  // New field
+        movie.setRating(movieDetails.getRating());    // Ensure enum is updated
+
+        return movieRepository.save(movie);
+    }).orElseThrow(() -> new RuntimeException("Movie not found with id " + id));
+}
+
 
     // Delete a movie
     @DeleteMapping("/{id}")

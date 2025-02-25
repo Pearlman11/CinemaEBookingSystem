@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -28,31 +29,32 @@ public class CinemaEBookingSystemApplication {
     }
 
 	@Bean
-CommandLineRunner initDatabase(MovieRepository movieRepository, ShowdateRepository showdateRepository) {
-    return args -> {
-        // Save a movie first
-		Movie movie = new Movie(
-			"Inception", 
-			"Sci-Fi", 
-			List.of("Emma Watson"),  // Cast should be a list
-			"Christopher Nolan", 
-			"Emma Thomas", 
-			"https://trailer.link/inception",  // Placeholder for the trailer link
-			MovieRating.PG13, 
-			new ArrayList<>()  // Empty list for Showdates initially
-		);
-		
-        movieRepository.save(movie);
-
-        // Create and save showdates
-        List<Showdate> dates = new ArrayList<>(Arrays.asList(
-            new Showdate(LocalDate.of(2025, 3, 15), movie),
-            new Showdate(LocalDate.of(2025, 3, 16), movie)
-        ));
-
-        showdateRepository.saveAll(dates);
-    };
-}
-
+	CommandLineRunner initDatabase(MovieRepository movieRepository, ShowdateRepository showdateRepository) {
+		return args -> {
+			if (movieRepository.existsByTitle("The Monkey")) {
+				System.out.println("Skipping insert: 'The Monkey' already exists.");
+				return; // Skip insertion
+			}
+	
+			List<Movie> movies = List.of(
+				new Movie(
+					"The Monkey",
+					"Now Playing",
+					List.of("Theo James", "Elijah Wood"),
+					"Osgood Perkins",
+					"James Wan",
+					"https://www.youtube.com/watch?v=1jc0KjSiXb0",
+					"https://www.impawards.com/2025/posters/monkey_ver2_xlg.jpg",
+					"Twin brothers Hal and Bill discover a cursed toy monkey...",
+					Set.of("Horror gold!"),
+					MovieRating.R,
+					new ArrayList<>()
+				)
+			);
+	
+			movieRepository.saveAll(movies);
+		};
+	}
+	
 }
 	

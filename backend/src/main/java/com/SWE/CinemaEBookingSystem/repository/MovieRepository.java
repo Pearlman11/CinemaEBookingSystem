@@ -17,5 +17,7 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
    // - void delete(Movie movie) or void deleteById(Long id) for deletion.
   
    // You can also add custom query methods if needed, for example:
+
+   boolean existsByTitle(String title); 
 }
 
