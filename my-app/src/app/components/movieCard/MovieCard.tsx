@@ -32,7 +32,6 @@ interface Movie {
   showTimes: Showdate[]; // Updated type for correct mapping
 }
 
-
 export default function MovieCard() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
@@ -83,9 +82,8 @@ export default function MovieCard() {
               alt={movie.title}
               width={300}
               height={450}
-              priority // Ensures correct hydration
-              />
-
+              priority
+            />
           </div>
           <div className={style.movieinfocontainer}>
             <div className={style.titleRatingContainer}>
@@ -101,7 +99,9 @@ export default function MovieCard() {
             </div>
 
             <div
-              className={`${style.flipContainer} ${flipped.includes(movieIndex) ? style.flipped : ""}`}
+              className={`${style.flipContainer} ${
+                flipped.includes(movieIndex) ? style.flipped : ""
+              }`}
               role="button"
               tabIndex={0}
               onClick={() => handleCardFlip(movieIndex)}
@@ -111,38 +111,57 @@ export default function MovieCard() {
                 }
               }}
             >
-              <div className={style.additionalInfo}>
-  <strong>Showtimes:</strong>
-  {movie.showTimes && movie.showTimes.length > 0 ? (
-    movie.showTimes.map((show, idx) => (
-      <div key={idx}>
-        <p><strong>Date:</strong> {show.screeningDay}</p>
-        {show.times && show.times.length > 0 ? (
-          show.times.map((timeSlot, timeIdx) => (
-            <p key={timeIdx}>
-              Time: {timeSlot.screentime}
-            </p>
-          ))
-        ) : (
-          <p>No showtimes available</p>
-        )}
-      </div>
-    ))
-  ) : (
-    <p>No showtimes available</p>
-  )}
-</div>
-
+              <div className={style.front}>
+                <div className={style.additionalInfo}>
+                  <strong className={style.showtimeTitle}>Showtimes:</strong>
+                  <div className={style.showtimes}>
+                    {movie.showTimes && movie.showTimes.length > 0 ? (
+                      movie.showTimes.map((show, idx) => (
+                        <div key={idx} className={style.showtimeEntry}>
+                          <p className={style.screeningDay}>
+                            {show.screeningDay}
+                          </p>
+                          <div className={style.timesList}>
+                            {show.times && show.times.length > 0 ? (
+                              show.times.map((timeSlot, timeIdx) => (
+                                <p key={timeIdx} className={style.screentime}>
+                                  {timeSlot.screentime}
+                                </p>
+                              ))
+                            ) : (
+                              <p className={style.noTimes}>
+                                No times available
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className={style.noShowtimes}>
+                        No showtimes available
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
 
               <div className={style.back}>
                 <div className={style.additionalInfo}>
                   <div className={style.productionCrew}>
-                    <p><strong>Director:</strong> {movie.director}</p>
-                    <p><strong>Producer:</strong> {movie.producer}</p>
-                    <p><strong>Cast:</strong> {movie.cast.join(", ")}</p>
+                    <p>
+                      <strong>Director:</strong> {movie.director}
+                    </p>
+                    <p>
+                      <strong>Producer:</strong> {movie.producer}
+                    </p>
+                    <p>
+                      <strong>Cast:</strong> {movie.cast.join(", ")}
+                    </p>
                   </div>
                   <div className={style.reviews}>
-                    <p><strong>Description:</strong> {movie.description}</p>
+                    <p>
+                      <strong>Description:</strong> {movie.description}
+                    </p>
                     <strong>Reviews:</strong>
                     {movie.reviews?.map((review, reviewIndex) => (
                       <p key={reviewIndex}>{review}</p>
