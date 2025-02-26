@@ -3,6 +3,7 @@ package com.SWE.CinemaEBookingSystem.controller;
 import com.SWE.CinemaEBookingSystem.entity.Movie;
 import com.SWE.CinemaEBookingSystem.repository.MovieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
@@ -26,8 +27,10 @@ public class MovieController {
 
     // Get a movie by ID
     @GetMapping("/{id}")
-    public Optional<Movie> getMovieById(@PathVariable Long id) {
-        return movieRepository.findById(id);
+    public ResponseEntity<Movie> getMovieById(@PathVariable Long id) {
+        return movieRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     // Add a new movie
