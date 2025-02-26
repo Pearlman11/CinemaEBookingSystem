@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.ArrayList;
 
@@ -23,7 +24,9 @@ public class Showdate {
     private Movie movie;
 
     @OneToMany(mappedBy = "date", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("date") // ✅ Prevents infinite recursion but allows showtimes
     private List<Showtime> times = new ArrayList<>();
+
 
     // Default constructor (Required by JPA)
     public Showdate() {}

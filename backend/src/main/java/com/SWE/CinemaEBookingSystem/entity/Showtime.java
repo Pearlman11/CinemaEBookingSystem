@@ -1,5 +1,8 @@
 package com.SWE.CinemaEBookingSystem.entity;
 import java.time.LocalTime;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -12,6 +15,7 @@ public class Showtime {
 
     @ManyToOne
     @JoinColumn(name = "showdate_id")
+    @JsonIgnore
     private Showdate date;
 
     
