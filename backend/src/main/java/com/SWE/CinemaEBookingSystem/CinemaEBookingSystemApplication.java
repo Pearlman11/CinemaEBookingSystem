@@ -19,7 +19,7 @@ import com.SWE.CinemaEBookingSystem.entity.Showdate;
 import com.SWE.CinemaEBookingSystem.entity.Showtime;
 import com.SWE.CinemaEBookingSystem.repository.MovieRepository;
 import com.SWE.CinemaEBookingSystem.repository.ShowdateRepository;
-import com.SWE.CinemaEBookingSystem.repository.ShowtimeRepository;
+import com.SWE.CinemaEBookingSystem.repository.ShowTimeRepository;
 
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -33,7 +33,7 @@ public class CinemaEBookingSystemApplication {
     }
 
 	@Bean
-CommandLineRunner initDatabase(MovieRepository movieRepository, ShowdateRepository showdateRepository, ShowtimeRepository showtimeRepository) {
+CommandLineRunner initDatabase(MovieRepository movieRepository, ShowdateRepository showdateRepository, ShowTimeRepository showtimeRepository) {
     return args -> {
         if (movieRepository.existsByTitle("The Monkey")) {
             System.out.println("Skipping insert: 'The Monkey' already exists.");
