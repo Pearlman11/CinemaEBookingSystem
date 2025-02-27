@@ -29,7 +29,7 @@ interface Movie {
   description: string;
   reviews?: string[];
   rating: string;
-  showTimes: Showdate[]; // Updated type for correct mapping
+  showTimes: Showdate[];
 }
 
 export default function MovieCard() {

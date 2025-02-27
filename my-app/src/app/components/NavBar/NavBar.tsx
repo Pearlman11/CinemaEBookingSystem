@@ -31,6 +31,7 @@ export default function NavBar() {
               </Link>
             </li>
           )}
+          
         </ul>
       </div>
 
