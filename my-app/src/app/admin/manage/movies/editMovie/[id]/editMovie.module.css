@@ -4,14 +4,6 @@
     padding: 20px;
   }
   
-  .title {
-    font-size: 2rem;
-    font-weight: 600;
-    color: #333333;
-    margin-bottom: 20px;
-    text-align: center;
-  }
-  
   .form {
     display: flex;
     flex-direction: column;
@@ -39,7 +31,7 @@
     border-radius: 4px;
     width: 100%;
     box-sizing: border-box;
-    background-color: #ffffff; /* Ensure dropdowns have a white background */
+    background-color: #ffffff;
   }
   
   .formGroup textarea {
@@ -56,7 +48,7 @@
   .addButton {
     padding: 6px 12px;
     font-size: 0.9rem;
-    background-color:var(--highlight-color, #007bff);
+    background-color: var(--highlight-color);
     color: #ffffff;
     border: none;
     border-radius: 4px;
@@ -66,7 +58,7 @@
   }
   
   .addButton:hover {
-    background-color:var(--hover-darken, #007bff);
+    background-color: var(--hover-darken);
   }
   
   .removeButton {
@@ -94,23 +86,10 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
   }
-  
   .submitButton:hover {
     background-color: var(--highlight-color);
   }
   
-  .error {
-    color: #dc3545;
-    font-size: 0.9rem;
-    text-align: center;
-  }
-  
-  .success {
-    color: #28a745;
-    font-size: 0.9rem;
-    text-align: center;
-  }
-
   .cancelButton {
     padding: 10px 20px;
     font-size: 1rem;
@@ -124,16 +103,24 @@
   }
   
   .cancelButton:hover {
-    background-color: black;
+    background-color: black; /* Darker gray on hover */
+  }
+  
+  .error {
+    color: #dc3545;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+  
+  .success {
+    color: #28a745;
+    font-size: 0.9rem;
+    text-align: center;
   }
   
   @media (max-width: 768px) {
     .container {
       padding: 10px;
-    }
-  
-    .title {
-      font-size: 1.5rem;
     }
   
     .formGroup input,
@@ -144,8 +131,8 @@
   
     .addButton,
     .removeButton,
-    .submitButton {
+    .submitButton,
+    .cancelButton {
       font-size: 0.8rem;
-      
     }
   }

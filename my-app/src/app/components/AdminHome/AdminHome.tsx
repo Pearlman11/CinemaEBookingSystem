@@ -7,7 +7,7 @@ const AdminHome: React.FC = () => {
   const router = useRouter(); 
 
   const handleAddMovieClick = () => {
-    router.push("/admin/manage/movies/addMovie"); // Navigate to addMovie page
+    router.push("/admin/manage/movies/addMovie"); 
   };
 
   return (

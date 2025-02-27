@@ -1,7 +1,7 @@
 // Main landing page for application "Homepage"
 
 import Home from "./home/page"
-import './/globals.css'
+import './globals.css'
 
 
 export default function Homepage() {

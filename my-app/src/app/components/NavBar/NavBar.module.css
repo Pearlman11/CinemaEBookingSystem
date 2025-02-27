@@ -6,21 +6,23 @@
   align-items: center;
   padding: 1rem;
   background-color: var(--dark-bg-color);
+  
+
 }
 
-/* Three columns for left, center, and right */
+
 .left,
 .center,
 .right {
   flex: 1;
 }
 
-/* Center the title text in the middle section */
+
 .center {
   text-align: center;
 }
 
-/* Left and right sections are aligned to the start and end respectively */
+
 .left {
   text-align: left;
 }
@@ -28,14 +30,14 @@
   text-align: right;
 }
 
-/* Styling for the title */
+
 .title {
   font-weight: bold;
   font-size: 1.5rem;
   color: var(--highlight-color);
 }
 
-/* Nav list styling */
+
 .navList {
   list-style: none;
   margin: 0;
@@ -44,7 +46,7 @@
   align-items: center;
 }
 
-/* Standard link styling with increased padding for a button-like appearance */
+
 .link {
   color: var(--text-color);
   padding: 10px 20px;
@@ -92,13 +94,13 @@
 }
 
 
-/* Center the navbar */
+
 .navbar {
   display: flex;
   justify-content: center;
 }
 
-/* Nav container with ample horizontal padding */
+
 .navContainer {
   width: 100%;
   max-width: 1200px;
@@ -109,7 +111,7 @@
 }
 
 
-/* Nav list with increased spacing */
+
 .navList {
   list-style: none;
   display: flex;
@@ -118,13 +120,13 @@
   padding: 0;
 }
 
-/* Nav items align center */
+
 .navItem {
   display: flex;
   align-items: center;
 }
 
-/* Nav links styled with accent hover effects */
+
 .navLink {
   color: #f1f1f1;
   text-decoration: none;
@@ -135,7 +137,7 @@
 }
 
 .navLink:hover {
-  color: #e94560; /* Accent color */
+  color: #e94560; 
   background-color: rgba(233, 69, 96, 0.15);
   text-decoration: none;
 }

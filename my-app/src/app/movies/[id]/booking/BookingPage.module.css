@@ -1,0 +1,161 @@
+.container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+.heading {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #222;
+}
+
+.movieInfo {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.poster {
+  width: 150px;
+  border-radius: 8px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.ticketSection,
+.seatSection {
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-left: 5px solid var(--highlight-color, #e94560);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.input,
+.select {
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-top: 5px;
+}
+
+.ticketTotal {
+  font-weight: bold;
+  margin-top: 10px;
+  color: #222;
+}
+
+.seatMap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.seatRow {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.seat {
+  width: 40px;
+  height: 40px;
+  background-color: #eee;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.seat:hover {
+  background-color: #ddd;
+}
+
+.selectedSeat {
+  background-color: var(--highlight-color, #e94560);
+  color: #fff;
+  border-color: var(--hover-darken, #d73750);
+}
+
+.selectedInfo {
+  margin-top: 10px;
+  font-size: 1rem;
+  color: #333;
+}
+
+.confirmButton {
+  padding: 12px 24px;
+  font-size: 1rem;
+  background-color: var(--highlight-color, #e94560);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  align-self: center;
+  transition: background-color 0.3s ease;
+}
+
+.confirmButton:hover {
+  background-color: var(--hover-darken, #d73750);
+}
+
+.loading,
+.error {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #555;
+}
+
+.inputGroup {
+  margin: 20px 0;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-left: 5px solid var(--highlight-color, #e94560);
+  border-radius: 8px;
+}
+
+.sectionHeading {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+  color: #222;
+}
+
+.selectGroup {
+  display: flex;
+  gap: 20px;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.input {
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-top: 5px;
+}
