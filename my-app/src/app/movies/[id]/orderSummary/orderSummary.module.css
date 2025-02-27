@@ -1,0 +1,89 @@
+.container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 8px;
+  }
+  
+  .heading {
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #222;
+  }
+  
+  .summaryTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  
+  .summaryTable th,
+  .summaryTable td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .input {
+    width: 60px;
+    padding: 5px;
+    font-size: 1rem;
+    text-align: center;
+  }
+  
+  .deleteButton {
+    padding: 5px 10px;
+    background-color: #e94560;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .deleteButton:hover {
+    background-color: #d73750;
+  }
+  
+  .total {
+    text-align: right;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+  
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+  }
+  
+  .updateButton,
+  .checkoutButton {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .updateButton {
+    background-color: #888;
+    color: #fff;
+  }
+  
+  .updateButton:hover {
+    background-color: #777;
+  }
+  
+  .checkoutButton {
+    background-color: var(--highlight-color, #e94560);
+    color: #fff;
+  }
+  
+  .checkoutButton:hover {
+    background-color: var(--hover-darken, #d73750);
+  }
