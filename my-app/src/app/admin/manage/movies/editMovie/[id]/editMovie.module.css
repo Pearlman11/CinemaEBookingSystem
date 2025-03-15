@@ -1,0 +1,138 @@
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .formGroup label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #555555;
+  }
+  
+  .formGroup input,
+  .formGroup textarea,
+  .formGroup select {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #ffffff;
+  }
+  
+  .formGroup textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+  
+  .inputWithRemove {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  .addButton {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    background-color: var(--highlight-color);
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    align-self: flex-start;
+  }
+  
+  .addButton:hover {
+    background-color: var(--hover-darken);
+  }
+  
+  .removeButton {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    background-color: #dc3545;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .removeButton:hover {
+    background-color: #b02a37;
+  }
+  
+  .submitButton {
+    padding: 12px;
+    font-size: 1rem;
+    background-color: var(--hover-darken);
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  .submitButton:hover {
+    background-color: var(--highlight-color);
+  }
+  
+  .cancelButton {
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #6c757d; /* Gray for cancel */
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-bottom: 20px;
+  }
+  
+  .cancelButton:hover {
+    background-color: black; /* Darker gray on hover */
+  }
+  
+  .error {
+    color: #dc3545;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+  
+  .success {
+    color: #28a745;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+  
+  @media (max-width: 768px) {
+    .container {
+      padding: 10px;
+    }
+  
+    .formGroup input,
+    .formGroup textarea,
+    .formGroup select {
+      font-size: 0.9rem;
+    }
+  
+    .addButton,
+    .removeButton,
+    .submitButton,
+    .cancelButton {
+      font-size: 0.8rem;
+    }
+  }

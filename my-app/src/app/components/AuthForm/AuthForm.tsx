@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import styles from "./AuthForm.module.css";
+import NavBar from "../NavBar/NavBar";
 
 export default function AuthForm() {
-  // Track if we're in "Login (true)" mode or "Sign Up (false)" mode
+
   const [isLogin, setIsLogin] = useState(true);
   const [isAdminLogin, setIsAdminLogin] = useState(false);
 
@@ -13,7 +14,7 @@ export default function AuthForm() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  // Optional information toggles (only for sign-up mode)
+
   const [showOptionalShipping, setShowOptionalShipping] = useState(false);
   const [showOptionalPayment, setShowOptionalPayment] = useState(false);
 
@@ -36,7 +37,7 @@ export default function AuthForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // For sign-up mode, ensure the passwords match
+
     if (!isLogin && password !== confirmPassword) {
       alert("Passwords do not match");
       return;
@@ -56,6 +57,8 @@ export default function AuthForm() {
   };
 
   return (
+    <div>
+      <NavBar></NavBar>
     <div className={styles.formContainer}>
       <h2>{isAdminLogin ? "Admin Login" : isLogin ? "Login" : "Sign Up"}</h2>
       <form onSubmit={handleSubmit} className={styles.form}>
@@ -207,6 +210,7 @@ export default function AuthForm() {
           {isAdminLogin ? "User Login" : "Admin Login"}
         </button>
       </p>
+    </div>
     </div>
   );
 }

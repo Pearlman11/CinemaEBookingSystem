@@ -8,12 +8,12 @@ import { useAuth } from "@/app/context/AuthContext";
 
 interface Showtime {
   id: number;
-  screentime: string; // LocalTime serialized as string from backend
+  screentime: string; 
 }
 
 interface Showdate {
   id: number;
-  screeningDay: string; // LocalDate serialized as string from backend
+  screeningDay: string;
   times: Showtime[];
 }
 
@@ -29,7 +29,7 @@ interface Movie {
   description: string;
   reviews?: string[];
   rating: string;
-  showTimes: Showdate[]; // Updated type for correct mapping
+  showTimes: Showdate[];
 }
 
 export default function MovieCard() {
