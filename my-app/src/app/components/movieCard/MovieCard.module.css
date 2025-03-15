@@ -163,6 +163,62 @@
   background-color: var(--highlight-color, #007bff);
 }
 
+
+
+
+
+.showtimeTitle {
+  font-size: calc(0.9rem + 0.3vw);
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333333;
+}
+
+.showtimes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; 
+}
+
+.showtimeEntry {
+  background-color: #f9f9f9; 
+  padding: 8px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.screeningDay {
+  font-size: calc(0.8rem + 0.2vw);
+  font-weight: 500;
+  margin: 0 0 4px 0;
+  color: #555555;
+}
+
+.timesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px; 
+}
+
+.screentime {
+  font-size: calc(0.7rem + 0.2vw);
+  margin: 0;
+  padding: 4px 8px;
+  background-color: #e0e0e0; 
+  border-radius: 4px;
+  color: #333333;
+}
+
+.noTimes,
+.noShowtimes {
+  font-size: calc(0.7rem + 0.2vw);
+  color: #777777;
+  font-style: italic;
+  margin: 0;
+}
+
+
+
 @media (max-width: 768px) {
   .movie {
     grid-template-columns: 1fr;
@@ -191,4 +247,6 @@
     object-fit: contain;
     transition: transform 0.3s ease;
   }
+
+ 
 }
