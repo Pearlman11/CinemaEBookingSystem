@@ -4,6 +4,7 @@ import { useState, useEffect, FormEvent } from "react";
 import { useRouter, useParams } from "next/navigation";
 import styles from "./BookingPage.module.css";
 import NavBar from "@/app/components/NavBar/NavBar";
+import { ToastContainer, toast } from 'react-toastify';
 
 interface Showtime {
   screentime: string;
@@ -48,6 +49,7 @@ const CombinedBookingPage = () => {
   const cols = Array.from({ length: 8 }, (_, i) => i + 1);
 
 
+
   useEffect(() => {
     fetch(`http://localhost:8080/api/movies/${id}`)
       .then((res) => {
@@ -89,7 +91,7 @@ const CombinedBookingPage = () => {
       if (selectedSeats.length < totalTickets) {
         setSelectedSeats([...selectedSeats, seat]);
       } else {
-        alert("You have already selected all required seats.");
+      toast.error("You have already selected all required seats.", { className: styles['custom-toast'] });
       }
     }
   };
@@ -98,7 +100,7 @@ const CombinedBookingPage = () => {
   const handleTicketSelectionConfirm = (e: FormEvent) => {
     e.preventDefault();
     if (totalTickets === 0) {
-      alert("Please select at least one ticket.");
+      toast.error("Please select at least one ticket.",{ className: styles['custom-toast'] });
       return;
     }
     setShowSeatSelection(true);
@@ -107,11 +109,7 @@ const CombinedBookingPage = () => {
   const handleSeatSelectionConfirm = (e: FormEvent) => {
     e.preventDefault();
     if (selectedSeats.length !== totalTickets) {
-      alert(
-        `Please select exactly ${totalTickets} seat${
-          totalTickets !== 1 ? "s" : ""
-        }.`
-      );
+      toast.error(`Please select exactly ${totalTickets} seat${totalTickets !== 1 ? "s" : ""}.`,{ className: styles['custom-toast'] });
       return;
     }
 
@@ -127,9 +125,12 @@ const CombinedBookingPage = () => {
   if (loading) return <div className={styles.loading}>Loading...</div>;
   if (error) return <div className={styles.error}>{error}</div>;
 
+
+
   return (
     <div>
       <NavBar></NavBar>
+      <ToastContainer aria-label={undefined}  progressClassName={styles.customProgress} hideProgressBar = {true} autoClose = {4000} className={styles.toastContainer} limit={2} />
 
       <div className={styles.container}>
         <h1 className={styles.heading}>Book Tickets for {movie?.title}</h1>
@@ -223,6 +224,7 @@ const CombinedBookingPage = () => {
             <button type="submit" className={styles.confirmButton}>
               Confirm Ticket Selection
             </button>
+
           </form>
         )}
 

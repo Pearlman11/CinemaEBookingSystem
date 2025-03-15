@@ -160,6 +160,9 @@
 .topBar {
   text-align: center;
   margin-bottom: 20px;
+
+
+
 }
 
 .bookTicketButton {
@@ -175,6 +178,29 @@
 
 .bookTicketButton:hover {
   background-color: var(--hover-darken, #d73750);
+}
+
+.cancelButtonContainer {
+  align-items: center;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+
+}
+
+.cancelButton{
+  margin-top: 10px;
+  display: inline-block;
+  background-color: var(--hover-darken, #e94560);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 1.2rem;
+  transition: background-color 0.3s ease;
+}
+.cancelButton:hover {
+  background-color: var(--highlight-color, #d73750);
 }
 
 .title {

@@ -8,7 +8,7 @@ import Link from "next/link";
 
 interface Showtime {
   id: number;
-  screentime: string; 
+  screentime: string;
 }
 
 interface Showdate {
@@ -70,11 +70,14 @@ const MovieDetailPage = () => {
     <div>
       <NavBar></NavBar>
       <div className={styles.container}>
-         <div className={styles.topBar}>
-        <Link href={`/movies/${movie.id}/booking`} className={styles.bookTicketButton}>
-          Book Tickets
-        </Link>
-      </div>
+        <div className={styles.topBar}>
+          <Link
+            href={`/movies/${movie.id}/booking`}
+            className={styles.bookTicketButton}
+          >
+            Book Tickets
+          </Link>
+        </div>
         <h1 className={styles.title}>{movie.title}</h1>
         <p className={styles.description}>{movie.description}</p>
 
@@ -141,8 +144,12 @@ const MovieDetailPage = () => {
           ) : (
             <p className={styles.noTimes}>No showtimes available</p>
           )}
-          
         </div>
+      </div>
+      <div className={styles.cancelButtonContainer}>
+        <Link href={"/"} className={styles.cancelButton}>
+          Cancel Order
+        </Link>
       </div>
     </div>
   );

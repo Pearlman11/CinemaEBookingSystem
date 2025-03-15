@@ -41,6 +41,7 @@ CommandLineRunner initDatabase(MovieRepository movieRepository, ShowdateReposito
         }
 
         List<Movie> movies = List.of(
+               /* 
                 new Movie(
                         "Love Hurts",
                         "Now Playing",
@@ -57,6 +58,7 @@ CommandLineRunner initDatabase(MovieRepository movieRepository, ShowdateReposito
                         MovieRating.R,
                         new ArrayList<>()
                 ),
+                */
                 new Movie(
                         "Flight Risk",
                         "Now Playing",

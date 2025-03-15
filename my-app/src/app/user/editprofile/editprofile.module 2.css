@@ -1,0 +1,106 @@
+.editProfileContainer {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: Arial, sans-serif;
+  }
+  
+  .editProfileContainer h1 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .section {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 1rem;
+  }
+  
+  .section:last-child {
+    border-bottom: none;
+  }
+  
+  /* Accordion header styles */
+  .sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f2f2f2;
+    padding: 0.75rem 1rem;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    font-size: 1.25rem;
+    color: #333;
+  }
+  
+  /* Icon for toggle state */
+  .toggleIcon {
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+  
+  /* Section content styles */
+  .sectionContent {
+    padding: 1rem 0;
+  }
+  
+  .field {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+  }
+  
+  .input {
+    padding: 0.5rem;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 0.5rem;
+  }
+  
+  .field small {
+    color: #888;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+  }
+  
+  .saveButton {
+    padding: 0.75rem;
+    font-size: 1rem;
+    cursor: pointer;
+    background-color: var(--highlight-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    align-self: center;
+  }
+  
+  .saveButton:hover {
+    background-color: var(--hover-darken);
+  }
+  
+  .cancelButton {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    font-size: 1rem;
+    background-color: #eee;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .cancelButton:hover {
+    background-color: #ddd;
+  }

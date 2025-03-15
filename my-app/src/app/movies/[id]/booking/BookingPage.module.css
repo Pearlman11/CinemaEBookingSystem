@@ -159,3 +159,25 @@
   border-radius: 4px;
   margin-top: 5px;
 }
+
+.custom-toast {
+  background: #fff;
+  border: 2px solid var(--hover-darken, #e94560);
+  color: #222;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-family: Arial, sans-serif;
+}
+
+.customProgress {
+  background: var(--highlight-color, #e94560);
+  height: 6px;
+  border-radius: 2px;
+  opacity: 100;
+}
+
+.toastContainer {
+  font-size: 18px;
+
+}
