@@ -1,0 +1,77 @@
+.container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+  }
+  
+  .heading {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    color: #222;
+  }
+  
+  .instruction {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    color: #555;
+  }
+  
+  .seatMap {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .seatRow {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+  }
+  
+  .seat {
+    width: 40px;
+    height: 40px;
+    background-color: #eee;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 0.9rem;
+  }
+  
+  .seat:hover {
+    background-color: #ddd;
+  }
+  
+  .selectedSeat {
+    background-color: var(--highlight-color, #e94560);
+    color: #fff;
+    border-color: var(--hover-darken, #d73750);
+  }
+  
+  .selectedInfo {
+    font-size: 1rem;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .confirmButton {
+    padding: 12px 24px;
+    font-size: 1rem;
+    background-color: var(--highlight-color, #e94560);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .confirmButton:hover {
+    background-color: var(--hover-darken, #d73750);
+  }

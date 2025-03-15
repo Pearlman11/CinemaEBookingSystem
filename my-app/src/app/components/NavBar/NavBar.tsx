@@ -5,26 +5,18 @@ import { useAuth } from '@/app/context/AuthContext';
 import styles from './NavBar.module.css';
 
 export default function NavBar() {
-  const { isLoggedIn, isAdmin, logout } = useAuth();
+  const { isLoggedIn, logout } = useAuth();
 
   return (
     <nav className={styles.nav}>
       <div className={styles.left}>
         <ul className={styles.navList}>
           <li className={styles.navItem}>
-            
-            {isAdmin && (
-              <Link className={styles.link} href="/admin/manage/movies">
-                Admin Home
-              </Link>
-            )} 
-            {!isAdmin && (
-              <Link className={styles.link} href="/">
+            <Link className={styles.link} href="/">
               Home
             </Link>
-            )}
           </li>
-          {isLoggedIn && !isAdmin &&(
+          {isLoggedIn && (
             <li className={styles.navItem}>
               <Link className={styles.link} href="/user/profile">
                 View Profile
@@ -46,7 +38,7 @@ export default function NavBar() {
                 Log Out
               </button>
             ) : (
-              <Link className={styles.link} href="/signin">
+              <Link className={styles.link} href="../signin">
                 Log In
               </Link>
             )}

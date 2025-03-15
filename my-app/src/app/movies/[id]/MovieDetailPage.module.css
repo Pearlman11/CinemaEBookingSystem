@@ -1,0 +1,235 @@
+.container {
+  max-width: 90vw;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background-color: #fefefe;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.title {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  color: #222;
+  text-align: center;
+}
+
+.description {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  margin-left: 2px;
+  font-weight: bold;
+  color: #555;
+  text-align: center;
+}
+
+
+
+.trailer {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-height: 150px;
+  max-width: 80vw;
+  margin: auto auto;
+
+}
+
+.noTrailer {
+  color: #999;
+  font-style: italic;
+  text-align: center;
+}
+
+
+.showtimes {
+  margin-bottom: 20px;
+}
+
+.showtimes h2 {
+  margin-bottom: 10px;
+  color: #222;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 5px;
+}
+
+/* Showdate Card Styling */
+.showdate {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-left: 5px solid var(--hover-darken);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.showdate p:first-child {
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+/* TimeSlot Badge Styling */
+.timeSlot {
+  display: inline-block;
+  margin: 0 10px 10px 0;
+  padding: 5px 10px;
+  background-color: var(--highlight-color);
+  color: #fff;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+}
+
+.timeSlot:hover {
+  background-color: var(--hover-darken);
+}
+
+.noTimes {
+  color: #999;
+  font-style: italic;
+  padding-left: 10px;
+}
+
+/* Cast Section Card Styling */
+.cast {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-left: 5px solid var(--hover-darken);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cast h2 {
+  margin-bottom: 10px;
+  color: #222;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 5px;
+}
+
+/* Reviews Section Card Styling */
+.reviews {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-left: 5px solid var(--hover-darken);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.reviews h2 {
+  margin-bottom: 10px;
+  color: #222;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 5px;
+}
+
+.reviewList {
+  list-style: none;
+  padding: 0;
+}
+
+.reviewItem {
+  background-color: #f8f8f8;
+  padding: 10px;
+  margin-bottom: 5px;
+  border-radius: 4px;
+  border: 1px solid #eee;
+}
+
+.error {
+  color: red;
+  text-align: center;
+}
+
+.loading {
+  text-align: center;
+  font-style: italic;
+}
+
+.container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.topBar {
+  text-align: center;
+  margin-bottom: 20px;
+
+
+
+}
+
+.bookTicketButton {
+  display: inline-block;
+  background-color: var(--highlight-color, #e94560);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 1.2rem;
+  transition: background-color 0.3s ease;
+}
+
+.bookTicketButton:hover {
+  background-color: var(--hover-darken, #d73750);
+}
+
+.cancelButtonContainer {
+  align-items: center;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+
+}
+
+.cancelButton{
+  margin-top: 10px;
+  display: inline-block;
+  background-color: var(--hover-darken, #e94560);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 1.2rem;
+  transition: background-color 0.3s ease;
+}
+.cancelButton:hover {
+  background-color: var(--highlight-color, #d73750);
+}
+
+.title {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  color: #222;
+  text-align: center;
+}
+
+.description {
+  font-size: 1.1rem;
+  color: #555;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.poster {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.error {
+  color: red;
+  text-align: center;
+}
+
+.loading {
+  text-align: center;
+  font-style: italic;
+}
