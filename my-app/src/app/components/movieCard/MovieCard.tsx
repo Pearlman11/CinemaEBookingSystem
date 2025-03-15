@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import style from "./MovieCard.module.css";
-import { useAuth } from "@/app/context/AuthContext";
+//import { useAuth } from "@/app/context/AuthContext";
+import { useMovies } from "@/app/context/MovieContext";
+
 
 interface Showtime {
   id: number;
@@ -31,33 +33,18 @@ interface Movie {
   rating: string;
   showTimes: Showdate[];
 }
+interface MovieCardProps {
+  movies?: Movie[];
+}
 
-export default function MovieCard() {
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { isAdmin } = useAuth();
+export default function MovieCard({ movies: propsMovies }: MovieCardProps) {
+//  const { isAdmin } = useAuth();
   const router = useRouter();
   const [flipped, setFlipped] = useState<number[]>([]);
+  const { movies: contextMovies } = useMovies();
 
-  useEffect(() => {
-    fetch("http://localhost:8080/api/movies")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data: Movie[]) => {
-        setMovies(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching movies:", error);
-        setError("Failed to load movies.");
-        setLoading(false);
-      });
-  }, []);
+  // Use the movies passed as a prop if available; otherwise, use the context movies.
+  const movies = propsMovies || contextMovies;
 
   const handleTitleClick = (movieId: number) => {
     router.push(`/movies/${movieId}`);
@@ -68,9 +55,6 @@ export default function MovieCard() {
       prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
     );
   };
-
-  if (loading) return <p>Loading movies...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
     <div className={style.container}>
