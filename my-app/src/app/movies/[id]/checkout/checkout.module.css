@@ -1,0 +1,141 @@
+
+
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    font-family: Arial, sans-serif;
+  }
+  
+  .heading {
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #222;
+  }
+  
+
+  .modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .modalContent {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    text-align: center;
+  }
+  
+  .checkmark {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+  
+  
+  .movieInfo {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .poster {
+    width: 150px;
+    height: auto;
+    margin-right: 20px;
+    border-radius: 8px;
+  }
+  
+  .details h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #222;
+  }
+  
+  .details p {
+    margin: 5px 0;
+    color: #555;
+  }
+  
+  .orderSummary {
+    margin-bottom: 30px;
+  }
+  
+  .summaryTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+  }
+  
+  .summaryTable th,
+  .summaryTable td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .summaryTable th {
+    background-color: #f4f4f4;
+  }
+  
+  .seatsInfo {
+    margin-top: 10px;
+    font-size: 1rem;
+    color: #333;
+  }
+  
+  .paymentForm {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .formGroup {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .input {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .submitButton {
+    padding: 12px;
+    font-size: 1rem;
+    background-color: var(--highlight-color, #e94560);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .submitButton:hover {
+    background-color: var(--hover-darken, #d73750);
+  }
+  
+  .loading {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #555;
+  }
+  
+  .error {
+    text-align: center;
+    font-size: 1.2rem;
+    color: red;
+  }
