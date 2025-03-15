@@ -1,5 +1,2 @@
 target/
-backend/target/
-backend/target/
-backend/target/ # Ensure target is ignored
-backend/target/
+target/
