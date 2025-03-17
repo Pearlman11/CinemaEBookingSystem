@@ -65,13 +65,13 @@ export default function AuthForm() {
       if (isLogin) {
         if (isAdminLogin) {
           setAdmin(true);
-          adminLogin(userData); // Pass user data
+          adminLogin(userData); 
         } else {
-          login(userData); // Pass user data
+          login(userData); 
         }
       } else {
         // Handle sign-up success
-        login(userData); // Pass user data after signup
+        login(userData); 
       }
     } catch (error) {
       alert(error instanceof Error ? error.message : 'Authentication failed');
