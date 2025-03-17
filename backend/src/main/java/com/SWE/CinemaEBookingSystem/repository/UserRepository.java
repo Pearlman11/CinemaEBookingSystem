@@ -1,6 +1,7 @@
 package com.SWE.CinemaEBookingSystem.repository;
 
 import com.SWE.CinemaEBookingSystem.entity.User;
+
 import com.SWE.CinemaEBookingSystem.entity.UserRole;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,3 +23,4 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
 
 }
+
