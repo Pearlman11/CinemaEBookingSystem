@@ -2,13 +2,17 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import styles from "./editProfile.module.css";
+import NavBar from '@/app/components/NavBar/NavBar';
 
 const EditProfile = () => {
   const [isPersonalOpen, setIsPersonalOpen] = useState(true);
   const [isPaymentOpen, setIsPaymentOpen] = useState(true);
   const [isHomeOpen, setIsHomeOpen] = useState(true);
+  const [isPasswordOpen, setIsPasswordOpen] = useState(true);
 
   return (
+    <div>
+      <NavBar></NavBar>
     <div className={styles.editProfileContainer}>
       <h1>Edit Profile</h1>
       <form className={styles.form}>
@@ -18,6 +22,7 @@ const EditProfile = () => {
             type="button"
             className={styles.sectionHeader}
             onClick={() => setIsPersonalOpen(!isPersonalOpen)}
+            aria-expanded={isPersonalOpen}
           >
             <span>Personal Information</span>
             <span className={styles.toggleIcon}>{isPersonalOpen ? "−" : "+"}</span>
@@ -63,6 +68,7 @@ const EditProfile = () => {
             type="button"
             className={styles.sectionHeader}
             onClick={() => setIsPaymentOpen(!isPaymentOpen)}
+            aria-expanded={isPaymentOpen}
           >
             <span>Payment Information</span>
             <span className={styles.toggleIcon}>{isPaymentOpen ? "−" : "+"}</span>
@@ -115,6 +121,7 @@ const EditProfile = () => {
             type="button"
             className={styles.sectionHeader}
             onClick={() => setIsHomeOpen(!isHomeOpen)}
+            aria-expanded={isHomeOpen}
           >
             <span>Home Address</span>
             <span className={styles.toggleIcon}>{isHomeOpen ? "−" : "+"}</span>
@@ -161,36 +168,48 @@ const EditProfile = () => {
           )}
         </div>
 
-        {/* Change Password (remains always visible) */}
+        {/* Change Password Section */}
         <div className={styles.section}>
-          <h2>Change Password</h2>
-          <div className={styles.field}>
-            <label htmlFor="currentPassword">Current Password</label>
-            <input
-              type="password"
-              id="currentPassword"
-              placeholder="Enter current password"
-              className={styles.input}
-            />
-          </div>
-          <div className={styles.field}>
-            <label htmlFor="newPassword">New Password</label>
-            <input
-              type="password"
-              id="newPassword"
-              placeholder="Enter new password"
-              className={styles.input}
-            />
-          </div>
-          <div className={styles.field}>
-            <label htmlFor="confirmPassword">Confirm New Password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              placeholder="Confirm new password"
-              className={styles.input}
-            />
-          </div>
+          <button
+            type="button"
+            className={styles.sectionHeader}
+            onClick={() => setIsPasswordOpen(!isPasswordOpen)}
+            aria-expanded={isPasswordOpen}
+          >
+            <span>Change Password</span>
+            <span className={styles.toggleIcon}>{isPasswordOpen ? "−" : "+"}</span>
+          </button>
+          {isPasswordOpen && (
+            <div className={styles.sectionContent}>
+              <div className={styles.field}>
+                <label htmlFor="currentPassword">Current Password</label>
+                <input
+                  type="password"
+                  id="currentPassword"
+                  placeholder="Enter current password"
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.field}>
+                <label htmlFor="newPassword">New Password</label>
+                <input
+                  type="password"
+                  id="newPassword"
+                  placeholder="Enter new password"
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.field}>
+                <label htmlFor="confirmPassword">Confirm New Password</label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  placeholder="Confirm new password"
+                  className={styles.input}
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         <button type="submit" className={styles.saveButton}>
@@ -202,6 +221,7 @@ const EditProfile = () => {
           Cancel
         </button>
       </Link>
+    </div>
     </div>
   );
 };
