@@ -21,10 +21,12 @@ import com.SWE.CinemaEBookingSystem.repository.ShowTimeRepository;
 
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @EntityScan("com.SWE.CinemaEBookingSystem.entity")  // Ensure Hibernate scans entities
 @EnableJpaRepositories("com.SWE.CinemaEBookingSystem.repository") // Ensure JPA repositories are enabled
+@ComponentScan(basePackages = "com.SWE.CinemaEBookingSystem")
 public class CinemaEBookingSystemApplication {
     public static void main(String[] args) {
         SpringApplication.run(CinemaEBookingSystemApplication.class, args);
