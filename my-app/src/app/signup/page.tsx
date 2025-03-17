@@ -16,6 +16,10 @@ export default function SignupPage() {
     confirmPassword: "",
     phone: "",
     dob: "",
+    shippingAddress: "",
+    cardNumber: "",
+    cardExpiry: "",
+    cardCVC: ""
   });
   
   const [showOptionalShipping, setShowOptionalShipping] = useState(false);
@@ -45,7 +49,7 @@ export default function SignupPage() {
     setIsLoading(true);
 
     try {
-      // API call to your backend
+      // API call to backend
       const response = await fetch("http://localhost:8080/api/auth/register", {
         method: "POST",
         headers: {
@@ -58,7 +62,7 @@ export default function SignupPage() {
           password: formData.password,
           phone: formData.phone || null,
           dob: formData.dob || null,
-          role: "USER"
+          role: "USER",
         }),
       });
 
@@ -169,8 +173,8 @@ export default function SignupPage() {
                   id="shippingAddress"
                   label="Shipping Address"
                   type="text"
-                  value=""
-                  onChange={() => {}}
+                  value={formData.shippingAddress}
+                  onChange={handleChange}
                   placeholder="Enter your shipping address"
                 />
               </div>
@@ -193,8 +197,8 @@ export default function SignupPage() {
                   id="cardNumber"
                   label="Card Number"
                   type="text"
-                  value=""
-                  onChange={() => {}}
+                  value={formData.cardNumber}
+                  onChange={handleChange}
                   placeholder="Enter your card number"
                 />
                 
@@ -203,8 +207,8 @@ export default function SignupPage() {
                     id="cardExpiry"
                     label="Expiry Date"
                     type="text"
-                    value=""
-                    onChange={() => {}}
+                    value={formData.cardExpiry}
+                    onChange={handleChange}
                     placeholder="MM/YY"
                   />
                   
@@ -212,8 +216,8 @@ export default function SignupPage() {
                     id="cardCVC"
                     label="CVC"
                     type="text"
-                    value=""
-                    onChange={() => {}}
+                    value={formData.cardCVC}
+                    onChange={handleChange}
                     placeholder="Enter CVC"
                   />
                 </div>

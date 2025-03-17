@@ -3,6 +3,7 @@ import { useState, useMemo } from "react";
 import { useMovies } from "@/app/context/MovieContext";
 import NavBar from "../components/NavBar/NavBar";
 import MovieCard from "../components/movieCard/MovieCard";
+import FeaturedSlider from "../components/FeaturedSlider/FeaturedSlider";
 import styles from "./home.module.css";
 
 export default function Home() {
@@ -13,6 +14,7 @@ export default function Home() {
   const [dateFilter, setDateFilter] = useState("");
   const [timeFilter, setTimeFilter] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const [currentView, setCurrentView] = useState("now-playing");
 
   // Get unique values for filter dropdowns
   const categories = useMemo(() => {
@@ -25,25 +27,26 @@ export default function Home() {
     return Array.from(uniqueRatings).filter(Boolean).sort();
   }, [movies]);
 
+  // Group movies by category
+  const nowPlayingMovies = useMemo(() => 
+    movies.filter(movie => movie.category === "Now Playing"), [movies]);
+  
+  const comingSoonMovies = useMemo(() => 
+    movies.filter(movie => movie.category === "Coming Soon"), [movies]);
   
 
+  // Get popular movies (could be based on a rating or view count in your actual data)
+  const popularMovies = useMemo(() => 
+    [...movies].sort(() => 0.5 - Math.random()).slice(0, 4), [movies]);
 
   const filteredMovies = useMemo(() => {
     return movies.filter((movie) => {
-      // Title search filter
+      // Apply all existing filters
       const matchesSearch = movie.title.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      // Rating filter
       const matchesRating = !ratingFilter || movie.rating === ratingFilter;
-      
-      // Category filter
       const matchesCategory = !categoryFilter || movie.category === categoryFilter;
-      
-      // Date filter
       const matchesDate = !dateFilter || (movie.showTimes && 
         movie.showTimes.some(showdate => showdate.screeningDay === dateFilter));
-      
-      // Time filter
       const matchesTime = !timeFilter || (movie.showTimes && 
         movie.showTimes.some(showdate => 
           showdate.times && showdate.times.some(time => time.screentime === timeFilter)
@@ -61,9 +64,51 @@ export default function Home() {
     setTimeFilter("");
   };
 
+  // Determine which movies to show based on current view
+  const displayMovies = useMemo(() => {
+    if (searchQuery || ratingFilter || categoryFilter || dateFilter || timeFilter) {
+      return filteredMovies; 
+    }
+    
+    switch(currentView) {
+      case "now-playing": return nowPlayingMovies;
+      case "coming-soon": return comingSoonMovies;
+      case "all": return movies;
+      default: return nowPlayingMovies;
+    }
+  }, [currentView, filteredMovies, movies, nowPlayingMovies, comingSoonMovies, 
+      searchQuery, ratingFilter, categoryFilter, dateFilter, timeFilter]);
+
   return (
     <div>
       <NavBar />
+      
+      {/* Featured Slider */}
+      <FeaturedSlider movies={popularMovies.length ? popularMovies : movies.slice(0, 4)} />
+      
+      {/* Category Selection */}
+      <div className={styles.categoryTabs}>
+        <button 
+          className={`${styles.categoryTab} ${currentView === 'now-playing' ? styles.active : ''}`}
+          onClick={() => setCurrentView('now-playing')}
+        >
+          Now Playing
+        </button>
+        <button 
+          className={`${styles.categoryTab} ${currentView === 'coming-soon' ? styles.active : ''}`}
+          onClick={() => setCurrentView('coming-soon')}
+        >
+          Coming Soon
+        </button>
+        <button 
+          className={`${styles.categoryTab} ${currentView === 'all' ? styles.active : ''}`}
+          onClick={() => setCurrentView('all')}
+        >
+          All Movies
+        </button>
+      </div>
+      
+      {/* Search and Filters */}
       <div className={styles.searchContainer}>
         <form className={styles.searchForm} onSubmit={(e) => e.preventDefault()}>
           <div className={styles.inputGroup}>
@@ -137,14 +182,12 @@ export default function Home() {
                   className={styles.filterSelect}
                 >
                   <option value="">All Categories</option>
-                  <option value="Now Playing">Now Playing</option>
-                  <option value="Coming Soon">Coming Soon</option>
                   {categories.map(category => (
-                    category !== "Now Playing" && category !== "Coming Soon" && 
                     <option key={category} value={category}>{category}</option>
                   ))}
                 </select>
               </div>
+              
               <button 
                 className={styles.resetButton} 
                 type="button" 
@@ -161,14 +204,18 @@ export default function Home() {
         </form>
       </div>
       
+      {/* Results info */}
       <div className={styles.resultsInfo}>
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
         </svg>
-        <p>Showing {filteredMovies.length} {filteredMovies.length === 1 ? 'movie' : 'movies'}</p>
+        <p>Showing {displayMovies.length} {displayMovies.length === 1 ? 'movie' : 'movies'}</p>
       </div>
       
-      <MovieCard movies={filteredMovies} />
+      {/* Movie display */}
+      <MovieCard movies={displayMovies} />
+      
+      
     </div>
   );
 }

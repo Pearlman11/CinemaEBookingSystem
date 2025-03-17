@@ -20,7 +20,7 @@ export default function FeaturedSlider({ movies }: FeaturedSliderProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const router = useRouter();
 
-  // Auto-rotation of slides
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % movies.length);
@@ -29,12 +29,12 @@ export default function FeaturedSlider({ movies }: FeaturedSliderProps) {
     return () => clearInterval(timer);
   }, [movies.length]);
 
-  // Navigate to movie details
+
   const handleMovieClick = (movieId: number) => {
     router.push(`/movies/${movieId}`);
   };
   
-  // Previous and next slide controls
+
   const goToPrevSlide = () => {
     setCurrentSlide((prev) => (prev === 0 ? movies.length - 1 : prev - 1));
   };

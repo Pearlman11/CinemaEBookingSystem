@@ -67,7 +67,7 @@
 }
 
 .formButton:hover {
-  background-color: #0055b3;
+  background-color: var(--hover-darken);
   transform: translateY(-2px);
 }
 
@@ -91,7 +91,7 @@
 }
 
 .authLink:hover {
-  color: #004d99;
+  color: var(--hover-darken);
   text-decoration: underline;
 }
 

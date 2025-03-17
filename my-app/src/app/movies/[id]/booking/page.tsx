@@ -35,7 +35,9 @@ const CombinedBookingPage = () => {
   const [childTickets, setChildTickets] = useState<number>(0);
   const [seniorTickets, setSeniorTickets] = useState<number>(0);
   
+
   const handleTicketChange = (setter: React.Dispatch<React.SetStateAction<number>>, value: string) => {
+    // If the input is empty, allow it  in the UI but treat as 0 for calculations
     if (value === '') {
       setter(0);
       return;
