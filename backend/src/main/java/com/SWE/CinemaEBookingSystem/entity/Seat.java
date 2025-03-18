@@ -1,6 +1,5 @@
 package com.SWE.CinemaEBookingSystem.entity;
 
+public class Seat {
 
-public class Order_Item {
-    
 }

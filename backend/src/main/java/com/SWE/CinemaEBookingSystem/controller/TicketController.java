@@ -51,11 +51,12 @@ public class TicketController {
             ticket.setMovie(ticketDetails.getMovie());
             ticket.setUser(ticketDetails.getUser());
             ticket.setShowtime(ticketDetails.getShowtime());
-            ticket.setSeatNumber(ticketDetails.getSeatNumber());
+            ticket.setSeat(ticketDetails.getSeat());
             ticket.setPrice(ticketDetails.getPrice());
 
             Ticket updatedTicket = ticketRepository.save(ticket);
             return ResponseEntity.ok(updatedTicket);
+            
         } else {
             return ResponseEntity.notFound().build();
         }
