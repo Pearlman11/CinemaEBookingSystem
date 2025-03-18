@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 
 //  User interface to match backend entity
 export interface User {
+  password: string;
   id: number;
   firstName: string;
   lastName: string;
@@ -17,6 +18,7 @@ export interface User {
 
 type AuthContextType = {
     isLoggedIn: boolean;
+    isAuthenticated: boolean;
     isAdmin: boolean;
     user: User | null;
     login: (userData: User) => void; 
@@ -93,7 +95,16 @@ export function AuthProvider({children}: {children:ReactNode}) {
     };
   
     return (
-        <AuthContext.Provider value = {{isLoggedIn, isAdmin, user, login, logout, adminLogin, setAdmin}}>
+        <AuthContext.Provider value = {{
+            isLoggedIn, 
+            isAuthenticated: isLoggedIn,
+            isAdmin, 
+            user, 
+            login, 
+            logout, 
+            adminLogin, 
+            setAdmin
+        }}>
             {children}
         </AuthContext.Provider>
     );

@@ -50,8 +50,8 @@ export default function SignupPage() {
 
     try {
       // API call to backend
-      const response = await fetch("http://localhost:8080/api/auth/register", {
-        method: "POST",
+      const response = await fetch("http://localhost:8080/api/users/register", {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
