@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,12 +27,12 @@ public class BookingsController {
         return bookingRepository.findAll();
     }
 
-    // Get an booking by ID
+    // Get a booking by ID
     @GetMapping("/{id}")
     public ResponseEntity<Booking> getBookingById(@PathVariable Long id) {
         Optional<Booking> booking = bookingRepository.findById(id);
         return booking.map(ResponseEntity::ok)
-                    .orElseGet(() -> ResponseEntity.notFound().build());
+                      .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // Add a new booking
@@ -49,8 +50,11 @@ public class BookingsController {
         if (optionalBooking.isPresent()) {
             Booking booking = optionalBooking.get();
             booking.setUser(bookingDetails.getUser());
-            booking.setBookingDate(bookingDetails.getBookingDate());
-            booking.setTotalAmount(bookingDetails.getTotalAmount());
+            booking.setPaymentCard(bookingDetails.getPaymentCard());
+            booking.setPromotionCode(bookingDetails.getPromotionCode());
+            booking.setBookingStatus(bookingDetails.getBookingStatus());
+            booking.setTickets(bookingDetails.getTickets());
+            
 
             Booking updatedBooking = bookingRepository.save(booking);
             return ResponseEntity.ok(updatedBooking);
@@ -59,7 +63,7 @@ public class BookingsController {
         }
     }
 
-    // Delete an booking
+    // Delete a booking
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteBooking(@PathVariable Long id) {
         if (bookingRepository.existsById(id)) {
@@ -69,4 +73,14 @@ public class BookingsController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    // Get total amount for a booking
+    @GetMapping("/{id}/total-amount")
+    public ResponseEntity<BigDecimal> getTotalAmount(@PathVariable Long id) {
+        Optional<Booking> booking = bookingRepository.findById(id);
+        
+        return booking.map(b -> ResponseEntity.ok(b.getTotalAmount()))
+                      .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }
+
