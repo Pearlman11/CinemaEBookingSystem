@@ -34,6 +34,22 @@ const CombinedBookingPage = () => {
   const [adultTickets, setAdultTickets] = useState<number>(0);
   const [childTickets, setChildTickets] = useState<number>(0);
   const [seniorTickets, setSeniorTickets] = useState<number>(0);
+  
+
+  const handleTicketChange = (setter: React.Dispatch<React.SetStateAction<number>>, value: string) => {
+    // If the input is empty, allow it  in the UI but treat as 0 for calculations
+    if (value === '') {
+      setter(0);
+      return;
+    }
+    
+    // Otherwise parse as integer, defaulting to 0 for invalid inputs
+    const numValue = parseInt(value, 10);
+    if (!isNaN(numValue) && numValue >= 0) {
+      setter(numValue);
+    }
+  };
+  
   const totalTickets = adultTickets + childTickets + seniorTickets;
 
 
@@ -145,37 +161,31 @@ const CombinedBookingPage = () => {
               <label className={styles.label}>
                 Adult Tickets:
                 <input
-                  type="number"
-                  min="0"
-                  value={adultTickets}
-                  onChange={(e) =>
-                    setAdultTickets(parseInt(e.target.value, 10) || 0)
-                  }
+                  type="text"
+                  value={adultTickets === 0 ? '' : adultTickets.toString()}
+                  onChange={(e) => handleTicketChange(setAdultTickets, e.target.value)}
                   className={styles.input}
+                  placeholder="0"
                 />
               </label>
               <label className={styles.label}>
                 Child Tickets:
                 <input
-                  type="number"
-                  min="0"
-                  value={childTickets}
-                  onChange={(e) =>
-                    setChildTickets(parseInt(e.target.value, 10) || 0)
-                  }
+                  type="text"
+                  value={childTickets === 0 ? '' : childTickets.toString()}
+                  onChange={(e) => handleTicketChange(setChildTickets, e.target.value)}
                   className={styles.input}
+                  placeholder="0"
                 />
               </label>
               <label className={styles.label}>
                 Senior Tickets:
                 <input
-                  type="number"
-                  min="0"
-                  value={seniorTickets}
-                  onChange={(e) =>
-                    setSeniorTickets(parseInt(e.target.value, 10) || 0)
-                  }
+                  type="text"
+                  value={seniorTickets === 0 ? '' : seniorTickets.toString()}
+                  onChange={(e) => handleTicketChange(setSeniorTickets, e.target.value)}
                   className={styles.input}
+                  placeholder="0"
                 />
               </label>
               <p className={styles.ticketTotal}>

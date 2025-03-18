@@ -1,0 +1,173 @@
+.formContainer {
+  max-width: 550px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.formContainer h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--highlight-color, #0066cc);
+  font-size: 1.8rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.nameFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.inputLabel {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #444;
+}
+
+.inputField {
+  padding: 0.8rem 1rem;
+  border: 1px solid #e1e1e1;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.inputField:focus {
+  border-color: var(--highlight-color, #0066cc);
+  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
+  outline: none;
+}
+
+.formButton {
+  margin-top: 1rem;
+  padding: 0.9rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  background-color: var(--highlight-color, #0066cc);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.formButton:hover {
+  background-color: var(--hover-darken);
+  transform: translateY(-2px);
+}
+
+.formButton:disabled {
+  background-color: #7fb0e0;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.linkContainer {
+  margin-top: 1.2rem;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.authLink {
+  color: var(--highlight-color, #0066cc);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.authLink:hover {
+  color: var(--hover-darken);
+  text-decoration: underline;
+}
+
+.adminContainer {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.adminLoginButton {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.adminLoginButton:hover {
+  color: var(--highlight-color, #0066cc);
+}
+
+.errorMessage {
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 6px;
+  padding: 0.8rem 1rem;
+  margin-bottom: 1.2rem;
+  color: #cf1322;
+  font-size: 0.9rem;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 0.8rem;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.sectionHeader:hover {
+  background-color: #f1f1f1;
+}
+
+.toggleIcon {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.optionalContent {
+  padding: 1rem;
+  background-color: #fafafa;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+}
+
+.cardDetails {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 600px) {
+  .formContainer {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+  
+  .nameFields, .cardDetails {
+    grid-template-columns: 1fr;
+  }
+} 

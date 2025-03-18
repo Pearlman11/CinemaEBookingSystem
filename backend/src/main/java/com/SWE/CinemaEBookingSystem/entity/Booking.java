@@ -1,5 +1,6 @@
 package com.SWE.CinemaEBookingSystem.entity;
 
+
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -42,6 +43,8 @@ public class Booking {
         this.promotionCode = promotionCode;
         this.bookingStatus = bookingStatus;
         this.createdAt = LocalDateTime.now();
+
+
     }
 
     // Getters and Setters

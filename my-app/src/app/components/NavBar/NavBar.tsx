@@ -3,47 +3,181 @@
 import Link from 'next/link';
 import { useAuth } from '@/app/context/AuthContext';
 import styles from './NavBar.module.css';
+import { useState, useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 
 export default function NavBar() {
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, logout, user } = useAuth();
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    }
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Close menus when route changes
+  useEffect(() => {
+    setUserMenuOpen(false);
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
+  const toggleUserMenu = () => {
+    setUserMenuOpen(!userMenuOpen);
+  };
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
 
   return (
     <nav className={styles.nav}>
-      <div className={styles.left}>
-        <ul className={styles.navList}>
-          <li className={styles.navItem}>
-            <Link className={styles.link} href="/">
-              Home
-            </Link>
-          </li>
-          {isLoggedIn && (
+      <div className={styles.navContainer}>
+        <div className={styles.left}>
+          <div className={styles.mobileMenuToggle} onClick={toggleMobileMenu}>
+            <div className={`${styles.hamburger} ${mobileMenuOpen ? styles.active : ''}`}>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+          <ul className={`${styles.navList} ${mobileMenuOpen ? styles.mobileActive : ''}`}>
             <li className={styles.navItem}>
-              <Link className={styles.link} href="/user/profile">
-                View Profile
+              <Link 
+                className={`${styles.navLink} ${pathname === '/' ? styles.active : ''}`} 
+                href="/"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                  <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                Home
               </Link>
             </li>
-          )}
-        </ul>
-      </div>
+            
+          </ul>
+        </div>
 
-      <div className={styles.center}>
-        <span className={styles.title}>Cinema E-Booking System</span>
-      </div>
+        <div className={styles.center}>
+          <Link href="/" className={styles.logoLink}>
+            <h1 className={styles.title}>
+              <span className={styles.titleHighlight}>Cinema</span> E-Booking System
+            </h1>
+          </Link>
+        </div>
 
-      <div className={styles.right}>
-        <ul className={styles.navList}>
-          <li className={styles.navItem}>
-            {isLoggedIn ? (
-              <button className={styles.logoutButton} onClick={logout}>
-                Log Out
+        <div className={styles.right}>
+          {isLoggedIn ? (
+            <div className={styles.userContainer} ref={userMenuRef}>
+              <button 
+                className={styles.userButton} 
+                onClick={toggleUserMenu}
+                aria-expanded={userMenuOpen}
+                aria-haspopup="true"
+              >
+                <div className={styles.userAvatar}>
+                  {user?.firstName?.charAt(0) || 'U'}
+                </div>
+                <span className={styles.userName}>
+                  {user?.firstName || 'User'}
+                </span>
+                <svg 
+                  className={`${styles.dropdownArrow} ${userMenuOpen ? styles.open : ''}`} 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="16" 
+                  height="16" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
               </button>
-            ) : (
-              <Link className={styles.link} href="../signin">
-                Log In
+              
+              {userMenuOpen && (
+                <div className={styles.userMenu}>
+                  <Link 
+                    className={styles.userMenuItem} 
+                    href="/user/profile"
+                    onClick={() => setUserMenuOpen(false)}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    Profile
+                  </Link>
+                  <Link 
+                    className={styles.userMenuItem} 
+                    href="/user/editprofile"
+                    onClick={() => setUserMenuOpen(false)}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                    Edit Profile
+                  </Link>
+                  <div className={styles.menuDivider}></div>
+                  <button 
+                    className={styles.userMenuItem} 
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      logout();
+                    }}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                      <polyline points="16 17 21 12 16 7"></polyline>
+                      <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className={styles.authButtons}>
+              <Link 
+                className={`${styles.navButton} ${styles.loginButton}`} 
+                href="/login"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                  <polyline points="10 17 15 12 10 7"></polyline>
+                  <line x1="15" y1="12" x2="3" y2="12"></line>
+                </svg>
+                Login
               </Link>
-            )}
-          </li>
-        </ul>
+              <Link 
+                className={`${styles.navButton} ${styles.signupButton}`} 
+                href="/signup"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="8.5" cy="7" r="4"></circle>
+                  <line x1="20" y1="8" x2="20" y2="14"></line>
+                  <line x1="23" y1="11" x2="17" y2="11"></line>
+                </svg>
+                Sign Up
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
     </nav>
   );

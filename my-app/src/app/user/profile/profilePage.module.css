@@ -1,19 +1,32 @@
 .profileContainer {
     max-width: 800px;
-    margin: 0 auto;
-    padding: 2rem;
+    margin: 2rem auto;
+    padding: 2.5rem;
     font-family: Arial, sans-serif;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   }
   
   .profileContainer h1 {
     text-align: center;
     margin-bottom: 2rem;
+    font-size: 2.2rem;
+    color: var(--highlight-color);
+    font-weight: 600;
   }
   
   .section {
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 1rem;
-    margin-bottom: 1rem;
+    border-radius: 8px;
+    padding: 0;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+  
+  .section:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
   
   .section:last-child {
@@ -24,40 +37,101 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #f2f2f2;
-    padding: 0.75rem 1rem;
+    background-color: #f8f8f8;
+    padding: 1rem 1.5rem;
     border: none;
     width: 100%;
     text-align: left;
     cursor: pointer;
     font-size: 1.25rem;
+    font-weight: 600;
     color: #333;
+    transition: background-color 0.2s ease;
+    border-left: 4px solid var(--highlight-color);
+  }
+  
+  .sectionHeader:hover {
+    background-color: #f0f0f0;
   }
   
   .toggleIcon {
     font-size: 1.5rem;
     line-height: 1;
+    color: var(--highlight-color);
+    transition: transform 0.3s ease;
+  }
+  
+  .sectionHeader[aria-expanded="true"] .toggleIcon {
+    transform: rotate(180deg);
   }
   
   .sectionContent {
-    padding: 1rem 0;
+    padding: 1.5rem;
+    background-color: white;
+    border-top: 1px solid #eee;
+  }
+  
+  .infoItem {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f0f0f0;
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  .infoItem:last-child {
+    border-bottom: none;
+  }
+  
+  .infoItem strong {
+    display: inline-block;
+    width: 150px;
+    color: #555;
+    font-weight: 600;
   }
   
   .editButton {
-    text-decoration: underline;
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
+    padding: 0.9rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
     cursor: pointer;
-    background-color:var(--highlight-color);
+    background-color: var(--highlight-color);
+    color: white;
     border: none;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-    margin: 0 auto;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    margin: 1.5rem auto 0;
+    box-shadow: 0 4px 12px rgba(var(--highlight-color-rgb), 0.3);
     display: block;
-    color: var(--text-color);
+    text-decoration-line: underline;
+    text-decoration-color: var(--highlight-color);
 
-  }
+   }
   
   .editButton:hover {
     background-color: var(--hover-darken);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(var(--highlight-color-rgb), 0.4);
+    text-decoration-line: underline;
+    text-decoration-color: var(--hover-darken);
+  }
+  
+  .editButton:active {
+    transform: translateY(0);
+  }
+  
+  @media (max-width: 768px) {
+    .profileContainer {
+      padding: 1.5rem;
+      margin: 1rem;
+    }
+    
+    .infoItem strong {
+      width: 120px;
+    }
+    
+    .editButton {
+      width: 100%;
+      text-decoration: none;
+    }
   }

@@ -1,143 +1,423 @@
 /* NavBar.module.css */
 
 .nav {
+  background-color: var(--dark-bg-color);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  transition: all 0.3s ease-in-out;
+}
+
+.navContainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  background-color: var(--dark-bg-color);
-  
-
+  padding: 0.75rem 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
+.left, .center, .right {
+  display: flex;
+  align-items: center;
+}
 
-.left,
-.center,
-.right {
+.left, .right {
   flex: 1;
 }
 
-
 .center {
-  text-align: center;
-}
-
-
-.left {
-  text-align: left;
-}
-.right {
-  text-align: right;
-}
-
-
-.title {
-  font-weight: bold;
-  font-size: 1.5rem;
-  color: var(--highlight-color);
-}
-
-
-.navList {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  align-items: center;
-}
-
-
-.link {
-  color: var(--text-color);
-  padding: 10px 20px;
-  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
-  
-}
-
-.right .navList {
-  justify-content: flex-end;
-}
-
-.loginButton {
-  display: inline-block;
-  padding: 0.5rem 1rem;
-  font-size: 1.1rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #0070f3;
-  border-radius: 4px;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  text-decoration: underline;
-}
-.logoutButton {
-  display: inline-block;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color:var(--text-color);
-  border-radius: 4px;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  text-decoration: underline;
-}
-
-.link:hover {
-  text-decoration: underline;
-  color: var(--hover-darken);
-}
-
-.logoutButton:hover {
-  text-decoration: underline;
-  color: var(--hover-darken);
-}
-
-
-
-.navbar {
-  display: flex;
+  flex: 2;
   justify-content: center;
 }
 
-
-.navContainer {
-  width: 100%;
-  max-width: 1200px;
-  padding: 0 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.logoLink {
+  text-decoration: none;
+  transition: opacity 0.2s ease;
 }
 
+.logoLink:hover {
+  opacity: 0.9;
+}
 
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: #fff;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.titleHighlight {
+  color: var(--highlight-color);
+  position: relative;
+}
+
+.titleHighlight:after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--highlight-color);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+  transform-origin: right;
+}
+
+.logoLink:hover .titleHighlight:after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
 
 .navList {
-  list-style: none;
   display: flex;
-  gap: 2.5rem;
+  align-items: center;
+  gap: 1rem;
+  list-style: none;
   margin: 0;
   padding: 0;
 }
 
-
 .navItem {
-  display: flex;
-  align-items: center;
+  position: relative;
 }
 
-
 .navLink {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
   color: #f1f1f1;
   text-decoration: none;
   font-weight: 500;
-  padding: 0.6rem 1.2rem;
+  font-size: 0.95rem;
+  border-radius: 8px;
   transition: all 0.3s ease;
-  border-radius: 6px;
+}
+
+.navLink svg {
+  transition: transform 0.3s ease;
 }
 
 .navLink:hover {
-  color: #e94560; 
-  background-color: rgba(233, 69, 96, 0.15);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--highlight-color);
+}
+
+.navLink:hover svg {
+  transform: translateY(-2px);
+}
+
+.navLink.active {
+  color: var(--highlight-color);
+  background-color: rgba(var(--highlight-color-rgb), 0.15);
+}
+
+/* User dropdown menu */
+.userContainer {
+  position: relative;
+}
+
+.userButton {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.userButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.userAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--highlight-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  transition: transform 0.3s ease;
+}
+
+.userButton:hover .userAvatar {
+  transform: scale(1.05);
+}
+
+.userName {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.dropdownArrow {
+  transition: transform 0.3s ease;
+}
+
+.dropdownArrow.open {
+  transform: rotate(180deg);
+}
+
+.userMenu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 220px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  animation: dropIn 0.3s ease forwards;
+}
+
+@keyframes dropIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.userMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  color: #333;
   text-decoration: none;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.userMenuItem svg {
+  color: #666;
+  transition: transform 0.3s ease;
+}
+
+.userMenuItem:hover {
+  background-color: #f5f5f5;
+}
+
+.userMenuItem:hover svg {
+  transform: translateX(3px);
+  color: var(--highlight-color);
+}
+
+.menuDivider {
+  height: 1px;
+  background-color: #eaeaea;
+  margin: 0.5rem 0;
+}
+
+/* Auth buttons */
+.authButtons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.loginButton {
+  color: #f1f1f1;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.loginButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.signupButton {
+  color: white;
+  background-color: var(--highlight-color);
+  border: 1px solid var(--highlight-color);
+  box-shadow: 0 4px 10px rgba(var(--highlight-color-rgb), 0.3);
+}
+
+.signupButton:hover {
+  background-color: var(--hover-darken);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(var(--highlight-color-rgb), 0.4);
+}
+
+/* Mobile styles */
+.mobileMenuToggle {
+  display: none;
+  cursor: pointer;
+}
+
+.hamburger {
+  width: 24px;
+  height: 20px;
+  position: relative;
+  cursor: pointer;
+}
+
+.hamburger span {
+  display: block;
+  position: absolute;
+  height: 2px;
+  width: 100%;
+  background: #f1f1f1;
+  border-radius: 2px;
+  opacity: 1;
+  left: 0;
+  transform: rotate(0deg);
+  transition: .25s ease-in-out;
+}
+
+.hamburger span:nth-child(1) {
+  top: 0px;
+}
+
+.hamburger span:nth-child(2) {
+  top: 9px;
+}
+
+.hamburger span:nth-child(3) {
+  top: 18px;
+}
+
+.hamburger.active span:nth-child(1) {
+  top: 9px;
+  transform: rotate(135deg);
+}
+
+.hamburger.active span:nth-child(2) {
+  opacity: 0;
+  left: -60px;
+}
+
+.hamburger.active span:nth-child(3) {
+  top: 9px;
+  transform: rotate(-135deg);
+}
+
+@media (max-width: 992px) {
+  .navContainer {
+    padding: 0.75rem 1.5rem;
+  }
+  
+  .title {
+    font-size: 1.3rem;
+  }
+  
+  .navLink {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .mobileMenuToggle {
+    display: block;
+    margin-right: 1rem;
+  }
+  
+  .navContainer {
+    padding: 0.75rem 1rem;
+  }
+  
+  .left {
+    order: 1;
+    flex: initial;
+  }
+  
+  .center {
+    order: 2;
+    flex: 1;
+  }
+  
+  .right {
+    order: 3;
+    flex: initial;
+  }
+  
+  .title {
+    font-size: 1.1rem;
+  }
+  
+  .navList {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    width: 250px;
+    height: calc(100vh - 60px);
+    background-color: var(--dark-bg-color);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .navList.mobileActive {
+    transform: translateX(0);
+  }
+  
+  .navItem {
+    width: 100%;
+  }
+  
+  .navLink {
+    width: 100%;
+    padding: 0.75rem 1rem;
+  }
+  
+  .userButton {
+    padding: 0.5rem;
+  }
+  
+  .userName {
+    display: none;
+  }
+  
+  .authButtons {
+    gap: 0.5rem;
+  }
+  
+  .navButton {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .loginButton span {
+    display: none;
+  }
 }

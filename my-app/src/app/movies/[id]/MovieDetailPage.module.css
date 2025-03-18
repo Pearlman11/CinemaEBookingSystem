@@ -1,11 +1,9 @@
 .container {
-  max-width: 90vw;
-  margin: 0 auto;
-  padding: 20px;
+  max-width: 90%;
+  margin: 2rem auto 4rem;
+  padding: 0 2rem;
   font-family: Arial, sans-serif;
-  background-color: #fefefe;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
+  background-color: transparent;
 }
 
 .title {
@@ -25,8 +23,6 @@
   text-align: center;
 }
 
-
-
 .trailer {
   margin-bottom: 20px;
   padding: 15px;
@@ -36,7 +32,6 @@
   min-height: 150px;
   max-width: 80vw;
   margin: auto auto;
-
 }
 
 .noTrailer {
@@ -44,7 +39,6 @@
   font-style: italic;
   text-align: center;
 }
-
 
 .showtimes {
   margin-bottom: 20px;
@@ -152,32 +146,30 @@
   font-style: italic;
 }
 
-.container {
-  padding: 20px;
-  font-family: Arial, sans-serif;
-}
-
 .topBar {
+  margin: 1rem 0 3rem;
   text-align: center;
-  margin-bottom: 20px;
-
-
-
+  display: flex;
+  justify-content: center;
 }
 
 .bookTicketButton {
   display: inline-block;
   background-color: var(--highlight-color, #e94560);
   color: #fff;
-  padding: 10px 20px;
-  border-radius: 4px;
+  padding: 1rem 2.5rem;
+  border-radius: 8px;
   text-decoration: none;
   font-size: 1.2rem;
-  transition: background-color 0.3s ease;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(233, 69, 96, 0.2);
 }
 
 .bookTicketButton:hover {
   background-color: var(--hover-darken, #d73750);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(233, 69, 96, 0.3);
 }
 
 .cancelButtonContainer {
@@ -185,7 +177,6 @@
   text-align: center;
   display: flex;
   justify-content: center;
-
 }
 
 .cancelButton{

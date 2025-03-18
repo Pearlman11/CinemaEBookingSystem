@@ -1,5 +1,4 @@
 package com.SWE.CinemaEBookingSystem.entity;
-
 import jakarta.persistence.*;
 
 @Entity
@@ -32,4 +31,5 @@ public class Seat {
 
     public int getSeatNumber() { return seatNumber; }
     public void setSeatNumber(int seatNumber) { this.seatNumber = seatNumber; }
+
 }
