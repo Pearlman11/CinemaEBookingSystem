@@ -39,12 +39,4 @@ public class PaymentCard {
     public void setBillingAddress(String billingAddress) { this.billingAddress = billingAddress; }
     public void setExpirationDate(String expirationDate) { this.expirationDate = expirationDate; }
 
-
-    
-
-
-
-
-
-
 }
