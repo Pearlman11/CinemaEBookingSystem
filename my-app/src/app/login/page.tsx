@@ -22,22 +22,32 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // API call to your backend
-      const response = await fetch("http://localhost:8080/api/auth/login", {
+      // API call to backend using email and password
+      const response = await fetch(`http://localhost:8080/api/users/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password, isAdmin: isAdminLogin }),
+        body: JSON.stringify({ 
+          email: email, 
+          password: password 
+        }),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Login failed");
+        throw new Error("Invalid email or password");
       }
 
       const userData = await response.json();
-
+      
+      // Check if user role matches requested login type
+      const isUserAdmin = userData.role === "ADMIN";
+      if (isAdminLogin && !isUserAdmin) {
+        throw new Error("Not authorized as admin");
+      } else if (!isAdminLogin && isUserAdmin) {
+        throw new Error("Please use admin login for admin accounts");
+      }
+      
       if (isAdminLogin) {
         setAdmin(true);
         adminLogin(userData);
