@@ -1,5 +1,5 @@
 package com.SWE.CinemaEBookingSystem.entity;
 
-public class Order {
-    
+public enum SeatType {
+    ADULT, CHILD, SENIOR
 }
