@@ -1,7 +1,6 @@
 package com.SWE.CinemaEBookingSystem.repository;
 
 import com.SWE.CinemaEBookingSystem.entity.User;
-
 import com.SWE.CinemaEBookingSystem.entity.UserRole;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,15 +11,19 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
-    // find by email
+    
     Optional<User> findByEmail(String email);
+    
 
     //Find by role
     List<User> findByRole(UserRole role);
+
+
 
     // Find by email and password for login
     Optional<User> findByEmailAndPassword(String email, String password);
 
 
-}
 
+
+}

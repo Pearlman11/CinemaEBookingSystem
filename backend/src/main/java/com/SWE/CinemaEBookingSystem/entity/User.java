@@ -2,6 +2,7 @@ package com.SWE.CinemaEBookingSystem.entity;
 
 import jakarta.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -35,14 +36,28 @@ public class User {
     private UserRole role = UserRole.USER;
 
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<PaymentCard> cards;
+    
+
+
+
+
+    
+
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = false, updatable = false)
+
+   
+    
+   
     private Date createdAt = new Date();
 
-    // Constructors
+    
     public User() {}
 
-    public User(String firstName, String lastName, String email, String password, String phone, Date dob, UserRole role) {
+    public User(String firstName, String lastName, String email, String password, String phone, Date dob, UserRole role,List<PaymentCard> cards) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -51,6 +66,7 @@ public class User {
         this.dob = dob;
         this.role = role;
         this.createdAt = new Date();
+        this.cards = cards;
     }
 
     // Getters and Setters
@@ -63,6 +79,7 @@ public class User {
     public Date getDob() { return dob; }
     public UserRole getRole() { return role; }
     public Date getCreatedAt() { return createdAt; }
+    public List<PaymentCard> getPaymentCards(){return cards;}
 
     public void setId(Integer id) { this.id = id; }
     public void setFirstName(String firstName) { this.firstName = firstName; }
@@ -72,4 +89,10 @@ public class User {
     public void setPhone(String phone) { this.phone = phone; }
     public void setDob(Date dob) { this.dob = dob; }
     public void setRole(UserRole role) { this.role = role; }
+    public void setPaymentCard(List<PaymentCard> cards){
+        if (cards.size() > 4){
+             throw new IllegalArgumentException("Only 4 cards allowed per person!");
+        }
+        this.cards = cards;
+    }
 }

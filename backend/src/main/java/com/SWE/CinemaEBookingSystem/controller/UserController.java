@@ -50,6 +50,7 @@ public class UserController {
         }
     }
 
+
     // Updating an existing user
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Integer id, @RequestBody User userDetails) {
@@ -69,6 +70,26 @@ public class UserController {
         }
 
     }
+
+    //update on EditProfile //Need to finish payment card entity to full implement
+    @PutMapping("/{id}/editprofile")
+    public ResponseEntity<User> editProfileUpdate(@PathVariable Integer id, @RequestBody User userDetails) {
+        Optional<User> userData = userRepository.findById(id);
+
+        if (userData.isPresent()) {
+            User user = userData.get();
+            user.setFirstName(userDetails.getFirstName());
+            user.setLastName(userDetails.getLastName());
+            user.setPassword(userDetails.getPassword());
+            
+            return new ResponseEntity<>(userRepository.save(user), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+    }
+
+
 
     //Delete a user
     @DeleteMapping("/{id}")
