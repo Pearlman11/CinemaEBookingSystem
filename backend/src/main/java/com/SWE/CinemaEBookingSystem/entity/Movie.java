@@ -47,7 +47,7 @@ public class Movie {
     private MovieRating rating;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Showdate> showTimes;
+    private List<Showtime> showTimes;
 
     public Movie() {
         this.cast = new ArrayList<>();
@@ -57,7 +57,7 @@ public class Movie {
 
     public Movie(String title, String category, List<String> cast, String director, String producer,
                  String trailer, String poster, String description, Set<String> reviews, 
-                 MovieRating rating, List<Showdate> showTimes) {
+                 MovieRating rating, List<Showtime> showTimes) {
         this.title = title;
         this.category = category;
         this.cast = cast != null ? cast : new ArrayList<>();
@@ -82,7 +82,7 @@ public String getTrailer() { return trailer; }  // Fixed naming from 'link' to '
 public String getPoster() { return poster; }    // Added getter for poster image
 public String getDescription() { return description; } // Added getter for movie description
 public MovieRating getRating() { return rating; }
-public List<Showdate> getshowTimes() { return new ArrayList<>(showTimes); } // Returns a copy for safety
+public List<Showtime> getshowTimes() { return new ArrayList<>(showTimes); } // Returns a copy for safety
 public Set<String> getReviews() { return new HashSet<>(reviews); } // Returns a copy for safety
 
 // ✅ Setters
@@ -96,7 +96,7 @@ public void setTrailer(String trailer) { this.trailer = trailer; } // Fixed sett
 public void setPoster(String poster) { this.poster = poster; } // Added setter for poster image
 public void setDescription(String description) { this.description = description; } // Added setter for description
 public void setRating(MovieRating rating) { this.rating = rating; }
-public void setshowTimes(List<Showdate> showTimes) { this.showTimes = (showTimes != null) ? new ArrayList<>(showTimes) : new ArrayList<>(); }
+public void setshowTimes(List<Showtime> showTimes) { this.showTimes = (showTimes != null) ? new ArrayList<>(showTimes) : new ArrayList<>(); }
 public void setReviews(Set<String> reviews) { this.reviews = (reviews != null) ? new HashSet<>(reviews) : new HashSet<>(); }
 
 }

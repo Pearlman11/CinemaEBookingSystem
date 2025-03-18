@@ -50,8 +50,7 @@ public class ShowtimeController {
             Showtime showtime = optionalShowtime.get();
             showtime.setMovie(showtimeDetails.getMovie());
             showtime.setStartTime(showtimeDetails.getStartTime());
-            showtime.setEndTime(showtimeDetails.getEndTime());
-            showtime.setTheater(showtimeDetails.getTheater());
+            showtime.setShowroom(showtimeDetails.getShowroom());
 
             Showtime updatedShowtime = showtimeRepository.save(showtime);
             return ResponseEntity.ok(updatedShowtime);

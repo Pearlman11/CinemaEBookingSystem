@@ -16,7 +16,9 @@ public class Promotion {
     @Column(name = "start_date",nullable = false)
     private Date startDate;
 
-    
+    @Column(name = "discount_percentage", nullable = false)
+    private double discountPercentage;
+
     @Temporal(TemporalType.DATE)
     @Column(name = "end_date",nullable=false)
     private Date endDate;
@@ -43,5 +45,7 @@ public class Promotion {
     public void setStartDate(Date startDate) {this.startDate = startDate;}
     public Date getEndDate() {return endDate;}
     public void setEndDate(Date endDate) {this.endDate = endDate;}
+    public void setDiscountPercentage(double discountPercentage) {this.discountPercentage = discountPercentage;}
+    public double getDiscountPercentage() {return discountPercentage;}
 
 }

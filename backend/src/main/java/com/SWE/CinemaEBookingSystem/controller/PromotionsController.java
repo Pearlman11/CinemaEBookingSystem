@@ -28,8 +28,8 @@ public class PromotionsController {
 
     // Get a promotion by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Promotion> getPromotionById(@PathVariable Long id) {
-        Optional<Promotion> promotion = promotionRepository.findById(id);
+    public ResponseEntity<Promotion> getPromotionById(@PathVariable String promotionCode) {
+        Optional<Promotion> promotion = promotionRepository.findById(promotionCode);
         return promotion.map(ResponseEntity::ok)
                         .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -43,14 +43,14 @@ public class PromotionsController {
 
     // Update an existing promotion
     @PutMapping("/{id}")
-    public ResponseEntity<Promotion> updatePromotion(@PathVariable Long id, @RequestBody Promotion promotionDetails) {
-        Optional<Promotion> optionalPromotion = promotionRepository.findById(id);
+    public ResponseEntity<Promotion> updatePromotion(@PathVariable String promotionCode, @RequestBody Promotion promotionDetails) {
+        Optional<Promotion> optionalPromotion = promotionRepository.findById(promotionCode);
 
         if (optionalPromotion.isPresent()) {
             Promotion promotion = optionalPromotion.get();
-            promotion.setCode(promotionDetails.getCode());
-            promotion.setDiscount(promotionDetails.getDiscount());
-            promotion.setExpirationDate(promotionDetails.getExpirationDate());
+            promotion.setPromotionCode(promotionDetails.getPromotionCode());
+            promotion.setDiscountPercentage(promotionDetails.getDiscountPercentage());
+            promotion.setEndDate(promotionDetails.getEndDate());
 
             Promotion updatedPromotion = promotionRepository.save(promotion);
             return ResponseEntity.ok(updatedPromotion);
@@ -61,9 +61,9 @@ public class PromotionsController {
 
     // Delete a promotion
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePromotion(@PathVariable Long id) {
-        if (promotionRepository.existsById(id)) {
-            promotionRepository.deleteById(id);
+    public ResponseEntity<String> deletePromotion(@PathVariable String promotionCode) {
+        if (promotionRepository.existsById(promotionCode)) {
+            promotionRepository.deleteById(promotionCode);
             return ResponseEntity.ok("Promotion deleted successfully");
         } else {
             return ResponseEntity.notFound().build();
