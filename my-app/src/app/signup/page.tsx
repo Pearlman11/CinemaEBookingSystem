@@ -49,9 +49,8 @@ export default function SignupPage() {
     setIsLoading(true);
 
     try {
-      // API call to backend
       const response = await fetch("http://localhost:8080/api/users/register", {
-        method: "PUT",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
@@ -61,18 +60,20 @@ export default function SignupPage() {
           email: formData.email,
           password: formData.password,
           phone: formData.phone || null,
-          dob: formData.dob || null,
+          dob: formData.dob ? new Date(formData.dob) : null,
           role: "USER",
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Registration failed");
+        throw new Error(data.message || "Registration failed");
       }
 
-      const userData = await response.json();
-      login(userData);
+      // On successful registration, log the user in
+      login(data);
+      
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Registration failed");
     } finally {

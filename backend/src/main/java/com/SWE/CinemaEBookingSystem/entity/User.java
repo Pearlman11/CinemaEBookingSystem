@@ -35,6 +35,8 @@ public class User {
     @Column(name = "role", nullable = false)
     private UserRole role = UserRole.USER;
 
+    @Column(name = "is_verified", nullable = false)
+    private Boolean isVerified = false;  // Default to false for new users
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<PaymentCard> cards;
@@ -67,6 +69,7 @@ public class User {
         this.role = role;
         this.createdAt = new Date();
         this.cards = cards;
+        this.isVerified = false;  // Set default in constructor too
     }
 
     // Getters and Setters
@@ -80,6 +83,7 @@ public class User {
     public UserRole getRole() { return role; }
     public Date getCreatedAt() { return createdAt; }
     public List<PaymentCard> getPaymentCards(){return cards;}
+    public Boolean getIsVerified() { return isVerified; }
 
     public void setId(Integer id) { this.id = id; }
     public void setFirstName(String firstName) { this.firstName = firstName; }
@@ -95,4 +99,5 @@ public class User {
         }
         this.cards = cards;
     }
+    public void setIsVerified(Boolean isVerified) { this.isVerified = isVerified; }
 }
