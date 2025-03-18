@@ -38,22 +38,27 @@ public class User {
     @Column(name = "is_verified", nullable = false)
     private Boolean isVerified = false;  // Default to false for new users
 
+    @Column(name = "verification_token")
+    private String verificationToken;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<PaymentCards> cards;
 
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = false, updatable = false)
-
-   
+    private Date createdAt = new Date();
+    
+    @Enumerated(EnumType.STRING)
+    private UserStatus status = UserStatus.INACTIVE; // ✅ Default to INACTIVE
     
    
-    private Date createdAt = new Date();
+  
 
     
     public User() {}
 
-    public User(String firstName, String lastName, String email, String password, String phone, Date dob, UserRole role,List<PaymentCards> cards) {
+    public User(String firstName, String lastName, String email, String password, String phone, Date dob, UserRole role,List<PaymentCards> cards, Boolean isVerified, UserStatus status) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -64,6 +69,7 @@ public class User {
         this.createdAt = new Date();
         this.cards = cards;
         this.isVerified = false;  // Set default in constructor too
+        this.status = UserStatus.INACTIVE;
     }
 
     // Getters and Setters
@@ -95,4 +101,8 @@ public class User {
         this.cards = cards;
     }
     public void setIsVerified(Boolean isVerified) { this.isVerified = isVerified; }
+    public String getVerificationToken() { return verificationToken; }
+    public void setVerificationToken(String verificationToken) { this.verificationToken = verificationToken; }
+    public UserStatus getStatus() { return status; }
+    public void setStatus(UserStatus status) { this.status = status; }
 }

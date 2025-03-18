@@ -44,6 +44,7 @@ public class AuthControllerTest {
         User mockUser = new User();
         mockUser.setEmail(email);
         mockUser.setPassword(password);
+        mockUser.setIsVerified(true); // ✅ Ignore email verification for testing
 
         when(userService.authenticateUser(email, password)).thenReturn(mockUser);
         when(jwtUtil.generateToken(email, 1000L * 60 * 60 * 10)).thenReturn("mockedAccessToken");
@@ -64,6 +65,7 @@ public class AuthControllerTest {
         User mockUser = new User();
         mockUser.setEmail(email);
         mockUser.setPassword(password);
+        mockUser.setIsVerified(true); // ✅ Ignore email verification for testing
 
         when(userService.authenticateUser(email, password)).thenReturn(mockUser);
         when(jwtUtil.generateToken(email, 1000L * 60 * 60 * 24 * 7)).thenReturn("mockedAccessTokenWithRememberMe");
