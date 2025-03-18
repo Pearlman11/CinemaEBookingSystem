@@ -37,13 +37,7 @@ public class User {
 
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<PaymentCard> cards;
-    
-
-
-
-
-    
+    private List<PaymentCards> cards;
 
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -57,7 +51,7 @@ public class User {
     
     public User() {}
 
-    public User(String firstName, String lastName, String email, String password, String phone, Date dob, UserRole role,List<PaymentCard> cards) {
+    public User(String firstName, String lastName, String email, String password, String phone, Date dob, UserRole role,List<PaymentCards> cards) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -79,7 +73,7 @@ public class User {
     public Date getDob() { return dob; }
     public UserRole getRole() { return role; }
     public Date getCreatedAt() { return createdAt; }
-    public List<PaymentCard> getPaymentCards(){return cards;}
+    public List<PaymentCards> getPaymentCards(){return cards;}
 
     public void setId(Integer id) { this.id = id; }
     public void setFirstName(String firstName) { this.firstName = firstName; }
@@ -89,7 +83,7 @@ public class User {
     public void setPhone(String phone) { this.phone = phone; }
     public void setDob(Date dob) { this.dob = dob; }
     public void setRole(UserRole role) { this.role = role; }
-    public void setPaymentCard(List<PaymentCard> cards){
+    public void setPaymentCard(List<PaymentCards> cards){
         if (cards.size() > 4){
              throw new IllegalArgumentException("Only 4 cards allowed per person!");
         }

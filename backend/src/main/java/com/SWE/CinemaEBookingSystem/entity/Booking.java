@@ -19,7 +19,7 @@ public class Booking {
 
     @ManyToOne
     @JoinColumn(name = "payment_card_id", nullable = false)
-    private PaymentCard paymentCard;
+    private PaymentCards paymentCard;
 
     @Column(name = "promotion_code")
     private String promotionCode;
@@ -36,7 +36,7 @@ public class Booking {
 
     public Booking() {}
 
-    public Booking(User user, PaymentCard paymentCard, String promotionCode, BookingStatus bookingStatus) {
+    public Booking(User user, PaymentCards paymentCard, String promotionCode, BookingStatus bookingStatus) {
         this.user = user;
         this.paymentCard = paymentCard;
         this.promotionCode = promotionCode;
@@ -51,8 +51,8 @@ public class Booking {
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
 
-    public PaymentCard getPaymentCard() { return paymentCard; }
-    public void setPaymentCard(PaymentCard paymentCard) { this.paymentCard = paymentCard; }
+    public PaymentCards getPaymentCard() { return paymentCard; }
+    public void setPaymentCard(PaymentCards paymentCard) { this.paymentCard = paymentCard; }
 
     public String getPromotionCode() { return promotionCode; }
     public void setPromotionCode(String promotionCode) { this.promotionCode = promotionCode; }

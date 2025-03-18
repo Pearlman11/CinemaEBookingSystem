@@ -47,7 +47,7 @@ public class UserPromotionsController {
 
     // Assign a promotion to a user
     @PostMapping("/assign")
-    public ResponseEntity<UserPromotion> assignPromotionToUser(@RequestParam Long userId, @RequestParam Long promotionId) {
+    public ResponseEntity<UserPromotion> assignPromotionToUser(@RequestParam Integer userId, @RequestParam String promotionId) {
         Optional<User> user = userRepository.findById(userId);
         Optional<Promotion> promotion = promotionRepository.findById(promotionId);
 
