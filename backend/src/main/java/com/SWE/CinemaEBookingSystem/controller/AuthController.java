@@ -6,13 +6,12 @@ import com.SWE.CinemaEBookingSystem.security.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
     private final UserService userService;
-    private final JwtUtil jwtUtil; // Needed for token generation
+    private final JwtUtil jwtUtil;
 
     public AuthController(UserService userService, JwtUtil jwtUtil) {
         this.userService = userService;
@@ -30,20 +29,58 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User loginRequest) {
+    public ResponseEntity<?> login(@RequestBody User loginRequest, @RequestParam(defaultValue = "false") boolean rememberMe) {
         try {
             User user = userService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword());
-            String token = jwtUtil.generateToken(user.getEmail());
-            return ResponseEntity.ok(new AuthResponse(token));
+            long accessTokenExpiry = 1000L * 60 * 60 * 10; // 10 hours
+            if (rememberMe) {
+                accessTokenExpiry = 1000L * 60 * 60 * 24 * 7; // Extend if "Remember Me" is checked
+            }
+            String accessToken = jwtUtil.generateToken(user.getEmail(), accessTokenExpiry);
+            String refreshToken = jwtUtil.generateRefreshToken(user.getEmail());
+
+            return ResponseEntity.ok(new AuthResponse(accessToken, refreshToken));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
     }
 
-    // Simple DTO for returning the token
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@RequestBody RefreshRequest request) {
+        try {
+            String email = jwtUtil.extractEmail(request.getRefreshToken(), true);
+            if (email == null || !jwtUtil.validateToken(request.getRefreshToken(), email, true)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
+            }
+            String newAccessToken = jwtUtil.generateToken(email, 1000L * 60 * 60 * 10);
+            return ResponseEntity.ok(new AuthResponse(newAccessToken, request.getRefreshToken()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
+        }
+    }
+
     public static class AuthResponse {
-        private String token;
-        public AuthResponse(String token) { this.token = token; }
-        public String getToken() { return token; }
+        private String accessToken;
+        private String refreshToken;
+
+        public AuthResponse(String accessToken, String refreshToken) {
+            this.accessToken = accessToken;
+            this.refreshToken = refreshToken;
+        }
+
+        public String getAccessToken() {
+            return accessToken;
+        }
+
+        public String getRefreshToken() {
+            return refreshToken;
+        }
+    }
+
+    public static class RefreshRequest {
+        private String refreshToken;
+        public String getRefreshToken() { return refreshToken; }
+        public void setRefreshToken(String refreshToken) { this.refreshToken = refreshToken; }
     }
 }
+
