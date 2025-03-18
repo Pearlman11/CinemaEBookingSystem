@@ -11,12 +11,12 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/showtimes")
-public class ShowtimeController {
+public class ShowTimeController {
 
     private final ShowTimeRepository showTimeRepository;
 
     @Autowired
-    public ShowtimeController(ShowTimeRepository showTimeRepository) {
+    public ShowTimeController(ShowTimeRepository showTimeRepository) {
         this.showTimeRepository = showTimeRepository;
     }
 

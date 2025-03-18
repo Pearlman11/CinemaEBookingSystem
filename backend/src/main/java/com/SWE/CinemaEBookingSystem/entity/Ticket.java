@@ -12,16 +12,16 @@ public class Ticket {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "showtime_id", nullable = false)
-    private Showtime showtime;
+    @JoinColumn(name = "showtimes_id", nullable = false)
+    private Showtime showtimes;
 
     @ManyToOne
-    @JoinColumn(name = "booking_id", nullable = false)
-    private Booking booking;
+    @JoinColumn(name = "bookings_id", nullable = false)
+    private Booking bookings;
 
     @ManyToOne
-    @JoinColumn(name = "seat_id", nullable = false)
-    private Seat seat;
+    @JoinColumn(name = "seats_id", nullable = false)
+    private Seat seats;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "seat_type", nullable = false)
@@ -37,10 +37,10 @@ public class Ticket {
     // Constructors
     public Ticket() {}
 
-    public Ticket(Showtime showtime, Booking booking, Seat seat, SeatType seatType, BigDecimal price, TicketStatus status) {
-        this.showtime = showtime;
-        this.booking = booking;
-        this.seat = seat;
+    public Ticket(Showtime showtimes, Booking bookings, Seat seats, SeatType seatType, BigDecimal price, TicketStatus status) {
+        this.showtimes = showtimes;
+        this.bookings = bookings;
+        this.seats = seats;
         this.seatType = seatType;
         this.price = price;
         this.status = status;
@@ -56,27 +56,27 @@ public class Ticket {
     }
 
     public Showtime getShowtime() {
-        return showtime;
+        return showtimes;
     }
 
-    public void setShowtime(Showtime showtime) {
-        this.showtime = showtime;
+    public void setShowtime(Showtime showtimes) {
+        this.showtimes = showtimes;
     }
 
     public Booking getBooking() {
-        return booking;
+        return bookings;
     }
 
-    public void setBooking(Booking booking) {
-        this.booking = booking;
+    public void setBookings(Booking bookings) {
+        this.bookings = bookings;
     }
 
     public Seat getSeat() {
-        return seat;
+        return seats;
     }
 
-    public void setSeat(Seat seat) {
-        this.seat = seat;
+    public void setSeat(Seat seats) {
+        this.seats = seats;
     }
 
     public SeatType getSeatType() {
