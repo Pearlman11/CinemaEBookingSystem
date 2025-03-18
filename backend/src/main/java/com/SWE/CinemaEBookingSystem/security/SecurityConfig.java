@@ -19,19 +19,19 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {    
         http
         .csrf(csrf -> csrf.disable())
-    .authorizeHttpRequests(auth -> auth
-        .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
-        .anyRequest().authenticated()
-    )
-    .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-    .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/api/**").permitAll() // ✅ Allow public access to movies API
+            .anyRequest().authenticated()
+        )
+        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
-    }
+}
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
