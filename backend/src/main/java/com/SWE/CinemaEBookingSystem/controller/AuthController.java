@@ -3,6 +3,9 @@ package com.SWE.CinemaEBookingSystem.controller;
 import com.SWE.CinemaEBookingSystem.entity.User;
 import com.SWE.CinemaEBookingSystem.service.UserService;
 import com.SWE.CinemaEBookingSystem.security.JwtUtil;
+
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +28,16 @@ public class AuthController {
             return ResponseEntity.ok("User registered successfully!");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/verify")
+    public ResponseEntity<String> verifyEmail(@RequestParam("token") String token) {
+        boolean verified = userService.verifyUser(token);
+        if (verified) {
+            return ResponseEntity.ok("Email verified successfully! You can now log in.");
+        } else {
+            return ResponseEntity.badRequest().body("Invalid or expired verification token.");
         }
     }
 
@@ -83,6 +96,46 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error retrieving user data: " + e.getMessage());
         }
     }
+    @PostMapping("/forgot-password")
+public ResponseEntity<String> forgotPassword(@RequestBody Map<String, String> request) {
+    String email = request.get("email");
+    userService.sendPasswordResetEmail(email);
+    return ResponseEntity.ok("If this email exists, a password reset link has been sent.");
+}
+
+@GetMapping("/reset-password")
+public ResponseEntity<String> resetPasswordPage(@RequestParam("token") String token) {
+    boolean valid = userService.isValidResetToken(token);
+    if (valid) {
+        return ResponseEntity.ok("Redirecting to password reset page..."); // ✅ Replace with frontend redirection
+    } else {
+        return ResponseEntity.badRequest().body("Invalid or expired reset token.");
+    }
+}
+
+@PostMapping("/reset-password")
+public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> request) {
+    String token = request.get("token");
+    String newPassword = request.get("newPassword");
+
+    boolean success = userService.resetPassword(token, newPassword);
+    if (success) {
+        return ResponseEntity.ok("Password reset successful. You can now log in.");
+    } else {
+        return ResponseEntity.badRequest().body("Invalid or expired reset token.");
+    }
+}
+
+@PutMapping("/update-profile/{userId}")
+public ResponseEntity<String> updateProfile(@PathVariable Integer userId, @RequestBody User updatedUser) {
+    try {
+        userService.updateUserProfile(userId, updatedUser);
+        return ResponseEntity.ok("Profile updated successfully. A confirmation email has been sent.");
+    } catch (RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+}
+
 
     public static class AuthResponse {
         private String accessToken;

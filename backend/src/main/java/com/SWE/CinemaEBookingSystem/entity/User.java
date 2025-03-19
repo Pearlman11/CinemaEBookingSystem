@@ -38,6 +38,9 @@ public class User {
     @Column(name = "is_verified", nullable = false)
     private Boolean isVerified = false;  // Default to false for new users
 
+    @Column(name = "verification_token")
+    private String verificationToken;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<PaymentCards> cards;
 
@@ -47,13 +50,19 @@ public class User {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = false, updatable = false)
     private Date createdAt = new Date();
+    
+    @Enumerated(EnumType.STRING)
+    private UserStatus status = UserStatus.INACTIVE; // ✅ Default to INACTIVE
+    
+    private String resetToken; // ✅ Reset password token
 
     @Column(name = "promotion_opt_in", nullable = false)
-    private Boolean promotionOptIn = false;
+    private boolean promotionOptIn = false; // ✅ Default to false
+
 
     public User() {}
 
-    public User(String firstName, String lastName, String email, String password, String phone, Date dob, UserRole role,List<PaymentCards> cards) {
+    public User(String firstName, String lastName, String email, String password, String phone, Date dob, UserRole role,List<PaymentCards> cards, Boolean isVerified, UserStatus status) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -63,7 +72,8 @@ public class User {
         this.role = role;
         this.createdAt = new Date();
         this.cards = cards;
-        this.isVerified = false; 
+        this.isVerified = false;  // Set default in constructor too
+        this.status = UserStatus.INACTIVE;
     }
 
     // Getters and Setters
@@ -98,4 +108,14 @@ public class User {
     public void setIsVerified(Boolean isVerified) { this.isVerified = isVerified; }
     public void setResetTokenUsed(Boolean resetTokenUsed) { this.resetTokenUsed = resetTokenUsed; }
     public void setPromotionOptIn(Boolean promotionOptIn) { this.promotionOptIn = promotionOptIn; }
+
+    public String getVerificationToken() { return verificationToken; }
+    public void setVerificationToken(String verificationToken) { this.verificationToken = verificationToken; }
+    public UserStatus getStatus() { return status; }
+    public void setStatus(UserStatus status) { this.status = status; }
+    public String getResetToken() { return resetToken; }
+    public void setResetToken(String resetToken) { this.resetToken = resetToken; }
+    public boolean isResetTokenUsed() { return resetTokenUsed; }
+    public void setResetTokenUsed(boolean resetTokenUsed) { this.resetTokenUsed = resetTokenUsed; }
+    public boolean isPromotionOptIn() { return promotionOptIn; }
 }
