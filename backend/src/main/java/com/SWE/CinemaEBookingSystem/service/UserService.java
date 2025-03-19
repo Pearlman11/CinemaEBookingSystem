@@ -120,73 +120,21 @@ public class UserService {
     }
 
     public void updateUserProfile(Integer userId, User updatedUser) {
-        User existingUser = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-    
-        // Save original values before updating
-        String originalFirstName = existingUser.getFirstName();
-        String originalLastName = existingUser.getLastName();
-        String originalPhone = existingUser.getPhone();
-    
-        // Detect changes before updating
-        boolean firstNameChanged = !originalFirstName.equals(updatedUser.getFirstName());
-        boolean lastNameChanged = !originalLastName.equals(updatedUser.getLastName());
-        boolean nameChanged = firstNameChanged || lastNameChanged;
-        
-        // Safely compare phone numbers
-        boolean phoneChanged = false;
-        if (originalPhone == null) {
-            phoneChanged = updatedUser.getPhone() != null;
-        } else {
-            phoneChanged = !originalPhone.equals(updatedUser.getPhone());
-        }
-    
-        // Update the user data
-        existingUser.setFirstName(updatedUser.getFirstName());
-        existingUser.setLastName(updatedUser.getLastName());
-        existingUser.setPhone(updatedUser.getPhone());
-        
-        // Save the updated user
-        userRepository.save(existingUser);
-    
-        // Send email notification if changes were made
-        if (nameChanged || phoneChanged) {
+       
             String subject = "Profile Updated Successfully";
-            StringBuilder changesMessage = new StringBuilder();
             
-            if (firstNameChanged) {
-                changesMessage.append("- First name changed from \"").append(originalFirstName)
-                             .append("\" to \"").append(updatedUser.getFirstName()).append("\"\n");
-            }
             
-            if (lastNameChanged) {
-                changesMessage.append("- Last name changed from \"").append(originalLastName)
-                             .append("\" to \"").append(updatedUser.getLastName()).append("\"\n");
-            }
-            
-            if (phoneChanged) {
-                changesMessage.append("- Phone number changed from \"").append(originalPhone != null ? originalPhone : "None")
-                             .append("\" to \"").append(updatedUser.getPhone() != null ? updatedUser.getPhone() : "None").append("\"\n");
-            }
             
             // Only add the "Changes made:" header if there are actual changes to report
-            String changesText = changesMessage.length() > 0 ? 
-                "Changes made:\n" + changesMessage.toString() : 
-                "Note: Some fields were updated but values remained the same.";
+           
             
             String message = "Hello " + updatedUser.getFirstName() + ",\n\n"
                     + "Your profile has been updated successfully.\n\n"
-                    + changesText
                     + "\nIf you did not request these changes, please contact support immediately.\n\n"
                     + "Best Regards,\nYour Application Team";
     
-            emailService.sendEmail(existingUser.getEmail(), subject, message);
+            emailService.sendEmail(updatedUser.getEmail(), subject, message);
         }
-    }
-    
-    
-
-    
 
     
     
