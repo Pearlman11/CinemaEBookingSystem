@@ -47,7 +47,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // API call to AuthController instead of UserController
+      // API call to AuthController
       const response = await fetch(`http://localhost:8080/api/auth/login?rememberMe=${rememberMe}`, {
         method: "POST",
         headers: {
@@ -64,14 +64,24 @@ export default function LoginPage() {
       }
 
       const authData = await response.json();
-      
-      // AuthController returns tokens and we need to store them
       const { accessToken, refreshToken } = authData;
       
+      // Clear both storage locations first to prevent duplicates
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      sessionStorage.removeItem('accessToken');
+      sessionStorage.removeItem('refreshToken');
+      
+      // Store tokens based on rememberMe preference
+      if (rememberMe) {
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+      } else {
+        sessionStorage.setItem('accessToken', accessToken);
+        sessionStorage.setItem('refreshToken', refreshToken);
+      }
 
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
-
+      // Fetch user data with the token
       const userResponse = await fetch(`http://localhost:8080/api/users/email/${email}`, {
         headers: {
           "Authorization": `Bearer ${accessToken}`
@@ -83,6 +93,13 @@ export default function LoginPage() {
       }
       
       const userData = await userResponse.json();
+      
+      // Store user data in the same storage as tokens
+      if (rememberMe) {
+        localStorage.setItem('user', JSON.stringify(userData));
+      } else {
+        sessionStorage.setItem('user', JSON.stringify(userData));
+      }
       
       // Check if user role matches requested login type
       const isUserAdmin = userData.role === "ADMIN";

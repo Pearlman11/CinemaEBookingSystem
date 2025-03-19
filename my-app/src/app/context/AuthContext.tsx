@@ -37,28 +37,71 @@ export function AuthProvider({children}: {children:ReactNode}) {
 
     // Check for saved auth state on component mount
     useEffect(() => {
-        const savedUser = localStorage.getItem('user');
-        const savedIsAdmin = localStorage.getItem('isAdmin');
-        const savedIsLoggedIn = localStorage.getItem('isLoggedIn');
+        // First check if we have tokens
+        const accessToken = sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
         
-        if (savedUser && savedIsLoggedIn === 'true') {
-            setUser(JSON.parse(savedUser));
+        if (!accessToken) {
+            // No valid token, ensure user is logged out
+            setIsLoggedIn(false);
+            setIsAdmin(false);
+            setUser(null);
+            return;
+        }
+
+        // If we have a token, check for user data
+        const savedUser = sessionStorage.getItem('user') || localStorage.getItem('user');
+        
+        if (savedUser) {
+            const userData = JSON.parse(savedUser);
+            setUser(userData);
             setIsLoggedIn(true);
-            if (savedIsAdmin === 'true') {
-                setIsAdmin(true);
-            }
+            setIsAdmin(userData.role === 'ADMIN');
+        } else {
+            // We have a token but no user data - fetch the user data
+            fetchUserData(accessToken);
         }
     }, []);
+
+    // Function to fetch user data using token
+    const fetchUserData = async (token: string) => {
+        try {
+            // You'll need to implement this endpoint in your backend
+            const response = await fetch('http://localhost:8080/api/users/me', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if (response.ok) {
+                const userData = await response.json();
+                setUser(userData);
+                setIsLoggedIn(true);
+                setIsAdmin(userData.role === 'ADMIN');
+                
+                // Store the user data in the same storage as the token
+                if (localStorage.getItem('accessToken')) {
+                    localStorage.setItem('user', JSON.stringify(userData));
+                } else {
+                    sessionStorage.setItem('user', JSON.stringify(userData));
+                }
+            } else {
+                // Invalid token or other error
+                logout();
+            }
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+            logout();
+        }
+    };
 
     const adminLogin = (userData: User) => {
         setIsLoggedIn(true);
         setIsAdmin(true);
         setUser(userData);
         
-        // Save to localStorage
-        localStorage.setItem('user', JSON.stringify(userData));
-        localStorage.setItem('isAdmin', 'true');
-        localStorage.setItem('isLoggedIn', 'true');
+        // Save to the appropriate storage based on token location
+        const storage = localStorage.getItem('accessToken') ? localStorage : sessionStorage;
+        storage.setItem('user', JSON.stringify(userData));
         
         router.push('/admin/manage/movies');
     }
@@ -68,10 +111,9 @@ export function AuthProvider({children}: {children:ReactNode}) {
         setIsAdmin(userData.role === 'ADMIN');
         setUser(userData);
         
-        // Save to localStorage
-        localStorage.setItem('user', JSON.stringify(userData));
-        localStorage.setItem('isAdmin', userData.role === 'ADMIN' ? 'true' : 'false');
-        localStorage.setItem('isLoggedIn', 'true');
+        // Save to the appropriate storage based on token location
+        const storage = localStorage.getItem('accessToken') ? localStorage : sessionStorage;
+        storage.setItem('user', JSON.stringify(userData));
         
         router.push('/');
     }
@@ -81,17 +123,20 @@ export function AuthProvider({children}: {children:ReactNode}) {
         setIsAdmin(false);
         setUser(null);
         
-        // Clear localStorage
+        // Clear both storage locations
         localStorage.removeItem('user');
-        localStorage.removeItem('isAdmin');
-        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        
+        sessionStorage.removeItem('user');
+        sessionStorage.removeItem('accessToken');
+        sessionStorage.removeItem('refreshToken');
         
         router.push('/');
     };
     
     const setAdmin = (admin: boolean) => {
         setIsAdmin(admin);
-        localStorage.setItem('isAdmin', admin ? 'true' : 'false');
     };
   
     return (
