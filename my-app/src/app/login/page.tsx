@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/app/context/AuthContext";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import styles from "@/app/components/auth/Auth.module.css";
 import NavBar from "@/app/components/NavBar/NavBar";
@@ -19,7 +20,15 @@ export default function LoginPage() {
   const [, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const { login, adminLogin, setAdmin } = useAuth();
+  const { login, adminLogin, setAdmin, isAuthenticated } = useAuth();
+  const router = useRouter();
+
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/');
+    }
+  }, [isAuthenticated, router]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -177,6 +186,9 @@ export default function LoginPage() {
             <label htmlFor="rememberMe" className={styles.checkboxLabel}>
               Remember me
             </label>
+            <Link href="/forgotpassword/request" className={styles.forgotPassword}>
+              Forgot password?
+            </Link>
           </div>
           
           <button 

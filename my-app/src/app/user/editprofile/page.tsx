@@ -64,11 +64,11 @@ const EditProfile = () => {
         lastName,
         email,
         phone,
-        password: newPassword || user.password, // Only updating if new password is provided
+        password: newPassword || user.password,
         role: user.role
       };
-
-      // API call to update user profile
+      
+      // First API call - Update user profile with original endpoint
       const response = await fetch(`http://localhost:8080/api/users/${user.id}/editprofile`, {
         method: 'PUT',
         headers: {
@@ -76,12 +76,29 @@ const EditProfile = () => {
         },
         body: JSON.stringify(updateData),
       });
-
+      
       if (!response.ok) {
         throw new Error('Failed to update profile');
       }
 
       const updatedUser = await response.json();
+      
+      // Second API call - Send confirmation email
+      try {
+        const emailResponse = await fetch(`http://localhost:8080/api/auth/update-profile/${user.id}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updateData),
+        });
+
+        if (!emailResponse.ok) {
+          console.warn('Confirmation email could not be sent, but profile was updated');
+        }
+      } catch {
+        console.warn('Confirmation email could not be sent, but profile was updated');
+      }
       
       // Update auth context with new user data
       login(updatedUser);

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import styles from "@/app/components/auth/Auth.module.css";
 import NavBar from "@/app/components/NavBar/NavBar";
 import FormField from "@/app/components/auth/FormField";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/context/AuthContext";
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -26,9 +27,16 @@ export default function SignupPage() {
   const [showOptionalPayment, setShowOptionalPayment] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
-
+  
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
+
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/');
+    }
+  }, [isAuthenticated, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

@@ -104,11 +104,11 @@ public class UserController {
             user.setLastName(userDetails.getLastName());
             user.setPassword(userDetails.getPassword());
             
-            return new ResponseEntity<>(userRepository.save(user), HttpStatus.OK);
+            User savedUser = userRepository.save(user);
+            return new ResponseEntity<>(savedUser, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
     }
 
 

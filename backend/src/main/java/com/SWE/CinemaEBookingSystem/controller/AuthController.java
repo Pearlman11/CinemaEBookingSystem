@@ -46,6 +46,9 @@ public class AuthController {
         try {
             User user = userService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword());
             long accessTokenExpiry = 1000L * 60 * 60 * 10; // 10 hours
+            if (!user.getIsVerified()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please verify your email before logging in.");
+            }
             if (rememberMe) {
                 accessTokenExpiry = 1000L * 60 * 60 * 24 * 7; // Extend if "Remember Me" is checked
             }
@@ -107,7 +110,9 @@ public ResponseEntity<String> forgotPassword(@RequestBody Map<String, String> re
 public ResponseEntity<String> resetPasswordPage(@RequestParam("token") String token) {
     boolean valid = userService.isValidResetToken(token);
     if (valid) {
-        return ResponseEntity.ok("Redirecting to password reset page..."); // ✅ Replace with frontend redirection
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .header("Location", "http://localhost:3000/forgotpassword?token=" + token)
+                .build();
     } else {
         return ResponseEntity.badRequest().body("Invalid or expired reset token.");
     }
@@ -126,7 +131,7 @@ public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> req
     }
 }
 
-@PutMapping("/update-profile/{userId}")
+@PostMapping("/update-profile/{userId}")
 public ResponseEntity<String> updateProfile(@PathVariable Integer userId, @RequestBody User updatedUser) {
     try {
         userService.updateUserProfile(userId, updatedUser);

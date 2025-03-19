@@ -72,7 +72,7 @@
 }
 
 .formButton:disabled {
-  background-color: #7fb0e0;
+  background-color: var(--hover-darken);
   cursor: not-allowed;
   transform: none;
 }
@@ -115,13 +115,42 @@
 }
 
 .errorMessage {
-  background-color: #fff2f0;
+  background-color: #f7f7f7;
   border: 1px solid #ffccc7;
-  border-radius: 6px;
-  padding: 0.8rem 1rem;
-  margin-bottom: 1.2rem;
-  color: #cf1322;
-  font-size: 0.9rem;
+  color: #ff4d4f;
+  padding: 12px;
+  margin-bottom: 16px;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.successMessage {
+  background-color: #f7f7f7;
+  border: 1px solid var(--highlight-color);
+  color: var(black);
+  padding: 12px;
+  margin-bottom: 16px;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.checkboxContainer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.forgotPassword {
+  margin-left: auto;
+  font-size: 0.875rem;
+  color: var(--highlight-color, #0066cc);
+}
+
+.forgotPassword:hover {
+  color: var(--hover-darken);
+  text-decoration: underline;
 }
 
 .sectionHeader {
@@ -140,7 +169,7 @@
 }
 
 .sectionHeader:hover {
-  background-color: #f1f1f1;
+  background-color: var(--hover-darken);
 }
 
 .toggleIcon {
@@ -206,4 +235,14 @@
 
 .toastContainer {
   font-size: 18px;
+}
+
+.checkbox {
+  margin-right: 0.25rem;
+}
+
+.checkboxLabel {
+  font-size: 0.9rem;
+  color: #444;
+  margin-right: 0.5rem;
 } 
