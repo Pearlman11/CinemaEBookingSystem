@@ -93,7 +93,7 @@ public class UserService {
             + "We received a request to reset your password for your CinemaEBooking account. To reset your password, click the link below:\n\n"
             + resetUrl + "\n\n"
             + "If you did not request this password reset, please ignore this email. Your account is secure, and no changes have been made.\n\n"
-            + "This link will expire in 24 hours. If you do not reset your password within this time, you will need to submit another request.\n\n"
+            + "This link will expire in 24 hours or after clicked. If you do not reset your password within this time, you will need to submit another request.\n\n"
             + "If you have any questions or need further assistance, please contact our support team at support@cinemaebooking.com.\n\n"
             + "Thank you,\n"
             + "Team A9";

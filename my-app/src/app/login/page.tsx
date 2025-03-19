@@ -50,14 +50,18 @@ export default function LoginPage() {
     }
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMessage("");
-    setIsLoading(true);
-
+    setIsLoading(true); // Start loading before request
+  
     try {
-      // API call to AuthController
-      const response = await fetch(`http://localhost:8080/api/auth/login?rememberMe=${rememberMe}`, {
+      // Determine correct login endpoint based on user selection
+      const loginEndpoint = isAdminLogin 
+        ? "http://localhost:8080/api/auth/admin/login" 
+        : "http://localhost:8080/api/auth/login";
+  
+      const response = await fetch(`${loginEndpoint}?rememberMe=${rememberMe}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -67,12 +71,13 @@ export default function LoginPage() {
           password: password 
         }),
       });
-
-      if (!response.ok) {
-        throw new Error("Invalid email or password");
-      }
-
+  
       const authData = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(authData.error || "Login failed");
+      }
+  
       const { accessToken, refreshToken } = authData;
       
       // Clear both storage locations first to prevent duplicates
@@ -89,27 +94,27 @@ export default function LoginPage() {
         sessionStorage.setItem('accessToken', accessToken);
         sessionStorage.setItem('refreshToken', refreshToken);
       }
-
+  
       // Fetch user data with the token
       const userResponse = await fetch(`http://localhost:8080/api/users/email/${email}`, {
         headers: {
           "Authorization": `Bearer ${accessToken}`
         }
       });
-      
+  
       if (!userResponse.ok) {
         throw new Error("Failed to get user data");
       }
-      
+  
       const userData = await userResponse.json();
-      
+  
       // Store user data in the same storage as tokens
       if (rememberMe) {
         localStorage.setItem('user', JSON.stringify(userData));
       } else {
         sessionStorage.setItem('user', JSON.stringify(userData));
       }
-      
+  
       // Check if user role matches requested login type
       const isUserAdmin = userData.role === "ADMIN";
       if (isAdminLogin && !isUserAdmin) {
@@ -117,25 +122,37 @@ export default function LoginPage() {
       } else if (!isAdminLogin && isUserAdmin) {
         throw new Error("Please use admin login for admin accounts");
       }
-      
+  
+      // Login the user based on their role
       if (isAdminLogin) {
         setAdmin(true);
         adminLogin(userData);
       } else {
         login(userData);
       }
+  
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Login failed");
-    } finally {
+      // 🔹 FIX: Allow retrying login by resetting `isLoading`
       setIsLoading(false);
+  
+      // 🔹 FIX: Handle 'unknown' error properly in TypeScript
+      if (error instanceof Error) {
+        setErrorMessage(error.message);
+      } else if (typeof error === "string") {
+        setErrorMessage(error);
+      } else {
+        setErrorMessage("An unknown error occurred. Please try again.");
+      }
     }
   };
-
+  
+  
   const toggleAdminMode = () => {
     setIsAdminLogin(!isAdminLogin);
     setPassword("");
     setErrorMessage("");
   };
+  
 
   return (
     <div>
