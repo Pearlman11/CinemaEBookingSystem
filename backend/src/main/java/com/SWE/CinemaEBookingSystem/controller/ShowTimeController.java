@@ -18,8 +18,8 @@ public class ShowTimeController {
     @Autowired
     public ShowTimeController(ShowTimeRepository showTimeRepository) {
         this.showTimeRepository = showTimeRepository;
-    }
 
+    }
     // Get all showtimes
     @GetMapping
     public List<Showtime> getAllShowtimes() {

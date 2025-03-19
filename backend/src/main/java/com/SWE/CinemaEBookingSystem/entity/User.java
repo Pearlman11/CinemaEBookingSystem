@@ -1,8 +1,12 @@
 package com.SWE.CinemaEBookingSystem.entity;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "users")
@@ -41,8 +45,11 @@ public class User {
     @Column(name = "verification_token")
     private String verificationToken;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<PaymentCards> cards;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @JsonManagedReference
+    private List<PaymentCards> cards = new ArrayList<>();
+
 
     @Column(name = "reset_token_used")
     private Boolean resetTokenUsed = false;
@@ -61,6 +68,7 @@ public class User {
 
 
     public User() {}
+
 
     public User(String firstName, String lastName, String email, String password, String phone, Date dob, UserRole role,List<PaymentCards> cards, Boolean isVerified, UserStatus status) {
         this.firstName = firstName;
@@ -91,6 +99,7 @@ public class User {
     public Boolean getResetTokenUsed() { return resetTokenUsed; }
     public Boolean getPromotionOptIn() { return promotionOptIn; }
 
+
     public void setId(Integer id) { this.id = id; }
     public void setFirstName(String firstName) { this.firstName = firstName; }
     public void setLastName(String lastName) { this.lastName = lastName; }
@@ -99,7 +108,9 @@ public class User {
     public void setPhone(String phone) { this.phone = phone; }
     public void setDob(Date dob) { this.dob = dob; }
     public void setRole(UserRole role) { this.role = role; }
-    public void setPaymentCard(List<PaymentCards> cards){
+
+    public void setPaymentCards(List<PaymentCards> cards){
+
         if (cards.size() > 4){
              throw new IllegalArgumentException("Only 4 cards allowed per person!");
         }
@@ -118,4 +129,15 @@ public class User {
     public boolean isResetTokenUsed() { return resetTokenUsed; }
     public void setResetTokenUsed(boolean resetTokenUsed) { this.resetTokenUsed = resetTokenUsed; }
     public boolean isPromotionOptIn() { return promotionOptIn; }
+
+
+    public void addPaymentCard(PaymentCards card){
+        if (this.cards.size() < 4 ){
+            cards.add(card);
+            
+        }
+        else{
+            throw new IllegalArgumentException("A user can only have up to 4 payment cards.");
+        }
+    }
 }
