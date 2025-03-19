@@ -58,6 +58,14 @@ export default function SignupPage() {
     setIsLoading(true);
 
     try {
+       // Conditionally add payment details if `showOptionalPayment` is true
+  const paymentData = showOptionalPayment
+  ? {
+      cardNumber: formData.cardNumber,
+      cardExpiry: formData.cardExpiry,
+      billingAddress: formData.BillingAddress,
+    }
+  : {};
       const registerResponse = await fetch("http://localhost:8080/api/auth/register", {
         method: "POST",
         headers: {
@@ -74,7 +82,7 @@ export default function SignupPage() {
           isVerified: false,
           resetTokenUsed: false,
           promotionOptIn: false
-        }),
+        , ...paymentData}),
       });
 
       let data;
