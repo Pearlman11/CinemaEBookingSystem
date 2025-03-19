@@ -82,7 +82,7 @@ public class User {
         this.dob = dob;
         this.role = role;
         this.createdAt = new Date();
-        this.cards = cards;
+        this.cards = (cards != null) ? cards : new ArrayList<>();
         this.isVerified = false;  // Set default in constructor too
         this.status = UserStatus.INACTIVE;
         this.primaryCard = primaryCard;
@@ -116,10 +116,14 @@ public class User {
     public void setRole(UserRole role) { this.role = role; }
     public void setPrimaryCard(PaymentCards primaryCard){this.primaryCard = primaryCard;}
     public void setPaymentCards(List<PaymentCards> cards){
-
-        if (cards.size() > 4){
-             throw new IllegalArgumentException("Only 4 cards allowed per person!");
+        if (cards == null) {
+            throw new IllegalArgumentException("Payment cards list cannot be null!");
         }
+        
+        if (cards.size() > 4) {
+            throw new IllegalArgumentException("Only 4 cards allowed per person!");
+        }
+        
         this.cards = cards;
     }
     public void setIsVerified(Boolean isVerified) { this.isVerified = isVerified; }
@@ -138,6 +142,10 @@ public class User {
 
 
     public void addPaymentCard(PaymentCards card){
+
+        if (this.cards == null) {
+            this.cards = new ArrayList<>();
+        }
         if (this.cards.size() < 4 ){
             cards.add(card);
             

@@ -36,9 +36,9 @@ public class PaymentCardService{
     public PaymentCards addPaymentCardToUser(Integer userId,PaymentCards card ){
          User user = userRepository.findById(userId)
                  .orElseThrow(() -> new RuntimeException("User not found with id" + userId));
-         if (user.getPaymentCards().size() >= 4) {
+        if (user.getPaymentCards() == null || user.getPaymentCards().size() >= 4) {
                 throw new IllegalArgumentException("User already has 4 payment cards. Cannot add more.");
-         }
+        }
             
          if(card.getCardNumber()!= null){
             try {

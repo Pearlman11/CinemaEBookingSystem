@@ -21,10 +21,12 @@ import java.util.Map;
 import com.SWE.CinemaEBookingSystem.entity.User;
 
 import com.SWE.CinemaEBookingSystem.entity.UserRole;
+import com.SWE.CinemaEBookingSystem.config.AESUtil;
 import com.SWE.CinemaEBookingSystem.entity.PaymentCards;
 import com.SWE.CinemaEBookingSystem.repository.UserRepository;
 import com.SWE.CinemaEBookingSystem.repository.PaymentCardRepository;
 import com.SWE.CinemaEBookingSystem.service.PaymentCardService;
+import com.SWE.CinemaEBookingSystem.service.UserService;
 
 @RestController
 @RequestMapping("/api/users")
@@ -40,6 +42,11 @@ public class UserController {
 
     @Autowired
     private PaymentCardService paymentCardService;
+
+    @Autowired
+    private UserService userService;
+
+
 
 
     // Getting all users
@@ -120,6 +127,7 @@ public class UserController {
     @PutMapping("/{id}/editprofile")
     public ResponseEntity<User> editProfileUpdate(@PathVariable Integer id, @RequestBody User userDetails) {
         Optional<User> userData = userRepository.findById(id);
+        
         if (userData.isPresent()) {
             User user = userData.get();
             user.setFirstName(userDetails.getFirstName());
@@ -185,5 +193,28 @@ public class UserController {
         Optional<User> user = userRepository.findByEmail(email);
         return user.map(value -> new ResponseEntity<>(value,HttpStatus.OK))
             .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+
+    @GetMapping("/{userId}/payment-cards")
+    public ResponseEntity<List<PaymentCards>> getUserPaymentCards(@PathVariable Integer userId) {
+        User user = userService.findById(userId);
+        List<PaymentCards> paymentCards = user.getPaymentCards();
+        if (paymentCards == null) {
+            paymentCards = new ArrayList<>();
+        }
+        AESUtil aesUtil = new AESUtil();  // Assuming AESUtil is your decryption utility
+        for (PaymentCards card : paymentCards) {
+            if (card.getCardNumber() != null) {
+                try {
+                String decryptedCardNumber = aesUtil.decrypt(card.getCardNumber());
+                card.setCardNumber(decryptedCardNumber);
+            } catch (Exception e) {
+                throw new RuntimeException("Error decrypting card number", e);
+            }
+        }
+    }
+
+        return ResponseEntity.ok(paymentCards);
     }
 }

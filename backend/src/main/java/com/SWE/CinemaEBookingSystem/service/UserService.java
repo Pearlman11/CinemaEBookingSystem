@@ -57,13 +57,17 @@ public class UserService {
         userRepository.save(user);
         AESUtil aesUtil = new AESUtil();
         PaymentCards primaryCard = user.getPrimaryCard();
-
-// Encrypt the card number and update the object
+        user.addPaymentCard(primaryCard);
+        
         if (primaryCard != null) {
              primaryCard.setCardNumber(aesUtil.encrypt(primaryCard.getCardNumber()));
 
-    // Save the updated PaymentCards entity
+    
+            primaryCard.setUser(user);
+            user.addPaymentCard(primaryCard); 
+
             paymentCardRepository.save(primaryCard);
+            userRepository.save(user);
         }
         
         
@@ -157,7 +161,9 @@ public class UserService {
     
             emailService.sendEmail(updatedUser.getEmail(), subject, message);
         }
-
+    public User findById(Integer userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
     
     
     
