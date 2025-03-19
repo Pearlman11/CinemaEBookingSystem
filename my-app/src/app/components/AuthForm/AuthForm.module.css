@@ -1,4 +1,4 @@
-/* Container for the entire authentication form card */
+
 .formContainer {
   display: flex;
   flex-direction: column;
@@ -10,23 +10,16 @@
 
 }
 
-/* Form styling with a controlled max-width */
 .form {
   width: 100%;
   max-width: 600px;
 
 }
 
-/* Input group for spacing between label and input */
 .inputGroup {
   margin-bottom: 1.5rem;
 
-
-
 }
-
-
-/* Label styling for clarity */
 .inputLabel {
   display: block;
   font-size: 0.9rem;
@@ -38,7 +31,6 @@
 
 }
 
-/* Input field styling for a modern look */
 .inputField {
   width: 100%;
   padding-top: 0.75rem;
@@ -47,7 +39,6 @@
   border-radius: 5px;
   font-size: 1rem;
   transition: border-color 0.3s ease;
-
 }
 
 .inputField:focus {
@@ -55,7 +46,6 @@
   border-color: var(--highlight-color);
 }
 
-/* Primary form button with a smooth hover lift effect */
 .formbutton {
   background-color: var(--highlight-color);
   border: none;
@@ -73,7 +63,7 @@
   transform: translateY(-2px);
 }
 
-/* Container for the login/signup toggle button */
+
 .loginbuttoncontiner {
   display: flex;
   flex-direction: column;
@@ -81,7 +71,7 @@
   margin-top: 1rem;
 }
 
-/* Toggle button styling with consistent colors and lift effect */
+
 .loginbutton {
   background-color: var(--highlight-color);
   border: none;
@@ -100,7 +90,7 @@
   transform: translateY(-2px);
 }
 
-/* Admin container to center the admin login button */
+
 .adminContainer {
   margin-top: 2rem;
   display: flex;
@@ -108,9 +98,9 @@
   width: 100%;
 }
 
-/* Admin login button styling */
+
 .adminLoginButton {
-  background-color: var(--primary-color);
+  background-color: var(--highlight-color);
   border: none;
   width: 100%;
   max-width: 600px;
@@ -127,7 +117,14 @@
   transform: translateY(-2px);
 }
 
-
+.successMessage {
+  background-color: #dff0d8;
+  color: #3c763d;
+  padding: 12px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  text-align: center;
+}
 
 
 

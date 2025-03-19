@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.Optional;
+import java.util.Map;
 
 import com.SWE.CinemaEBookingSystem.entity.User;
+import com.SWE.CinemaEBookingSystem.entity.UserRole;
 import com.SWE.CinemaEBookingSystem.repository.UserRepository;
 
 @RestController
@@ -23,6 +26,9 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     // Getting all users
     @GetMapping
@@ -40,15 +46,32 @@ public class UserController {
     }
 
     // Creating a new User
-    @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    @PostMapping("/register")
+    public ResponseEntity<?> createUser(@RequestBody User user) {
         try {
+            // Check if user already exists
+            Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
+            if (existingUser.isPresent()) {
+                Map<String, String> response = Map.of("message", "User with this email already exists");
+                return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+            }
+
+            // Encode password before saving
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            
+            // Set default role if not provided
+            if (user.getRole() == null) {
+                user.setRole(UserRole.USER);
+            }
+
             User savedUser = userRepository.save(user);
             return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
         } catch(Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            Map<String, String> response = Map.of("message", "Error creating user: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
+
 
     // Updating an existing user
     @PutMapping("/{id}")
@@ -70,6 +93,26 @@ public class UserController {
 
     }
 
+    //update on EditProfile //Need to finish payment card entity to full implement
+    @PutMapping("/{id}/editprofile")
+    public ResponseEntity<User> editProfileUpdate(@PathVariable Integer id, @RequestBody User userDetails) {
+        Optional<User> userData = userRepository.findById(id);
+
+        if (userData.isPresent()) {
+            User user = userData.get();
+            user.setFirstName(userDetails.getFirstName());
+            user.setLastName(userDetails.getLastName());
+            user.setPassword(userDetails.getPassword());
+            
+            return new ResponseEntity<>(userRepository.save(user), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+    }
+
+
+
     //Delete a user
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteUser(@PathVariable Integer id) {
@@ -88,6 +131,4 @@ public class UserController {
         return user.map(value -> new ResponseEntity<>(value,HttpStatus.OK))
             .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
-    
-
 }

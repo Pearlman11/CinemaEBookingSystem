@@ -34,25 +34,47 @@ export default function AuthForm() {
     setConfirmPassword("");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
 
     if (!isLogin && password !== confirmPassword) {
       alert("Passwords do not match");
       return;
     }
 
-    if (isLogin) {
-      if (isAdminLogin) {
-        setAdmin(true);
-        adminLogin();
-      } else {
-        login();
+    try {
+      // Call your backend API
+      const response = await fetch(`http://localhost:8080/api/auth/${isLogin ? 'login' : 'register'}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          email, 
+          password,
+          // Add other fields for registration
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Authentication failed');
       }
-    } else {
-      // Handle sign-up logic
-      alert("Sign-up logic goes here");
+
+      const userData = await response.json();
+
+      if (isLogin) {
+        if (isAdminLogin) {
+          setAdmin(true);
+          adminLogin(userData); 
+        } else {
+          login(userData); 
+        }
+      } else {
+        // Handle sign-up success
+        login(userData); 
+      }
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Authentication failed');
     }
   };
 

@@ -2,6 +2,7 @@ package com.SWE.CinemaEBookingSystem.entity;
 
 import jakarta.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -34,15 +35,25 @@ public class User {
     @Column(name = "role", nullable = false)
     private UserRole role = UserRole.USER;
 
+    @Column(name = "is_verified", nullable = false)
+    private Boolean isVerified = false;  // Default to false for new users
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<PaymentCards> cards;
+
+    @Column(name = "reset_token_used")
+    private Boolean resetTokenUsed = false;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = false, updatable = false)
     private Date createdAt = new Date();
 
-    // Constructors
+    @Column(name = "promotion_opt_in", nullable = false)
+    private Boolean promotionOptIn = false;
+
     public User() {}
 
-    public User(String firstName, String lastName, String email, String password, String phone, Date dob, UserRole role) {
+    public User(String firstName, String lastName, String email, String password, String phone, Date dob, UserRole role,List<PaymentCards> cards) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -51,6 +62,8 @@ public class User {
         this.dob = dob;
         this.role = role;
         this.createdAt = new Date();
+        this.cards = cards;
+        this.isVerified = false; 
     }
 
     // Getters and Setters
@@ -63,6 +76,10 @@ public class User {
     public Date getDob() { return dob; }
     public UserRole getRole() { return role; }
     public Date getCreatedAt() { return createdAt; }
+    public List<PaymentCards> getPaymentCards(){return cards;}
+    public Boolean getIsVerified() { return isVerified; }
+    public Boolean getResetTokenUsed() { return resetTokenUsed; }
+    public Boolean getPromotionOptIn() { return promotionOptIn; }
 
     public void setId(Integer id) { this.id = id; }
     public void setFirstName(String firstName) { this.firstName = firstName; }
@@ -72,4 +89,13 @@ public class User {
     public void setPhone(String phone) { this.phone = phone; }
     public void setDob(Date dob) { this.dob = dob; }
     public void setRole(UserRole role) { this.role = role; }
+    public void setPaymentCard(List<PaymentCards> cards){
+        if (cards.size() > 4){
+             throw new IllegalArgumentException("Only 4 cards allowed per person!");
+        }
+        this.cards = cards;
+    }
+    public void setIsVerified(Boolean isVerified) { this.isVerified = isVerified; }
+    public void setResetTokenUsed(Boolean resetTokenUsed) { this.resetTokenUsed = resetTokenUsed; }
+    public void setPromotionOptIn(Boolean promotionOptIn) { this.promotionOptIn = promotionOptIn; }
 }

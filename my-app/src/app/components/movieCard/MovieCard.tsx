@@ -56,6 +56,12 @@ export default function MovieCard({ movies: propsMovies }: MovieCardProps) {
     );
   };
 
+  // Function to format the cast list for better readability
+  const formatCast = (cast: string[]) => {
+    if (cast.length <= 3) return cast.join(", ");
+    return `${cast.slice(0, 3).join(", ")} and ${cast.length - 3} more`;
+  };
+
   return (
     <div className={style.container}>
       {movies.map((movie, movieIndex) => (
@@ -71,15 +77,16 @@ export default function MovieCard({ movies: propsMovies }: MovieCardProps) {
           </div>
           <div className={style.movieinfocontainer}>
             <div className={style.titleRatingContainer}>
-              <p
+              <h2
                 className={style.title}
-                style={{ cursor: "pointer", textDecoration: "underline" }}
                 onClick={() => handleTitleClick(movie.id)}
               >
                 {movie.title}
-              </p>
-              <p className={style.category}>{movie.category}</p>
-              <p className={style.filmRatingCode}>Rating: {movie.rating}</p>
+              </h2>
+              <div>
+                <span className={style.category}>{movie.category}</span>
+                <span className={style.filmRatingCode}>{movie.rating}</span>
+              </div>
             </div>
 
             <div
@@ -97,7 +104,10 @@ export default function MovieCard({ movies: propsMovies }: MovieCardProps) {
             >
               <div className={style.front}>
                 <div className={style.additionalInfo}>
-                  <strong className={style.showtimeTitle}>Showtimes:</strong>
+                  <div className={style.showtimeHeader}>
+                    <strong className={style.showtimeTitle}>Showtimes</strong>
+                    <span className={style.inlineFlipInfo}>Click to see movie details</span>
+                  </div>
                   <div className={style.showtimes}>
                     {movie.showTimes && movie.showTimes.length > 0 ? (
                       movie.showTimes.map((show, idx) => (
@@ -131,6 +141,10 @@ export default function MovieCard({ movies: propsMovies }: MovieCardProps) {
 
               <div className={style.back}>
                 <div className={style.additionalInfo}>
+                  <div className={style.showtimeHeader}>
+                    <strong className={style.showtimeTitle}>Movie Details</strong>
+                    <span className={style.inlineFlipInfo}>Click to see showtimes</span>
+                  </div>
                   <div className={style.productionCrew}>
                     <p>
                       <strong>Director:</strong> {movie.director}
@@ -139,17 +153,21 @@ export default function MovieCard({ movies: propsMovies }: MovieCardProps) {
                       <strong>Producer:</strong> {movie.producer}
                     </p>
                     <p>
-                      <strong>Cast:</strong> {movie.cast.join(", ")}
+                      <strong>Cast:</strong> {formatCast(movie.cast)}
                     </p>
                   </div>
                   <div className={style.reviews}>
                     <p>
                       <strong>Description:</strong> {movie.description}
                     </p>
-                    <strong>Reviews:</strong>
-                    {movie.reviews?.map((review, reviewIndex) => (
-                      <p key={reviewIndex}>{review}</p>
-                    ))}
+                    {movie.reviews && movie.reviews.length > 0 && (
+                      <>
+                        <strong>Reviews:</strong>
+                        {movie.reviews.map((review, reviewIndex) => (
+                          <p key={reviewIndex}>{review}</p>
+                        ))}
+                      </>
+                    )}
                   </div>
                 </div>
               </div>

@@ -1,42 +1,47 @@
 .container {
   display: grid;
-  grid-template-rows: repeat(auto-fit, minmax(350px, 1fr));
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  padding-right: 20px;
-  overflow-y: auto;
+  grid-template-columns: repeat(auto-fill, minmax(650px, 1fr));
+  gap: 28px;
+  padding: 20px;
+  max-width: auto;
+  margin: 0 auto;
 }
 
 .movie {
   background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   display: grid;
   grid-template-columns: 1fr 2.5fr;
-  grid-template-rows: auto auto auto;
-  min-height: 200px; /* Prevents shrinking */
-  max-height: 350px; /* Limits card height */
-  overflow-y:auto
+  position: relative;
+  min-height: 250px;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
-/* Keeps the poster fixed in place while scrolling */
+.movie:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12), 0 4px 10px rgba(0, 0, 0, 0.06);
+}
+
 .posterContainer {
   position: sticky;
-  top: 0; /* Keeps it stuck at the top of the card */
-  height: 100%; /* Makes sure the image doesn't shrink */
+  top: 0;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: white; /* Prevents flickering */
+  background: #f8f8f8;
+  overflow: hidden;
 }
 
-/* Image stays in place and maintains aspect ratio */
 .posterContainer img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.4s ease-out;
 }
 
 .movie:hover .posterContainer img {
@@ -44,48 +49,63 @@
 }
 
 .movieinfocontainer {
-  grid-row: 1 / span 3;
   grid-column: 2 / 3;
   display: flex;
   flex-direction: column;
-  padding: 10px;
+  padding: 20px;
   color: #333333;
 }
 
 .titleRatingContainer {
-  font-size: calc(1rem + 0.5vw);
-  font-weight: 600;
-  margin-bottom: 10px;
-  text-align: center;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 12px;
 }
 
 .title {
-  margin: 0;
+  margin: 0 0 8px 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--highlight-color, #0066cc);
+  transition: color 0.2s ease;
+}
+
+.title:hover {
+  color: var(--hover-darken, #004d99);
 }
 
 .category {
-  font-size: calc(0.9rem + 0.3vw);
-  color: black;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #555;
+  margin: 4px 0;
+  display: inline-block;
+  background-color: #f5f5f5;
+  padding: 4px 10px;
+  border-radius: 20px;
 }
 
 .filmRatingCode {
-  font-size: calc(0.8rem + 0.3vw);
-  color: black;
+  font-size: 0.85rem;
+  color: #666;
+  margin: 4px 0;
+  display: inline-block;
+  margin-left: 8px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background-color: #f0f0f0;
+  border: 1px solid #e0e0e0;
 }
 
 /* Flip Container */
 .flipContainer {
   position: relative;
   flex-grow: 1;
+  perspective: 1000px;
   transform-style: preserve-3d;
-  transition: transform 0.6s;
   cursor: pointer;
-  min-height: f;
-  
-}
-
-.flipContainer.flipped {
-  transform: rotateY(180deg);
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .front,
@@ -95,9 +115,26 @@
   height: 100%;
   backface-visibility: hidden;
   overflow-y: auto;
+  transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+  padding: 16px;
+  border-radius: 12px;
+  background-color: #fcfcfc;
+  scrollbar-width: thin;
+}
+
+.front::-webkit-scrollbar,
+.back::-webkit-scrollbar {
+  width: 6px;
+}
+
+.front::-webkit-scrollbar-thumb,
+.back::-webkit-scrollbar-thumb {
+  background-color: #d0d0d0;
+  border-radius: 3px;
 }
 
 .front {
+  transform: rotateY(0deg);
   z-index: 2;
 }
 
@@ -105,73 +142,84 @@
   transform: rotateY(180deg);
 }
 
-.additionalInfo p {
-  font-size: calc(0.8rem + 0.3vw);
-  margin: 5px 0;
+.flipContainer.flipped .front {
+  transform: rotateY(180deg);
 }
 
+.flipContainer.flipped .back {
+  transform: rotateY(0deg);
+}
+
+/* Content styling */
+.additionalInfo {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.productionCrew {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.productionCrew p {
+  font-size: 0.9rem;
+  margin: 8px 0;
+  line-height: 1.5;
+}
 
 .reviews {
-  margin-top: 10px;
+  margin-top: 12px;
   text-align: left;
 }
 
 .reviews strong {
-  font-size: calc(0.9rem + 0.3vw);
+  font-size: 0.95rem;
+  color: #333;
 }
 
 .reviews p {
-  font-size: calc(0.8rem + 0.3vw);
-  margin: 4px 0;
-}
-
-.adminControls {
-  grid-row: 4 / 5;
-  grid-column: 1 / span 2;
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 10px;
-  background-color: #f7f7f7;
-}
-
-.editButton,
-.deleteButton {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
   font-size: 0.9rem;
-}
-
-.editButton {
-  background-color: var(--highlight-color, #007bff);
-  color: #ffffff;
-}
-
-.deleteButton {
-  background-color: var(--primary-color, #28a745);
-  color: #ffffff;
-}
-
-.editButton:hover {
-  background-color: var(--primary-color, #28a745);
-}
-
-.deleteButton:hover {
-  background-color: var(--highlight-color, #007bff);
+  margin: 8px 0;
+  line-height: 1.5;
+  color: #555;
 }
 
 
-
-
+.showtimeHeader {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 12px;
+  margin-left: 10px;
+}
 
 .showtimeTitle {
-  font-size: calc(0.9rem + 0.3vw);
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #333333;
+  font-size: 1.1rem;
+  color: #444;
+  display: block;
+  margin-bottom: 16px;
+  position: relative;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--highlight-color, #0066cc);
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.inlineFlipInfo {
+  font-size: 0.8rem;
+  color: #777;
+  font-style: italic;
+  background-color: #f5f5f5;
+  padding: 3px 8px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.flipContainer:hover .inlineFlipInfo {
+  background-color: var(--highlight-color, #0066cc);
+  color: white;
 }
 
 .showtimes {
@@ -182,16 +230,24 @@
 
 .showtimeEntry {
   background-color: #f9f9f9; 
-  padding: 8px;
-  border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.showtimeEntry:hover {
+  background-color: #f2f2f2;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
 }
 
 .screeningDay {
-  font-size: calc(0.8rem + 0.2vw);
-  font-weight: 500;
-  margin: 0 0 4px 0;
-  color: #555555;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: #444;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed #e0e0e0;
 }
 
 .timesList {
@@ -201,52 +257,111 @@
 }
 
 .screentime {
-  font-size: calc(0.7rem + 0.2vw);
+  font-size: 0.85rem;
   margin: 0;
-  padding: 4px 8px;
-  background-color: #e0e0e0; 
-  border-radius: 4px;
-  color: #333333;
+  padding: 6px 10px;
+  background-color: #e8e8e8; 
+  border-radius: 20px;
+  color: #333;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.screentime:hover {
+  background-color: var(--highlight-color, #0066cc);
+  color: white;
+  transform: translateY(-2px);
 }
 
 .noTimes,
 .noShowtimes {
-  font-size: calc(0.7rem + 0.2vw);
-  color: #777777;
+  font-size: 0.85rem;
+  color: #777;
   font-style: italic;
-  margin: 0;
+  margin: 8px 0;
+  padding: 8px;
+  background-color: #f5f5f5;
+  border-radius: 6px;
+  text-align: center;
 }
 
+/* Admin controls */
+.adminControls {
+  grid-column: 1 / span 2;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 10px 16px;
+  background-color: #f7f7f7;
+  border-top: 1px solid #eaeaea;
+}
 
+.editButton,
+.deleteButton {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.editButton {
+  background-color: var(--highlight-color, #0066cc);
+  color: #ffffff;
+}
+
+.deleteButton {
+  background-color: var(--primary-color, #28a745);
+  color: #ffffff;
+}
+
+.editButton:hover {
+  background-color: var(--hover-darken, #004d99);
+  transform: translateY(-2px);
+}
+
+.deleteButton:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 992px) {
+  .container {
+    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+  }
+}
 
 @media (max-width: 768px) {
+  .container {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
   .movie {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto auto;
+    grid-template-rows: auto 1fr;
+    max-height: none;
   }
 
   .posterContainer {
-    grid-row: 1 / span 2;
-    padding-bottom: 60%;
+    height: 300px;
+    position: relative;
   }
 
   .movieinfocontainer {
-    grid-row: 2 / span 3;
+    grid-column: 1;
   }
 
-  .container {
-    grid-template-columns: 1fr;
+  .titleRatingContainer {
+    text-align: center;
   }
 
-  .posterContainer img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transition: transform 0.3s ease;
+  .flipContainer {
+    height: 400px;
   }
-
- 
 }

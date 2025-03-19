@@ -1,17 +1,41 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from "./profilePage.module.css";
 import NavBar from '@/app/components/NavBar/NavBar';
+import { useAuth } from '@/app/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 const ProfilePage = () => {
   const [isPersonalOpen, setIsPersonalOpen] = useState(true);
   const [isPaymentOpen, setIsPaymentOpen] = useState(true);
   const [isHomeOpen, setIsHomeOpen] = useState(true);
+  
+  const { user, isAuthenticated } = useAuth();
+  const router = useRouter();
+  
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
+  
+  // Show loading state while checking authentication
+  if (!isAuthenticated || !user) {
+    return (
+      <div>
+        <NavBar />
+        <div className={styles.profileContainer}>
+          <p>Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
-      <NavBar></NavBar>
+      <NavBar />
       <div className={styles.profileContainer}>
         <h1>User Profile</h1>
 
@@ -30,13 +54,13 @@ const ProfilePage = () => {
           {isPersonalOpen && (
             <div className={styles.sectionContent}>
               <p className={styles.infoItem}>
-                <strong>Name:</strong> John Doe
+                <strong>Name:</strong> {user.firstName || 'Not provided'} {user.lastName || 'Not provided'}
               </p>
               <p className={styles.infoItem}>
-                <strong>Phone Number:</strong> (555) 123-4567
+                <strong>Phone Number:</strong> {user.phone || 'Not provided'}
               </p>
               <p className={styles.infoItem}>
-                <strong>Email Address:</strong> john.doe@example.com
+                <strong>Email Address:</strong> {user.email || 'Not provided'}
               </p>
               <p className={styles.infoItem}>
                 <strong>Password:</strong> ********
@@ -60,16 +84,16 @@ const ProfilePage = () => {
           {isPaymentOpen && (
             <div className={styles.sectionContent}>
               <p className={styles.infoItem}>
-                <strong>Card Type:</strong> Visa
+                <strong>Card Type:</strong> Not provided
               </p>
               <p className={styles.infoItem}>
-                <strong>Card Number:</strong> **** **** **** 1234
+                <strong>Card Number:</strong> Not provided
               </p>
               <p className={styles.infoItem}>
-                <strong>Expiration Date:</strong> 12/24
+                <strong>Expiration Date:</strong> Not provided
               </p>
               <p className={styles.infoItem}>
-                <strong>Billing Address:</strong> 123 Payment St, Payville, CA
+                <strong>Billing Address:</strong> Not provided
               </p>
             </div>
           )}
@@ -90,16 +114,16 @@ const ProfilePage = () => {
           {isHomeOpen && (
             <div className={styles.sectionContent}>
               <p className={styles.infoItem}>
-                <strong>Street:</strong> 456 Home St
+                <strong>Street:</strong> Not provided
               </p>
               <p className={styles.infoItem}>
-                <strong>City:</strong> Hometown
+                <strong>City:</strong> Not provided
               </p>
               <p className={styles.infoItem}>
-                <strong>State:</strong> CA
+                <strong>State:</strong> Not provided
               </p>
               <p className={styles.infoItem}>
-                <strong>Zip Code:</strong> 90210
+                <strong>Zip Code:</strong> Not provided
               </p>
             </div>
           )}

@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import styles from "./MovieDetailPage.module.css"; // Import CSS module
+import styles from "./MovieDetailPage.module.css";
 import NavBar from "@/app/components/NavBar/NavBar";
 import Link from "next/link";
 

@@ -15,7 +15,7 @@ const SeatSelectionPage = () => {
   const seniorTickets = parseInt(searchParams.get("senior") || "0", 10);
   const totalTickets = adultTickets + childTickets + seniorTickets;
 
-  // Parse showtime from search params (this is new)
+
   const showtime = searchParams.get("showtime") || "TBD";
 
   // State for selected seats
