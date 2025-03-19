@@ -1,8 +1,11 @@
 package com.SWE.CinemaEBookingSystem.service;
 
+import com.SWE.CinemaEBookingSystem.config.AESUtil;
 import com.SWE.CinemaEBookingSystem.entity.User;
+import com.SWE.CinemaEBookingSystem.entity.PaymentCards;
 import com.SWE.CinemaEBookingSystem.entity.UserStatus;
 import com.SWE.CinemaEBookingSystem.repository.UserRepository;
+import com.SWE.CinemaEBookingSystem.repository.PaymentCardRepository;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,13 +22,18 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PaymentCardRepository paymentCardRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final AESUtil aesUtil;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailService emailService) {
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailService emailService, PaymentCardRepository paymentCardRepository,AESUtil aesUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
+        this.paymentCardRepository = paymentCardRepository;
+        this.aesUtil = aesUtil;
     }
 
     /**
@@ -45,11 +53,25 @@ public class UserService {
         user.setVerificationToken(verificationToken);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setStatus(UserStatus.INACTIVE);
+
         userRepository.save(user);
+        AESUtil aesUtil = new AESUtil();
+        PaymentCards primaryCard = user.getPrimaryCard();
+
+// Encrypt the card number and update the object
+        if (primaryCard != null) {
+             primaryCard.setCardNumber(aesUtil.encrypt(primaryCard.getCardNumber()));
+
+    // Save the updated PaymentCards entity
+            paymentCardRepository.save(primaryCard);
+        }
+        
+        
         // Send verification email
         String subject = "Email Verification";
         String verificationUrl = "http://localhost:8080/api/auth/verify?token=" + verificationToken;
         String message = "Click the link below to verify your email:\n" + verificationUrl;
+
         emailService.sendEmail(user.getEmail(), subject, message);
     }
 

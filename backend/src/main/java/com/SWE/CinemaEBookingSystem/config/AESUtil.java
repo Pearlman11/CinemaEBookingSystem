@@ -15,7 +15,7 @@ import javax.crypto.KeyGenerator;
 public class AESUtil { 
 
     @Value("${custom.secret-key}")
-    private String aesKey;
+    private static final String aesKey = "JRkLqh6gw1ZbHZe30KZ/ncQ2LYGSe62tN7vsUloUpu4=";
     private static final String ALGORITHM = "AES";
 
     @PostConstruct
@@ -27,9 +27,7 @@ public class AESUtil {
 
 
     
-    public void setAesKey(String key) {
-        aesKey = key;
-    }
+    
     public   String encrypt(String data) {
         System.out.println("Encrypt method called with: " + data);
         if(data == null){

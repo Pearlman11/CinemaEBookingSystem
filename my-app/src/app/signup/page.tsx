@@ -59,31 +59,38 @@ export default function SignupPage() {
 
     try {
        // Conditionally add payment details if `showOptionalPayment` is true
-  const paymentData = showOptionalPayment
-  ? {
-      cardNumber: formData.cardNumber,
-      cardExpiry: formData.cardExpiry,
-      billingAddress: formData.BillingAddress,
-    }
-  : {};
-      const registerResponse = await fetch("http://localhost:8080/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          password: formData.password,
-          phone: formData.phone || null,
-          dob: formData.dob ? new Date(formData.dob) : null,
-          role: "USER",
-          isVerified: false,
-          resetTokenUsed: false,
-          promotionOptIn: false
-        , ...paymentData}),
-      });
+       const paymentCard =
+       showOptionalPayment &&
+       formData.cardNumber &&
+       formData.cardExpiry &&
+       formData.BillingAddress
+         ? {
+             cardNumber: formData.cardNumber,
+             expirationDate: formData.cardExpiry, // Ensure this matches the entity
+             billingAddress: formData.BillingAddress,
+           }
+         : null; // Set to null if payment info is incomplete
+
+     const registerResponse = await fetch("http://localhost:8080/api/auth/register", {
+       method: "POST",
+       headers: {
+         "Content-Type": "application/json",
+       },
+       body: JSON.stringify({
+         firstName: formData.firstName,
+         lastName: formData.lastName,
+         email: formData.email,
+         password: formData.password,
+         phone: formData.phone || null,
+         dob: formData.dob ? new Date(formData.dob) : null,
+         role: "USER",
+         isVerified: false,
+         resetTokenUsed: false,
+         promotionOptIn: false,
+         cards:null,
+         primaryCard:paymentCard, // Add only if not null
+       }),
+     });
 
       let data;
       const contentType = registerResponse.headers.get("content-type");
@@ -241,12 +248,12 @@ export default function SignupPage() {
                   />
                   
                   <FormField
-                    id="cardCVC"
+                    id="BillingAddress"
                     label="Billing Address"
                     type="text"
                     value={formData.BillingAddress}
                     onChange={handleChange}
-                    placeholder="Enter BillingAddress"
+                    placeholder="Enter Billing Address"
                   />
                 </div>
               </div>

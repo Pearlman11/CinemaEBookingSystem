@@ -23,6 +23,7 @@ import com.SWE.CinemaEBookingSystem.entity.User;
 import com.SWE.CinemaEBookingSystem.entity.UserRole;
 import com.SWE.CinemaEBookingSystem.entity.PaymentCards;
 import com.SWE.CinemaEBookingSystem.repository.UserRepository;
+import com.SWE.CinemaEBookingSystem.repository.PaymentCardRepository;
 import com.SWE.CinemaEBookingSystem.service.PaymentCardService;
 
 @RestController
@@ -59,6 +60,7 @@ public class UserController {
     // Creating a new User
     @PostMapping("/register")
     public ResponseEntity<?> createUser(@RequestBody User user) {
+        System.out.println("UserId:"+user.getId());
         try {
             // Check if user already exists
             Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
@@ -70,12 +72,22 @@ public class UserController {
             // Encode password before saving
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             
+
+            
+            if (user.getPaymentCards() != null && !user.getPaymentCards().isEmpty() && user.getPaymentCards().get(0) != null) {
+                PaymentCards card = paymentCardService.addPaymentCardToUser(user.getId(), user.getPaymentCards().get(0));
+                System.out.println("UserId:"+user.getId()+user.getPaymentCards().get(0));
+            }
             // Set default role if not provided
             if (user.getRole() == null) {
                 user.setRole(UserRole.USER);
             }
 
             User savedUser = userRepository.save(user);
+            
+
+            
+            
             return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
         } catch(Exception e) {
             Map<String, String> response = Map.of("message", "Error creating user: " + e.getMessage());
