@@ -26,6 +26,10 @@ const EditProfile = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isPromotionsOptedIn, setIsPromotionsOptedIn] = useState(false);
+
+  // Placeholder for payment cards (add your logic)
+  const [cards, setCards] = useState([]);
 
   // Pre-fill form with user data when component mounts
   useEffect(() => {
@@ -43,6 +47,18 @@ const EditProfile = () => {
       router.push('/login');
     }
   }, [isAuthenticated, router]);
+
+  // Placeholder for handling card changes (add your logic)
+  const handleCardChange = (index, field, value) => {
+    const updatedCards = [...cards];
+    updatedCards[index][field] = value;
+    setCards(updatedCards);
+  };
+
+  // Placeholder for adding a new card (add your logic)
+  const handleAddCard = () => {
+    setCards([...cards, { cardNumber: '', expDate: '', billingAddress: '' }]);
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -64,10 +80,10 @@ const EditProfile = () => {
         lastName,
         email,
         phone,
-        password: newPassword || user.password,
+        password: newPassword || user.password, // Only updating if new password is provided
         role: user.role
       };
-      
+
       // First API call - Update user profile with original endpoint
       const response = await fetch(`http://localhost:8080/api/users/${user.id}/editprofile`, {
         method: 'PUT',
@@ -210,44 +226,75 @@ const EditProfile = () => {
             </button>
             {isPaymentOpen && (
               <div className={styles.sectionContent}>
-                <div className={styles.field}>
-                  <label htmlFor="cardType">Card Type</label>
-                  <input
-                    type="text"
-                    id="cardType"
-                    placeholder="Enter card type"
-                    className={styles.input}
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label htmlFor="cardNumber">Card Number</label>
-                  <input
-                    type="text"
-                    id="cardNumber"
-                    placeholder="Enter card number"
-                    className={styles.input}
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label htmlFor="expDate">Expiration Date</label>
-                  <input
-                    type="text"
-                    id="expDate"
-                    placeholder="MM/YY"
-                    className={styles.input}
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label htmlFor="billingAddress">Billing Address</label>
-                  <input
-                    type="text"
-                    id="billingAddress"
-                    placeholder="Enter billing address"
-                    className={styles.input}
-                  />
-                </div>
+                {cards.map((card, index) => (
+                  <div key={index} className={styles.card}>
+                    <div className={styles.field}>
+                      <label htmlFor={`cardNumber-${index}`}>Card Number</label>
+                      <input
+                        type="text"
+                        id={`cardNumber-${index}`}
+                        placeholder="Enter card number"
+                        className={styles.input}
+                        value={card.cardNumber}
+                        onChange={(e) => handleCardChange(index, 'cardNumber', e.target.value)}
+                      />
+                    </div>
+                    <div className={styles.field}>
+                      <label htmlFor={`expDate-${index}`}>Expiration Date</label>
+                      <input
+                        type="text"
+                        id={`expDate-${index}`}
+                        placeholder="MM/YY"
+                        className={styles.input}
+                        value={card.expDate}
+                        onChange={(e) => handleCardChange(index, 'expDate', e.target.value)}
+                      />
+                    </div>
+                    <div className={styles.field}>
+                      <label htmlFor={`billingAddress-${index}`}>Billing Address</label>
+                      <input
+                        type="text"
+                        id={`billingAddress-${index}`}
+                        placeholder="Enter billing address"
+                        className={styles.input}
+                        value={card.billingAddress}
+                        onChange={(e) => handleCardChange(index, 'billingAddress', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                ))}
+                <button type="button" onClick={handleAddCard} className={styles.addCardButton}>
+                  Add Another Card
+                </button>
               </div>
             )}
+          </div>
+
+          {/* Promotions Opt-In */}
+          <div className={styles.field}>
+            <label>Receive Promotions:</label>
+            <div className={styles.radioGroup}>
+              <label>
+                <input
+                  type="radio"
+                  name="promotions"
+                  value="yes"
+                  checked={isPromotionsOptedIn === true}
+                  onChange={() => setIsPromotionsOptedIn(true)}
+                />
+                Yes
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="promotions"
+                  value="no"
+                  checked={isPromotionsOptedIn === false}
+                  onChange={() => setIsPromotionsOptedIn(false)}
+                />
+                No
+              </label>
+            </div>
           </div>
 
           {/* Home Address Section */}
