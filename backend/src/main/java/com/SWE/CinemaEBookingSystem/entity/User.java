@@ -52,7 +52,12 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserStatus status = UserStatus.INACTIVE; // ✅ Default to INACTIVE
     
-   
+    private String resetToken; // ✅ Reset password token
+    private boolean resetTokenUsed = false; // ✅ Track if token is used
+
+    @Column(name = "promotion_opt_in", nullable = false)
+    private boolean promotionOptIn = false; // ✅ Default to false
+
   
 
     
@@ -105,4 +110,10 @@ public class User {
     public void setVerificationToken(String verificationToken) { this.verificationToken = verificationToken; }
     public UserStatus getStatus() { return status; }
     public void setStatus(UserStatus status) { this.status = status; }
+    public String getResetToken() { return resetToken; }
+    public void setResetToken(String resetToken) { this.resetToken = resetToken; }
+    public boolean isResetTokenUsed() { return resetTokenUsed; }
+    public void setResetTokenUsed(boolean resetTokenUsed) { this.resetTokenUsed = resetTokenUsed; }
+    public boolean isPromotionOptIn() { return promotionOptIn; }
+    public void setPromotionOptIn(boolean promotionOptIn) { this.promotionOptIn = promotionOptIn; }
 }
