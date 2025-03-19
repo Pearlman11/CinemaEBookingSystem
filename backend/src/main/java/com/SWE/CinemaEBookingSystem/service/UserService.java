@@ -17,6 +17,17 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Find a user by their email address
+     * @param email The email to search for
+     * @return The user if found
+     * @throws RuntimeException if user not found
+     */
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
     public void registerUser(User user) {
         // Encrypt password before saving
         user.setPassword(passwordEncoder.encode(user.getPassword()));

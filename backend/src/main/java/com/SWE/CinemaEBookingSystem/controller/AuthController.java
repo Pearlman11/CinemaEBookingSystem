@@ -59,6 +59,31 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
+        try {
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing token");
+            }
+
+            String token = authHeader.substring(7); // Remove "Bearer " prefix
+            String email = jwtUtil.extractEmail(token, false);
+
+            if (email == null || !jwtUtil.validateToken(token, email, false)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired token");
+            }
+
+            User user = userService.findByEmail(email);
+            
+            // Don't return the password in the response
+            user.setPassword(null);
+            
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error retrieving user data: " + e.getMessage());
+        }
+    }
+
     public static class AuthResponse {
         private String accessToken;
         private String refreshToken;
