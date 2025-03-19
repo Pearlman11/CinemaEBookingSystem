@@ -1,0 +1,99 @@
+[
+    {
+        "title": "Captain America: Brave New World",
+        "releaseDate": "2025-02-14",
+        "category": "Now Playing",
+        "cast": ["Anthony Mackie", "Harrison Ford", "Danny Ramirez", "Shira Haas"],
+        "director": "Julius Onah",
+        "producer": ["Kevin Feige", "Dede Gardner", "Jeremy Kleiner"],
+        "trailer": "https://www.youtube.com/watch?v=1pHDWnXmK7Y",
+        "poster": "https://cdn.marvel.com/content/1x/captainamericabravenewworld_lob_mas_mob_03.jpg",
+        "description": "Sam Wilson, now Captain America, investigates a conspiracy involving President Thaddeus Ross...",
+        "reviews": ["Anthony Mackie capably takes up Cap's mantle and shield..."],
+        "showTimes": {
+            "2025-03-18": ["1:00 PM", "4:00 PM", "7:00 PM"]
+        }
+    },
+    {
+        "title": "Mickey 17",
+        "releaseDate": "2025-03-07",
+        "category": "Now Playing",
+        "cast": ["Robert Pattinson", "Steven Yeun", "Michael Monroe", "Naomi Ackie"],
+        "director": "Bong Joon Ho",
+        "producer": ["Andrew Form", "Brad Fuller", "Dan Berk", "Robert Olsen"],
+        "trailer": "https://www.youtube.com/watch?v=osYpGSz_0i4",
+        "poster": "https://lovelondonloveculture.com/wp-content/uploads/2025/02/mickey_oneseven_ver2_xxlg-1-1200x900-1.jpg",
+        "description": "An expendable employee, Mickey 17, dies and regenerates...",
+        "reviews": ["Mickey 17 is such a wasted opportunity..."],
+        "showTimes": {
+            "2025-03-18": ["2:00 PM", "5:00 PM", "8:00 PM"],
+            "2025-03-19": ["2:00 PM", "5:00 PM", "8:00 PM"],
+            "2025-03-20": ["2:00 PM", "5:00 PM", "8:00 PM"]
+        }
+    },
+    {
+        "title": "Novocaine",
+        "releaseDate": "2025-03-14",
+        "category": "Now Playing",
+        "cast": ["Jack Quaid", "Amber Midthunder", "Ray Nicholson", "Jacob Batalon"],
+        "director": "Dan Berk and Robert Olsen",
+        "producer": ["Andrew Form", "Brad Fuller", "Dan Berk", "Robert Olsen"],
+        "trailer": "https://www.youtube.com/watch?v=-PyOIlJEdqA",
+        "poster": "https://ntvb.tmsimg.com/assets/p28989445_v_h10_aa.jpg?w=960&h=540",
+        "description": "When the girl of his dreams is kidnapped, Nate, who can't feel pain...",
+        "reviews": ["Novocaine is the opposite of a pain to watch..."],
+        "showTimes": {
+            "2025-03-18": ["1:30 PM", "4:30 PM", "7:30 PM"],
+            "2025-03-19": ["1:30 PM", "4:30 PM", "7:30 PM"],
+            "2025-03-20": ["1:30 PM", "4:30 PM", "7:30 PM"]
+        }
+    },
+    {
+        "title": "Black Bag",
+        "releaseDate": "2025-03-14",
+        "category": "Now Playing",
+        "cast": ["Michael Fassbender", "Cate Blanchett", "Tom Burke", "Pierce Brosnan"],
+        "director": "Steven Soderbergh",
+        "producer": ["Jason Blum"],
+        "trailer": "https://www.youtube.com/watch?v=n_56L6WzLT8",
+        "poster": "https://assets-prd.ignimgs.com/2025/01/30/black-bag-button-1738262447466.jpg",
+        "description": "When his wife is suspected of treason, a spy must choose between loyalty to his marriage or his country...",
+        "reviews": ["Sleek in design and spiked with dry wit, Black Bag is an exemplary espionage caper..."],
+        "showTimes": {
+            "2025-03-18": ["2:30 PM", "5:30 PM", "8:30 PM"],
+            "2025-03-19": ["2:30 PM", "5:30 PM", "8:30 PM"],
+            "2025-03-20": ["2:30 PM", "5:30 PM", "8:30 PM"]
+        }
+    },
+    {
+        "title": "Hans Zimmer & Friends: Diamond in the Desert",
+        "releaseDate": "2025-03-19",
+        "category": "Coming Soon",
+        "cast": ["Hans Zimmer", "Timothée Chalamet", "Christopher Nolan", "Zendaya"],
+        "director": "Paul Dugdale",
+        "producer": ["Trafalgar Releasing"],
+        "trailer": "https://www.youtube.com/watch?v=vRvOkDjQprc",
+        "poster": "https://dx35vtwkllhj9.cloudfront.net/trafalgarreleasing/hans-zimmer-and-friends/images/regions/intl/onesheet.jpg",
+        "description": "A journey through Dubai featuring live performances...",
+        "reviews": ["Great concert film!", "A must-watch for fans of Hans Zimmer."],
+        "showTimes": {
+            "2025-03-19": ["11:00 AM", "1:00 PM", "3:00 PM", "5:00 PM"]
+        }
+    },
+    {
+        "title": "McVeigh",
+        "releaseDate": "2025-03-21",
+        "category": "Coming Soon",
+        "cast": ["Alfie Allen", "Brett Gelman", "Ashley Benson", "Anthony Carrigan"],
+        "director": "Mike Ott",
+        "producer": ["Some Production Company"],
+        "trailer": "https://www.youtube.com/watch?v=2MYKHos_kTA",
+        "poster": "https://images.fandango.com/ImageRenderer/0/0/redesign/static/img/default_poster.png/0/images/masterrepository/Fandango/239517/MCVEIGH_1a_fullsize.jpg",
+        "description": "Army veteran Timothy McVeigh hatches a deadly plan after the Waco siege...",
+        "reviews": ["A gripping thriller.", "Well-acted and intense."],
+        "showTimes": {
+            "2025-03-21": ["Limited Theatrical and Digital Release"]
+        }
+    }
+]
+
