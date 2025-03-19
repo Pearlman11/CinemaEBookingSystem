@@ -41,6 +41,7 @@ public class PaymentCards {
     public String getBillingAddress() { return billingAddress; }
     public Date getExpirationDate() { return expirationDate; }
     public User getUser(){return user;}
+    public Integer getId(){return id;}
 
     //Setters
     public void setCardNumber(String cardNumber) { this.cardNumber = cardNumber; }
