@@ -20,7 +20,7 @@ export default function SignupPage() {
     shippingAddress: "",
     cardNumber: "",
     cardExpiry: "",
-    cardCVC: ""
+    BillingAddress: ""
   });
   
   const [showOptionalShipping, setShowOptionalShipping] = useState(false);
@@ -234,11 +234,11 @@ export default function SignupPage() {
                   
                   <FormField
                     id="cardCVC"
-                    label="CVC"
+                    label="Billing Address"
                     type="text"
-                    value={formData.cardCVC}
+                    value={formData.BillingAddress}
                     onChange={handleChange}
-                    placeholder="Enter CVC"
+                    placeholder="Enter BillingAddress"
                   />
                 </div>
               </div>
