@@ -3,7 +3,6 @@
 import {createContext, useContext, useState, ReactNode, useEffect} from 'react'
 import { useRouter } from 'next/navigation';
 
-//  User interface to match backend entity
 export interface User {
   password: string;
   id: number;
@@ -37,11 +36,11 @@ export function AuthProvider({children}: {children:ReactNode}) {
 
     // Check for saved auth state on component mount
     useEffect(() => {
-        // First check if we have tokens
+        //  check if we have tokens
         const accessToken = sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
         
         if (!accessToken) {
-            // No valid token,user is logged out
+            // No valid token, ensure user is logged out
             setIsLoggedIn(false);
             setIsAdmin(false);
             setUser(null);
@@ -65,7 +64,7 @@ export function AuthProvider({children}: {children:ReactNode}) {
     // Function to fetch user data using token
     const fetchUserData = async (token: string) => {
         try {
-            const response = await fetch('http://localhost:8080/api/users/me', {
+            const response = await fetch('http://localhost:8080/api/auth/me', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -84,6 +83,7 @@ export function AuthProvider({children}: {children:ReactNode}) {
                     sessionStorage.setItem('user', JSON.stringify(userData));
                 }
             } else {
+                // Invalid token or other error
                 logout();
             }
         } catch (error) {
