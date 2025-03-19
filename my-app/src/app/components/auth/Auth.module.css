@@ -185,4 +185,25 @@
   .nameFields, .cardDetails {
     grid-template-columns: 1fr;
   }
+}
+
+.custom-toast {
+  background: #fff;
+  border: 2px solid var(--hover-darken, #0066cc);
+  color: #222;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-family: Arial, sans-serif;
+}
+
+.customProgress {
+  background: var(--highlight-color, #0066cc);
+  height: 6px;
+  border-radius: 2px;
+  opacity: 100;
+}
+
+.toastContainer {
+  font-size: 18px;
 } 

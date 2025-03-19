@@ -13,7 +13,6 @@ export default function NavBar() {
   const userMenuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
-  // Close user menu when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
@@ -27,7 +26,6 @@ export default function NavBar() {
     };
   }, []);
 
-  // Close menus when route changes
   useEffect(() => {
     setUserMenuOpen(false);
     setMobileMenuOpen(false);

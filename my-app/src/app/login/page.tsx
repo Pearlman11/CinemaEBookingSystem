@@ -1,3 +1,4 @@
+//login
 "use client";
 
 import { useState, useEffect } from "react";
@@ -6,6 +7,8 @@ import Link from "next/link";
 import styles from "@/app/components/auth/Auth.module.css";
 import NavBar from "@/app/components/NavBar/NavBar";
 import FormField from "@/app/components/auth/FormField";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -13,7 +16,7 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [isAdminLogin, setIsAdminLogin] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+  const [, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const { login, adminLogin, setAdmin } = useAuth();
@@ -29,7 +32,11 @@ export default function LoginPage() {
       }
       
       if (registered === 'true') {
-        setSuccessMessage('Account created successfully! Please log in.');
+        const message = 'Account created successfully! Please log in.';
+        setSuccessMessage(message);
+        toast.success(message, { 
+          className: styles['custom-toast'] 
+        });
       }
     }
   }, []);
@@ -61,12 +68,10 @@ export default function LoginPage() {
       // AuthController returns tokens and we need to store them
       const { accessToken, refreshToken } = authData;
       
-      // Store tokens (you should update your AuthContext to handle these)
+
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
-      
-      // You'll need to fetch user data or extract it from JWT
-      // For now, we'll assume we need to make another call to get user data
+
       const userResponse = await fetch(`http://localhost:8080/api/users/email/${email}`, {
         headers: {
           "Authorization": `Bearer ${accessToken}`
@@ -109,12 +114,17 @@ export default function LoginPage() {
   return (
     <div>
       <NavBar />
+      <ToastContainer 
+        aria-label={undefined} 
+        progressClassName={styles.customProgress} 
+        hideProgressBar={true} 
+        autoClose={4000} 
+        className={styles.toastContainer} 
+        limit={2} 
+      />
+      
       <div className={styles.formContainer}>
         <h2>{isAdminLogin ? "Admin Login" : "Login"}</h2>
-        
-        {successMessage && (
-          <div className={styles.successMessage}>{successMessage}</div>
-        )}
         
         {errorMessage && (
           <div className={styles.errorMessage}>{errorMessage}</div>

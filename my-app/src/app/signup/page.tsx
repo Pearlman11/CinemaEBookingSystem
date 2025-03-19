@@ -50,7 +50,6 @@ export default function SignupPage() {
     setIsLoading(true);
 
     try {
-      // Register the user using AuthController
       const registerResponse = await fetch("http://localhost:8080/api/auth/register", {
         method: "POST",
         headers: {
@@ -70,13 +69,11 @@ export default function SignupPage() {
         }),
       });
 
-      // Safely handle response - check content type first
       let data;
       const contentType = registerResponse.headers.get("content-type");
       if (contentType && contentType.indexOf("application/json") !== -1) {
         data = await registerResponse.json();
       } else {
-        // Not JSON - get as text
         const textData = await registerResponse.text();
         data = { message: textData };
       }
