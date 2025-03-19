@@ -1,7 +1,7 @@
 package com.SWE.CinemaEBookingSystem.controller;
 
 import com.SWE.CinemaEBookingSystem.entity.Showtime;
-import com.SWE.CinemaEBookingSystem.repository.ShowtimeRepository;
+import com.SWE.CinemaEBookingSystem.repository.ShowTimeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,12 +11,12 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/showtimes")
-public class ShowtimeController {
+public class ShowTimeController {
 
-    private final ShowtimeRepository showtimeRepository;
+    private final ShowTimeRepository showtimeRepository;
 
     @Autowired
-    public ShowtimeController(ShowtimeRepository showtimeRepository) {
+    public ShowTimeController(ShowTimeRepository showtimeRepository) {
         this.showtimeRepository = showtimeRepository;
     }
 

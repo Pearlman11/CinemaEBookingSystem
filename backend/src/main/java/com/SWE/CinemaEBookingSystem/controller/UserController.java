@@ -1,5 +1,7 @@
 package com.SWE.CinemaEBookingSystem.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,9 +15,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.Optional;
+import java.util.Map;
 
 import com.SWE.CinemaEBookingSystem.entity.User;
+import com.SWE.CinemaEBookingSystem.entity.PaymentCards;
 import com.SWE.CinemaEBookingSystem.repository.UserRepository;
+import com.SWE.CinemaEBookingSystem.service.PaymentCardService;
 
 @RestController
 @RequestMapping("/api/users")
@@ -23,6 +28,11 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
+
+    @Autowired
+    private PaymentCardService paymentCardService;
+
 
     // Getting all users
     @GetMapping
@@ -71,16 +81,26 @@ public class UserController {
 
     }
 
-    //update on EditProfile //Need to finish payment card entity to full implement
+    //update on EditProfile //Need to finish payment card entity to full implement //Assumed that the request body has the updated card
     @PutMapping("/{id}/editprofile")
     public ResponseEntity<User> editProfileUpdate(@PathVariable Integer id, @RequestBody User userDetails) {
         Optional<User> userData = userRepository.findById(id);
-
         if (userData.isPresent()) {
             User user = userData.get();
             user.setFirstName(userDetails.getFirstName());
             user.setLastName(userDetails.getLastName());
             user.setPassword(userDetails.getPassword());
+            
+            
+            List<PaymentCards> updatedCards = userDetails.getPaymentCards();
+            for(PaymentCards card:updatedCards){
+                paymentCardService.updateExistingCard(user.getId(), card); 
+                
+            }
+            System.out.println(userDetails.getPaymentCards());
+            
+
+
             
             return new ResponseEntity<>(userRepository.save(user), HttpStatus.OK);
         } else {
@@ -88,6 +108,32 @@ public class UserController {
         }
 
     }
+
+
+    @PostMapping("/{id}/payment-cards")
+    public ResponseEntity<PaymentCards> addPaymentCardToUser(@PathVariable("id") Integer userId,@RequestBody PaymentCards card){
+        System.out.println("User ID: " + userId);
+        System.out.println("Received Card: " + card);
+        if (card == null) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        try{
+            PaymentCards savedcard = paymentCardService.addPaymentCardToUser(userId, card);
+            return  new ResponseEntity<>(savedcard, HttpStatus.CREATED);
+
+            
+        }catch(IllegalArgumentException ex){
+            ex.printStackTrace();
+           return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
+    
+
+
+
+
 
 
 
