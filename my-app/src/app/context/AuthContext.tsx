@@ -41,7 +41,7 @@ export function AuthProvider({children}: {children:ReactNode}) {
         const accessToken = sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
         
         if (!accessToken) {
-            // No valid token, ensure user is logged out
+            // No valid token,user is logged out
             setIsLoggedIn(false);
             setIsAdmin(false);
             setUser(null);
@@ -65,7 +65,6 @@ export function AuthProvider({children}: {children:ReactNode}) {
     // Function to fetch user data using token
     const fetchUserData = async (token: string) => {
         try {
-            // You'll need to implement this endpoint in your backend
             const response = await fetch('http://localhost:8080/api/users/me', {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -85,7 +84,6 @@ export function AuthProvider({children}: {children:ReactNode}) {
                     sessionStorage.setItem('user', JSON.stringify(userData));
                 }
             } else {
-                // Invalid token or other error
                 logout();
             }
         } catch (error) {
