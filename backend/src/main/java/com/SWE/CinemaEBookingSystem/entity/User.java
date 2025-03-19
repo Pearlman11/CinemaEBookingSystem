@@ -41,16 +41,16 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<PaymentCards> cards;
 
+    @Column(name = "reset_token_used")
+    private Boolean resetTokenUsed = false;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = false, updatable = false)
-
-   
-    
-   
     private Date createdAt = new Date();
 
-    
+    @Column(name = "promotion_opt_in", nullable = false)
+    private Boolean promotionOptIn = false;
+
     public User() {}
 
     public User(String firstName, String lastName, String email, String password, String phone, Date dob, UserRole role,List<PaymentCards> cards) {
@@ -63,7 +63,7 @@ public class User {
         this.role = role;
         this.createdAt = new Date();
         this.cards = cards;
-        this.isVerified = false;  // Set default in constructor too
+        this.isVerified = false; 
     }
 
     // Getters and Setters
@@ -78,7 +78,8 @@ public class User {
     public Date getCreatedAt() { return createdAt; }
     public List<PaymentCards> getPaymentCards(){return cards;}
     public Boolean getIsVerified() { return isVerified; }
-
+    public Boolean getResetTokenUsed() { return resetTokenUsed; }
+    public Boolean getPromotionOptIn() { return promotionOptIn; }
 
     public void setId(Integer id) { this.id = id; }
     public void setFirstName(String firstName) { this.firstName = firstName; }
@@ -95,4 +96,6 @@ public class User {
         this.cards = cards;
     }
     public void setIsVerified(Boolean isVerified) { this.isVerified = isVerified; }
+    public void setResetTokenUsed(Boolean resetTokenUsed) { this.resetTokenUsed = resetTokenUsed; }
+    public void setPromotionOptIn(Boolean promotionOptIn) { this.promotionOptIn = promotionOptIn; }
 }

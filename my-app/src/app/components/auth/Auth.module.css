@@ -161,6 +161,21 @@
   gap: 1rem;
 }
 
+.rememberMeContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.rememberMeCheckbox {
+  margin-right: 0.5rem;
+}
+
+.rememberMeLabel {
+  font-size: 0.9rem;
+  color: #666;
+}
+
 @media (max-width: 600px) {
   .formContainer {
     padding: 1.5rem;

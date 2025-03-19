@@ -117,7 +117,14 @@
   transform: translateY(-2px);
 }
 
-
+.successMessage {
+  background-color: #dff0d8;
+  color: #3c763d;
+  padding: 12px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  text-align: center;
+}
 
 
 

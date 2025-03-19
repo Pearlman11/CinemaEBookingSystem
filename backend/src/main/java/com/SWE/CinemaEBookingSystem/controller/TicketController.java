@@ -50,7 +50,7 @@ public class TicketController {
             Ticket ticket = optionalTicket.get();
             ticket.setMovie(ticketDetails.getMovie());
             ticket.setUser(ticketDetails.getUser());
-            ticket.setShowtime(ticketDetails.getShowtime());
+            ticket.setShowtimes(ticketDetails.getShowtimes());
             ticket.setSeat(ticketDetails.getSeat());
             ticket.setPrice(ticketDetails.getPrice());
 

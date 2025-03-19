@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import Link from "next/link";
 import styles from "@/app/components/auth/Auth.module.css";
@@ -10,11 +10,29 @@ import FormField from "@/app/components/auth/FormField";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [isAdminLogin, setIsAdminLogin] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const { login, adminLogin, setAdmin } = useAuth();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const emailParam = params.get('email');
+      const registered = params.get('registered');
+      
+      if (emailParam) {
+        setEmail(emailParam);
+      }
+      
+      if (registered === 'true') {
+        setSuccessMessage('Account created successfully! Please log in.');
+      }
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,8 +40,8 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // API call to backend using email and password
-      const response = await fetch(`http://localhost:8080/api/users/login`, {
+      // API call to AuthController instead of UserController
+      const response = await fetch(`http://localhost:8080/api/auth/login?rememberMe=${rememberMe}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -38,7 +56,28 @@ export default function LoginPage() {
         throw new Error("Invalid email or password");
       }
 
-      const userData = await response.json();
+      const authData = await response.json();
+      
+      // AuthController returns tokens and we need to store them
+      const { accessToken, refreshToken } = authData;
+      
+      // Store tokens (you should update your AuthContext to handle these)
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+      
+      // You'll need to fetch user data or extract it from JWT
+      // For now, we'll assume we need to make another call to get user data
+      const userResponse = await fetch(`http://localhost:8080/api/users/email/${email}`, {
+        headers: {
+          "Authorization": `Bearer ${accessToken}`
+        }
+      });
+      
+      if (!userResponse.ok) {
+        throw new Error("Failed to get user data");
+      }
+      
+      const userData = await userResponse.json();
       
       // Check if user role matches requested login type
       const isUserAdmin = userData.role === "ADMIN";
@@ -73,6 +112,10 @@ export default function LoginPage() {
       <div className={styles.formContainer}>
         <h2>{isAdminLogin ? "Admin Login" : "Login"}</h2>
         
+        {successMessage && (
+          <div className={styles.successMessage}>{successMessage}</div>
+        )}
+        
         {errorMessage && (
           <div className={styles.errorMessage}>{errorMessage}</div>
         )}
@@ -95,6 +138,19 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+          
+          <div className={styles.checkboxContainer}>
+            <input
+              type="checkbox"
+              id="rememberMe"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className={styles.checkbox}
+            />
+            <label htmlFor="rememberMe" className={styles.checkboxLabel}>
+              Remember me
+            </label>
+          </div>
           
           <button 
             type="submit" 

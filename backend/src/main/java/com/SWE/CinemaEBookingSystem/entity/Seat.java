@@ -9,8 +9,8 @@ public class Seat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "row_number", nullable = false)
-    private int rowNumber;
+    @Column(name = "seat_row")
+    private Integer seatRow;
 
     @Column(name = "seat_number", nullable = false)
     private int seatNumber;
@@ -18,7 +18,7 @@ public class Seat {
     public Seat() {}
 
     public Seat(int rowNumber, int seatNumber) {
-        this.rowNumber = rowNumber;
+        this.seatRow = rowNumber;
         this.seatNumber = seatNumber;
     }
 
@@ -26,8 +26,8 @@ public class Seat {
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    public int getRowNumber() { return rowNumber; }
-    public void setRowNumber(int rowNumber) { this.rowNumber = rowNumber; }
+    public Integer getRowNumber() { return seatRow; }
+    public void setRowNumber(Integer rowNumber) { this.seatRow = rowNumber; }
 
     public int getSeatNumber() { return seatNumber; }
     public void setSeatNumber(int seatNumber) { this.seatNumber = seatNumber; }

@@ -34,6 +34,10 @@ public class Ticket {
     @Column(name = "status", nullable = false)
     private TicketStatus status = TicketStatus.BOOKED;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     // Constructors
     public Ticket() {}
 
@@ -55,11 +59,11 @@ public class Ticket {
         this.id = id;
     }
 
-    public Showtime getShowtime() {
+    public Showtime getShowtimes() {
         return showtimes;
     }
 
-    public void setShowtime(Showtime showtimes) {
+    public void setShowtimes(Showtime showtimes) {
         this.showtimes = showtimes;
     }
 
@@ -113,13 +117,12 @@ public class Ticket {
         throw new UnsupportedOperationException("Unimplemented method 'setMovie'");
     }
 
-    public Object getUser() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getUser'");
+    public User getUser() {
+        return user;
     }
 
-    public void setUser(Object user) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setUser(User user) {
+        this.user = user;
     }
 
 }

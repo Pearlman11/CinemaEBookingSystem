@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/app/context/AuthContext";
 import Link from "next/link";
 import styles from "@/app/components/auth/Auth.module.css";
 import NavBar from "@/app/components/NavBar/NavBar";
 import FormField from "@/app/components/auth/FormField";
+import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -27,7 +27,8 @@ export default function SignupPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const { login } = useAuth();
+
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -49,7 +50,8 @@ export default function SignupPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8080/api/users/register", {
+      // Register the user using AuthController
+      const registerResponse = await fetch("http://localhost:8080/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -62,17 +64,29 @@ export default function SignupPage() {
           phone: formData.phone || null,
           dob: formData.dob ? new Date(formData.dob) : null,
           role: "USER",
+          isVerified: false,
+          resetTokenUsed: false,
+          promotionOptIn: false
         }),
       });
 
-      const data = await response.json();
+      // Safely handle response - check content type first
+      let data;
+      const contentType = registerResponse.headers.get("content-type");
+      if (contentType && contentType.indexOf("application/json") !== -1) {
+        data = await registerResponse.json();
+      } else {
+        // Not JSON - get as text
+        const textData = await registerResponse.text();
+        data = { message: textData };
+      }
 
-      if (!response.ok) {
+      if (!registerResponse.ok) {
         throw new Error(data.message || "Registration failed");
       }
 
-      // On successful registration, log the user in
-      login(data);
+      // Redirect to login page with email pre-filled
+      router.push(`/login?email=${encodeURIComponent(formData.email)}&registered=true`);
       
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Registration failed");
