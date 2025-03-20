@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 
 
 @Entity
-@Table(name = "PaymentCards")
+@Table(name = "payment_cards")
 public class PaymentCards {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

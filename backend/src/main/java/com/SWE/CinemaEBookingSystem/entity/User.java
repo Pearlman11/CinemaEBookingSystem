@@ -42,9 +42,11 @@ public class User {
     @Column(name = "is_verified", nullable = false)
     private Boolean isVerified = false;  // Default to false for new users
 
+
     @Column(name = "verification_token")
     private String verificationToken;
-
+    @Column(name = "home_address")
+    private String homeAddress;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
     @JsonManagedReference
@@ -64,7 +66,8 @@ public class User {
     private String resetToken; // ✅ Reset password token
 
     @Column(name = "promotion_opt_in", nullable = false)
-    private boolean promotionOptIn = false; // ✅ Default to false
+    private boolean promotionOptIn = false;
+
 
     @OneToOne(cascade = CascadeType.ALL)
     private PaymentCards primaryCard;
@@ -73,7 +76,7 @@ public class User {
     public User() {}
 
 
-    public User(String firstName, String lastName, String email, String password, String phone, Date dob, UserRole role,List<PaymentCards> cards, Boolean isVerified, UserStatus status,PaymentCards primaryCard) {
+    public User(String firstName, String lastName, String email, String password, String phone, Date dob, UserRole role,List<PaymentCards> cards, Boolean isVerified, UserStatus status,PaymentCards primaryCard, String homeAddress, boolean promotionOptIn) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -86,6 +89,8 @@ public class User {
         this.isVerified = false;  // Set default in constructor too
         this.status = UserStatus.INACTIVE;
         this.primaryCard = primaryCard;
+        this.homeAddress = homeAddress;
+        this.promotionOptIn = promotionOptIn;
 
     }
 
@@ -104,6 +109,7 @@ public class User {
     public Boolean getResetTokenUsed() { return resetTokenUsed; }
     public Boolean getPromotionOptIn() { return promotionOptIn; }
     public PaymentCards getPrimaryCard(){return primaryCard;}
+    public String getHomeAddress(){return homeAddress;}
 
 
     public void setId(Integer id) { this.id = id; }
@@ -115,6 +121,7 @@ public class User {
     public void setDob(Date dob) { this.dob = dob; }
     public void setRole(UserRole role) { this.role = role; }
     public void setPrimaryCard(PaymentCards primaryCard){this.primaryCard = primaryCard;}
+    public void setHomeAddress(String homeAddress){this.homeAddress = homeAddress;}
     public void setPaymentCards(List<PaymentCards> cards){
         if (cards == null) {
             throw new IllegalArgumentException("Payment cards list cannot be null!");
@@ -138,7 +145,7 @@ public class User {
     public void setResetToken(String resetToken) { this.resetToken = resetToken; }
     public boolean isResetTokenUsed() { return resetTokenUsed; }
     public void setResetTokenUsed(boolean resetTokenUsed) { this.resetTokenUsed = resetTokenUsed; }
-    public boolean isPromotionOptIn() { return promotionOptIn; }
+
 
 
     public void addPaymentCard(PaymentCards card){

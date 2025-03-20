@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -69,16 +70,7 @@ public class UserService {
             paymentCardRepository.save(primaryCard);
             userRepository.save(user);
         }
-        
-        
-        // Send verification email
-        String subject = "Email Verification";
-        String verificationUrl = "http://localhost:8080/api/auth/verify?token=" + verificationToken;
-        String message = "Click the link below to verify your email:\n" + verificationUrl;
-
-        emailService.sendEmail(user.getEmail(), subject, message);
     }
-
     public boolean verifyUser(String token) {
         Optional<User> userOpt = userRepository.findByVerificationToken(token);
         if (userOpt.isPresent()) {

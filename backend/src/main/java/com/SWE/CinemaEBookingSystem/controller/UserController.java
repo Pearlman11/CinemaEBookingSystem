@@ -46,6 +46,9 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private PaymentCardRepository paymentCardRepository;
+
 
 
 
@@ -147,6 +150,8 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+
 
 
     @PostMapping("/{id}/payment-cards")
