@@ -28,6 +28,7 @@ const EditProfile = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isPromotionsOptedIn, setIsPromotionsOptedIn] = useState(false);
+  const [homeAddress, setHomeAddress] = useState('');
   
 
   // Placeholder for payment cards (add your logic)
@@ -221,6 +222,7 @@ interface PaymentCard {
     );
   }
 
+ 
   return (
     <div>
       <NavBar />
@@ -389,57 +391,31 @@ interface PaymentCard {
           </div>
 
           {/* Home Address Section */}
-          <div className={styles.section}>
-            <button
-              type="button"
-              className={styles.sectionHeader}
-              onClick={() => setIsHomeOpen(!isHomeOpen)}
-              aria-expanded={isHomeOpen}
-            >
-              <span>Home Address</span>
-              <span className={styles.toggleIcon}>{isHomeOpen ? "−" : "+"}</span>
-            </button>
-            {isHomeOpen && (
-              <div className={styles.sectionContent}>
-                <div className={styles.field}>
-                  <label htmlFor="street">Street</label>
-                  <input
-                    type="text"
-                    id="street"
-                    placeholder="Enter street"
-                    className={styles.input}
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label htmlFor="city">City</label>
-                  <input
-                    type="text"
-                    id="city"
-                    placeholder="Enter city"
-                    className={styles.input}
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label htmlFor="state">State</label>
-                  <input
-                    type="text"
-                    id="state"
-                    placeholder="Enter state"
-                    className={styles.input}
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label htmlFor="zip">Zip Code</label>
-                  <input
-                    type="text"
-                    id="zip"
-                    placeholder="Enter zip code"
-                    className={styles.input}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
+         <div className={styles.inputGroup}>
+           <button
+             type="button"
+             className={styles.sectionHeader}
+             onClick={() => setIsHomeOpen(!isHomeOpen)}
+           >
+             <span>Optional Information - Shipping Address</span>
+             <span className={styles.toggleIcon}>
+               {isHomeOpen ? "−" : "+"}
+             </span>
+           </button>
+          
+           {isHomeOpen && (
+             <div className={styles.field}>
+               <input
+                 id="homeAddress"
+                 type="text"
+                 value={homeAddress}
+                 onChange={(e) => setHomeAddress(e.target.value)}
+                 placeholder="Enter your Home address"
+                 className={styles.input}
+               />
+             </div>
+           )}
+         </div>
 
           {/* Change Password Section */}
           <div className={styles.section}>
