@@ -1,5 +1,6 @@
 package com.SWE.CinemaEBookingSystem.controller;
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,9 @@ import com.SWE.CinemaEBookingSystem.repository.UserRepository;
 import com.SWE.CinemaEBookingSystem.repository.PaymentCardRepository;
 import com.SWE.CinemaEBookingSystem.service.PaymentCardService;
 import com.SWE.CinemaEBookingSystem.service.UserService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 
 @RestController
 @RequestMapping("/api/users")
@@ -38,6 +42,10 @@ public class UserController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
 
 
     @Autowired
@@ -68,6 +76,7 @@ public class UserController {
     }
 
     // Creating a new User
+    @Transactional
     @PostMapping("/register")
     public ResponseEntity<?> createUser(@RequestBody User user) {
         System.out.println("UserId:"+user.getId());
@@ -127,29 +136,66 @@ public class UserController {
     }
 
     //update on EditProfile //Need to finish payment card entity to full implement //Assumed that the request body has the updated card
+    @Transactional
     @PutMapping("/{id}/editprofile")
     public ResponseEntity<User> editProfileUpdate(@PathVariable Integer id, @RequestBody User userDetails) {
         Optional<User> userData = userRepository.findById(id);
+       
         
         if (userData.isPresent()) {
             User user = userData.get();
             user.setFirstName(userDetails.getFirstName());
             user.setLastName(userDetails.getLastName());
-            user.setPassword(userDetails.getPassword());
+            user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
+            user.setPhone(userDetails.getPhone());
+            user.setHomeAddress(userDetails.getHomeAddress());
+
             List<PaymentCards> updatedCards = userDetails.getPaymentCards();
-            for(PaymentCards card:updatedCards){
-                paymentCardService.updateExistingCard(user.getId(), card); 
-                
-            }
-            System.out.println(userDetails.getPaymentCards());
+            List<PaymentCards> existingCards = user.getPaymentCards();
+            
+           
 
             User savedUser = userRepository.save(user);
+           
+            
+            for(PaymentCards card:updatedCards){
+                AESUtil aesUtil = new AESUtil(); 
+                
+                Optional<PaymentCards> existingCardOpt = existingCards.stream()
+                    .filter(oldcard-> oldcard.getId().equals(card.getId()))
+                    .findFirst();
+                if (existingCardOpt.isPresent()) {
+                        PaymentCards existingCard = existingCardOpt.get();
+                        existingCard.setCardNumber(aesUtil.encrypt(card.getCardNumber())); 
+                        existingCard.setExpirationDate(card.getExpirationDate()); 
+                        existingCard.setBillingAddress(card.getBillingAddress());
+                        paymentCardRepository.save(existingCard);
+                }
+                else{
+                    card.setCardNumber(aesUtil.encrypt(card.getCardNumber())); 
+                    card.setUser(user); 
+                    card.setCardNumber(card.getCardNumber());
+                    card.setExpirationDate(card.getExpirationDate());
+                    card.setBillingAddress(card.getBillingAddress());
+                    paymentCardRepository.save(card);
+                   
+                }
+                
+                
+                
+               
+                
+
+            }
+           
+            
             return new ResponseEntity<>(savedUser, HttpStatus.OK);
             
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+   
 
 
 
@@ -208,11 +254,13 @@ public class UserController {
         if (paymentCards == null) {
             paymentCards = new ArrayList<>();
         }
-        AESUtil aesUtil = new AESUtil();  // Assuming AESUtil is your decryption utility
+        AESUtil aesUtil = new AESUtil();  
         for (PaymentCards card : paymentCards) {
             if (card.getCardNumber() != null) {
                 try {
+                System.out.println("Encrypted Card: " + card.getCardNumber());
                 String decryptedCardNumber = aesUtil.decrypt(card.getCardNumber());
+                System.out.println("Decrypted Card: " + decryptedCardNumber);
                 card.setCardNumber(decryptedCardNumber);
             } catch (Exception e) {
                 throw new RuntimeException("Error decrypting card number", e);

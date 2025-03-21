@@ -28,7 +28,7 @@ public class AESUtil {
 
     
     
-    public   String encrypt(String data) {
+    public String encrypt(String data) {
         System.out.println("Encrypt method called with: " + data);
         if(data == null){
             System.out.println("NULL DATA ");
@@ -38,11 +38,13 @@ public class AESUtil {
       
         try{
             
-            Cipher cipher = Cipher.getInstance(ALGORITHM);
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             byte[] decodedkey = Base64.getDecoder().decode(aesKey);
             SecretKeySpec keySpec = new SecretKeySpec(decodedkey,ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE,keySpec);
-            return Base64.getEncoder().encodeToString(cipher.doFinal(data.getBytes()));
+            byte[] encryptedData = cipher.doFinal(data.getBytes());
+            System.out.println("Encrypted data length (in bytes): " + encryptedData.length);
+            return Base64.getEncoder().encodeToString(encryptedData);
 
         }
         catch(Exception e){
@@ -52,10 +54,13 @@ public class AESUtil {
     public String decrypt(String encryptedData) {
         try {
             byte[] decodedKey = Base64.getDecoder().decode(aesKey);
-            Cipher cipher = Cipher.getInstance(ALGORITHM);
+            
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             SecretKeySpec keySpec = new SecretKeySpec(decodedKey, ALGORITHM);
             cipher.init(Cipher.DECRYPT_MODE, keySpec);
-            return new String(cipher.doFinal(Base64.getDecoder().decode(encryptedData)));
+            byte[] decodedData = Base64.getDecoder().decode(encryptedData);
+            System.out.println("Encrypted data length (in bytes): " + decodedData.length);
+            return new String(cipher.doFinal(decodedData));
         } catch (Exception e) {
             throw new RuntimeException("Decryption error", e);
         }

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
@@ -48,8 +49,8 @@ public class User {
     @Column(name = "home_address")
     private String homeAddress;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    @JsonManagedReference
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+    @JsonIgnore 
     private List<PaymentCards> cards = new ArrayList<>();
 
 

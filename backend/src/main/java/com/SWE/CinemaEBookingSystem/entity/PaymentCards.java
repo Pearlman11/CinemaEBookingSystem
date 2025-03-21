@@ -24,7 +24,7 @@ public class PaymentCards {
     @Column(name = "expiration_Date")
     private String expirationDate;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     @JsonBackReference
     private User user;
