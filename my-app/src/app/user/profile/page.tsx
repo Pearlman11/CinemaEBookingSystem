@@ -1,3 +1,4 @@
+// profile
 'use client'
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -9,7 +10,6 @@ import { useRouter } from 'next/navigation';
 const ProfilePage = () => {
   const [isPersonalOpen, setIsPersonalOpen] = useState(true);
   const [isPaymentOpen, setIsPaymentOpen] = useState(true);
-  const [isHomeOpen, setIsHomeOpen] = useState(true);
   const [paymentCards, setPaymentCards] = useState<PaymentCard[]>([]);
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
@@ -94,55 +94,43 @@ const ProfilePage = () => {
         </div>
 
         <div className={styles.section}>
-  <button
-    type="button"
-    className={styles.sectionHeader}
-    onClick={() => setIsPaymentOpen(!isPaymentOpen)}
-    aria-expanded={isPaymentOpen}
-  >
-    <span>Payment Information</span>
-    <span className={styles.toggleIcon}>{isPaymentOpen ? "−" : "+"}</span>
-  </button>
-
-  {isPaymentOpen && (
-    <div className={styles.sectionContent}>
-      {paymentCards.length > 0 ? (
-        paymentCards.map((card, index) => (
-          <div key={index} className={styles.cardForm}>
-            <h3>Card {index + 1}</h3>
-            <p><strong>Card Number:</strong> {card.cardNumber || "Not provided"}</p>
-            <p><strong>Expiration Date:</strong> {card.expirationDate || "Not provided"}</p>
-            <p><strong>Billing Address:</strong> {card.billingAddress || "Not provided"}</p>
-          </div>
-        ))
-      ) : (
-        <p>No payment cards added yet.</p>
-      )}
-    </div>
-  )}
-</div>
-
-
-        <div className={styles.section}>
           <button
             type="button"
             className={styles.sectionHeader}
-            onClick={() => setIsHomeOpen(!isHomeOpen)}
-            aria-expanded={isHomeOpen}
+            onClick={() => setIsPaymentOpen(!isPaymentOpen)}
+            aria-expanded={isPaymentOpen}
           >
-            <span>Home Address</span>
-            <span className={styles.toggleIcon}>
-              {isHomeOpen ? "−" : "+"}
-            </span>
+            <span>Payment Information</span>
+            <span className={styles.toggleIcon}>{isPaymentOpen ? "−" : "+"}</span>
           </button>
-          {isHomeOpen && (
+
+          {isPaymentOpen && (
             <div className={styles.sectionContent}>
-              <p className={styles.infoItem}>
-                <strong>Home Address:</strong> {user.homeAddress || 'Not provided'}
-              </p>
+              {paymentCards.length > 0 ? (
+                paymentCards.map((card, index) => (
+                  <div key={index} className={styles.card}>
+                    <h3 className={styles.cardTitle}>Card {index + 1}</h3>
+                    <div className={styles.cardInfo}>
+                      <p><strong>Card Number:</strong> {card.cardNumber || "Not provided"}</p>
+                      <p><strong>Expiration Date:</strong> {card.expirationDate || "Not provided"}</p>
+                      <p><strong>Billing Address:</strong> {card.billingAddress || "Not provided"}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className={styles.placeholderCard}>
+                  <div className={styles.placeholderIcon}>💳</div>
+                  <div className={styles.placeholderText}>
+                    No payment cards added yet
+                  </div>
+                  <div>Add a payment card in the Edit Profile section</div>
+                </div>
+              )}
             </div>
           )}
         </div>
+
+       
 
         <Link href="/user/editprofile">
           <button type="button" className={styles.editButton}>

@@ -1,3 +1,4 @@
+/* editProfile.module.css */
 .editProfileContainer {
   max-width: 800px;
   margin: 2rem auto;
@@ -175,6 +176,85 @@
   color: #333;
 }
 
+.card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  background-color: #fafafa;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.addCardButton {
+  padding: 0.7rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  background-color: var(--highlight-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  align-self: flex-start;
+  margin-top: 0.5rem;
+  box-shadow: 0 2px 8px rgba(var(--highlight-color-rgb), 0.2);
+}
+
+.addCardButton:hover {
+  background-color: var(--hover-darken);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(var(--highlight-color-rgb), 0.3);
+}
+
+.removeCardButton {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.removeCardButton:hover {
+  background-color: #d32f2f;
+}
+
+.placeholderCard {
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+  padding: 2rem 1.5rem;
+  margin-bottom: 1.5rem;
+  background-color: #f9f9f9;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px;
+}
+
+.placeholderText {
+  color: #888;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.placeholderIcon {
+  font-size: 2rem;
+  color: #ccc;
+  margin-bottom: 1rem;
+}
 
 @media (max-width: 768px) {
   .editProfileContainer {
@@ -185,4 +265,38 @@
   .saveButton, .cancelButton {
     width: 100%;
   }
+}
+
+/* Google Places Autocomplete styles */
+.addressLookup {
+  position: relative;
+  width: 100%;
+}
+
+/* Style for Google's autocomplete dropdown */
+.pac-container{
+  border-radius: 6px;
+  margin-top: 5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
+  z-index: 1050 !important; /* Ensure it appears above other elements */
+}
+
+.pac-item {
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.pac-item:hover {
+  background-color: #f5f5f5;
+}
+
+.pac-item-selected {
+  background-color: #f0f0f0;
+}
+
+.pac-matched{
+  font-weight: bold;
+  color: var(--highlight-color);
 }

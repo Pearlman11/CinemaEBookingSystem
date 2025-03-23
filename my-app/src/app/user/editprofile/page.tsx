@@ -1,3 +1,4 @@
+//edit profile
 'use client'
 import React, { useState, useEffect, FormEvent } from 'react';
 import Link from 'next/link';
@@ -14,8 +15,6 @@ const EditProfile = () => {
   // Section toggle states
   const [isPersonalOpen, setIsPersonalOpen] = useState(true);
   const [isPaymentOpen, setIsPaymentOpen] = useState(true);
-  const [isHomeOpen, setIsHomeOpen] = useState(true);
-  const [isPasswordOpen, setIsPasswordOpen] = useState(true);
   
   // Form field states
   const [firstName, setFirstName] = useState('');
@@ -28,7 +27,6 @@ const EditProfile = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isPromotionsOptedIn, setIsPromotionsOptedIn] = useState(false);
-  const [homeAddress, setHomeAddress] = useState('');
   
 
   // Placeholder for payment cards (add your logic)
@@ -99,6 +97,11 @@ interface PaymentCard {
     }
     setCards([...cards, { cardNumber,billingAddress,expirationDate:expDate }]);
     setShowOptionalPayment(true);
+  };
+
+  // Add this function to handle card removal
+  const handleRemoveCard = (indexToRemove: number) => {
+    setCards(cards.filter((_, index) => index !== indexToRemove));
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -309,53 +312,72 @@ interface PaymentCard {
             </button>
             {isPaymentOpen && (
               <div className={styles.sectionContent}>
-                {cards.map((card, index) => (
-                  <div key={index} className={styles.card}>
-                    <div className={styles.field}>
-                      <label htmlFor={`cardNumber-${index}`}>Card Number</label>
-                      <input
-                        type="text"
-                        id={`cardNumber-${index}`}
-                        placeholder="Enter card number"
-                        className={styles.input}
-                        value={card.cardNumber}
-                        onChange={(e) => {
-                          const updatedCards = [...cards];
-                          updatedCards[index].cardNumber = e.target.value;
-                          setCards(updatedCards);
-                        }}
-                      />
+                {cards.length > 0 ? (
+                  // Display actual payment cards if available
+                  cards.map((card, index) => (
+                    <div key={index} className={styles.card}>
+                      <button 
+                        type="button" 
+                        className={styles.removeCardButton}
+                        onClick={() => handleRemoveCard(index)}
+                      >
+                        Remove
+                      </button>
+                      <div className={styles.field}>
+                        <label htmlFor={`cardNumber-${index}`}>Card Number</label>
+                        <input
+                          type="text"
+                          id={`cardNumber-${index}`}
+                          placeholder="Enter card number"
+                          className={styles.input}
+                          value={card.cardNumber}
+                          onChange={(e) => {
+                            const updatedCards = [...cards];
+                            updatedCards[index].cardNumber = e.target.value;
+                            setCards(updatedCards);
+                          }}
+                        />
+                      </div>
+                      <div className={styles.field}>
+                        <label htmlFor={`expDate-${index}`}>Expiration Date</label>
+                        <input
+                          type="text"
+                          id={`expDate-${index}`}
+                          placeholder="MM/YY"
+                          className={styles.input}
+                          value={card.expirationDate}
+                          onChange={(e) => {const updatedCards = [...cards];
+                            updatedCards[index].expirationDate = e.target.value;
+                            setCards(updatedCards);
+                          }}
+                        />
+                      </div>
+                      <div className={styles.field}>
+                        <label htmlFor={`billingAddress-${index}`}>Billing Address</label>
+                        <input
+                          type="text"
+                          id={`billingAddress-${index}`}
+                          placeholder="Enter billing address"
+                          className={styles.input}
+                          value={card.billingAddress}
+                          onChange={(e) => {const updatedCards = [...cards];
+                            updatedCards[index].billingAddress = e.target.value;
+                            setCards(updatedCards);
+                          }}
+                        />
+                      </div>
                     </div>
-                    <div className={styles.field}>
-                      <label htmlFor={`expDate-${index}`}>Expiration Date</label>
-                      <input
-                        type="text"
-                        id={`expDate-${index}`}
-                        placeholder="MM/YY"
-                        className={styles.input}
-                        value={card.expirationDate}
-                        onChange={(e) => {const updatedCards = [...cards];
-                          updatedCards[index].expirationDate = e.target.value;
-                          setCards(updatedCards);
-                        }}
-                      />
+                  ))
+                ) : (
+                  // Display placeholder when no cards are available
+                  <div className={styles.placeholderCard}>
+                    <div className={styles.placeholderIcon}>💳</div>
+                    <div className={styles.placeholderText}>
+                      No payment cards added yet
                     </div>
-                    <div className={styles.field}>
-                      <label htmlFor={`billingAddress-${index}`}>Billing Address</label>
-                      <input
-                        type="text"
-                        id={`billingAddress-${index}`}
-                        placeholder="Enter billing address"
-                        className={styles.input}
-                        value={card.billingAddress}
-                        onChange={(e) => {const updatedCards = [...cards];
-                          updatedCards[index].billingAddress = e.target.value;
-                          setCards(updatedCards);
-                        }}
-                      />
-                    </div>
+                    <div>Add a payment card to simplify your checkout experience</div>
                   </div>
-                ))}
+                )}
                 <button type="button" onClick={handleAddCard} className={styles.addCardButton}>
                   Add Another Card
                 </button>
@@ -363,8 +385,13 @@ interface PaymentCard {
             )}
           </div>
 
-          {/* Promotions Opt-In */}
-          <div className={styles.field}>
+        
+
+        
+
+         
+            {/* Promotions Opt-In */}
+            <div className={styles.field}>
             <label>Receive Promotions:</label>
             <div className={styles.radioGroup}>
               <label>
@@ -390,83 +417,6 @@ interface PaymentCard {
             </div>
           </div>
 
-          {/* Home Address Section */}
-         <div className={styles.inputGroup}>
-           <button
-             type="button"
-             className={styles.sectionHeader}
-             onClick={() => setIsHomeOpen(!isHomeOpen)}
-           >
-             <span>Optional Information - Shipping Address</span>
-             <span className={styles.toggleIcon}>
-               {isHomeOpen ? "−" : "+"}
-             </span>
-           </button>
-          
-           {isHomeOpen && (
-             <div className={styles.field}>
-               <input
-                 id="homeAddress"
-                 type="text"
-                 value={homeAddress}
-                 onChange={(e) => setHomeAddress(e.target.value)}
-                 placeholder="Enter your Home address"
-                 className={styles.input}
-               />
-             </div>
-           )}
-         </div>
-
-          {/* Change Password Section */}
-          <div className={styles.section}>
-            <button
-              type="button"
-              className={styles.sectionHeader}
-              onClick={() => setIsPasswordOpen(!isPasswordOpen)}
-              aria-expanded={isPasswordOpen}
-            >
-              <span>Change Password</span>
-              <span className={styles.toggleIcon}>{isPasswordOpen ? "−" : "+"}</span>
-            </button>
-            {isPasswordOpen && (
-              <div className={styles.sectionContent}>
-                <div className={styles.field}>
-                  <label htmlFor="currentPassword">Current Password</label>
-                  <input
-                    type="password"
-                    id="currentPassword"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    placeholder="Enter current password"
-                    className={styles.input}
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label htmlFor="newPassword">New Password</label>
-                  <input
-                    type="password"
-                    id="newPassword"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Enter new password"
-                    className={styles.input}
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label htmlFor="confirmPassword">Confirm New Password</label>
-                  <input
-                    type="password"
-                    id="confirmPassword"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm new password"
-                    className={styles.input}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-
           <button 
             type="submit" 
             className={styles.saveButton}
@@ -481,6 +431,7 @@ interface PaymentCard {
           </button>
         </Link>
       </div>
+      
     </div>
   );
 };
