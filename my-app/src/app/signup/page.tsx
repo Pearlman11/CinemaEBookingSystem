@@ -22,10 +22,9 @@ export default function SignupPage() {
     cardNumber: "",
     cardExpiry: "",
     billingAddress: "",
-    optPromotion: false, // ✅ Added, but not included in API request
+    optPromotion: false, 
   });
 
-  const [showOptionalShipping, setShowOptionalShipping] = useState(false);
   const [showOptionalPayment, setShowOptionalPayment] = useState(false);
   const [errorMessage, setErrorMessage] = useState<React.ReactNode>("");
   const [isLoading, setIsLoading] = useState(false);
