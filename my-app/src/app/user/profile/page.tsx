@@ -10,9 +10,16 @@ const ProfilePage = () => {
   const [isPersonalOpen, setIsPersonalOpen] = useState(true);
   const [isPaymentOpen, setIsPaymentOpen] = useState(true);
   const [isHomeOpen, setIsHomeOpen] = useState(true);
-  
+  const [paymentCards, setPaymentCards] = useState<PaymentCard[]>([]);
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
+  interface PaymentCard {
+    id?: number;  // Optional ID for existing cards
+    cardNumber: string;
+    expirationDate: string;
+    billingAddress: string;
+  }
+  
   
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -20,6 +27,23 @@ const ProfilePage = () => {
       router.push('/login');
     }
   }, [isAuthenticated, router]);
+  useEffect(() => {
+    const fetchPaymentCards = async () => {
+      if (!user) return;
+      try {
+        const response = await fetch(`http://localhost:8080/api/users/${user.id}/payment-cards`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch payment cards");
+        }
+        const cards = await response.json();
+        setPaymentCards(cards);
+      } catch (error) {
+        console.error("Error fetching payment cards:", error);
+      }
+    };
+  
+    fetchPaymentCards();
+  }, [user]); // Re-run when user updates
   
   // Show loading state while checking authentication
   if (!isAuthenticated || !user) {
@@ -70,34 +94,34 @@ const ProfilePage = () => {
         </div>
 
         <div className={styles.section}>
-          <button
-            type="button"
-            className={styles.sectionHeader}
-            onClick={() => setIsPaymentOpen(!isPaymentOpen)}
-            aria-expanded={isPaymentOpen}
-          >
-            <span>Payment Information</span>
-            <span className={styles.toggleIcon}>
-              {isPaymentOpen ? "−" : "+"}
-            </span>
-          </button>
-          {isPaymentOpen && (
-            <div className={styles.sectionContent}>
-              <p className={styles.infoItem}>
-                <strong>Card Type:</strong> Not provided
-              </p>
-              <p className={styles.infoItem}>
-                <strong>Card Number:</strong> Not provided
-              </p>
-              <p className={styles.infoItem}>
-                <strong>Expiration Date:</strong> Not provided
-              </p>
-              <p className={styles.infoItem}>
-                <strong>Billing Address:</strong> Not provided
-              </p>
-            </div>
-          )}
-        </div>
+  <button
+    type="button"
+    className={styles.sectionHeader}
+    onClick={() => setIsPaymentOpen(!isPaymentOpen)}
+    aria-expanded={isPaymentOpen}
+  >
+    <span>Payment Information</span>
+    <span className={styles.toggleIcon}>{isPaymentOpen ? "−" : "+"}</span>
+  </button>
+
+  {isPaymentOpen && (
+    <div className={styles.sectionContent}>
+      {paymentCards.length > 0 ? (
+        paymentCards.map((card, index) => (
+          <div key={index} className={styles.cardForm}>
+            <h3>Card {index + 1}</h3>
+            <p><strong>Card Number:</strong> {card.cardNumber || "Not provided"}</p>
+            <p><strong>Expiration Date:</strong> {card.expirationDate || "Not provided"}</p>
+            <p><strong>Billing Address:</strong> {card.billingAddress || "Not provided"}</p>
+          </div>
+        ))
+      ) : (
+        <p>No payment cards added yet.</p>
+      )}
+    </div>
+  )}
+</div>
+
 
         <div className={styles.section}>
           <button
@@ -114,16 +138,7 @@ const ProfilePage = () => {
           {isHomeOpen && (
             <div className={styles.sectionContent}>
               <p className={styles.infoItem}>
-                <strong>Street:</strong> Not provided
-              </p>
-              <p className={styles.infoItem}>
-                <strong>City:</strong> Not provided
-              </p>
-              <p className={styles.infoItem}>
-                <strong>State:</strong> Not provided
-              </p>
-              <p className={styles.infoItem}>
-                <strong>Zip Code:</strong> Not provided
+                <strong>Home Address:</strong> {user.homeAddress || 'Not provided'}
               </p>
             </div>
           )}

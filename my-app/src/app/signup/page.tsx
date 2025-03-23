@@ -21,44 +21,56 @@ export default function SignupPage() {
     shippingAddress: "",
     cardNumber: "",
     cardExpiry: "",
-    cardCVC: ""
+    billingAddress: "",
+    optPromotion: false, // ✅ Added, but not included in API request
   });
-  
+
   const [showOptionalShipping, setShowOptionalShipping] = useState(false);
   const [showOptionalPayment, setShowOptionalPayment] = useState(false);
   const [errorMessage, setErrorMessage] = useState<React.ReactNode>("");
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const router = useRouter();
   const { isAuthenticated } = useAuth();
 
-  // Redirect if user is already logged in
   useEffect(() => {
     if (isAuthenticated) {
-      router.push('/');
+      router.push("/");
     }
   }, [isAuthenticated, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
-      [name]: value,
+      [name]: type === "checkbox" ? checked : value,
     });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage("");
-    
+
     if (formData.password !== formData.confirmPassword) {
       setErrorMessage("Passwords do not match");
       return;
     }
-    
+
     setIsLoading(true);
 
     try {
+      const paymentCard =
+        showOptionalPayment &&
+        formData.cardNumber &&
+        formData.cardExpiry &&
+        formData.billingAddress
+          ? {
+              cardNumber: formData.cardNumber,
+              expirationDate: formData.cardExpiry,
+              billingAddress: formData.billingAddress,
+            }
+          : null;
+
       const registerResponse = await fetch("http://localhost:8080/api/auth/register", {
         method: "POST",
         headers: {
@@ -74,13 +86,15 @@ export default function SignupPage() {
           role: "USER",
           isVerified: false,
           resetTokenUsed: false,
-          promotionOptIn: false
+
+          cards: null,
+          primaryCard: paymentCard,
         }),
       });
 
       let data;
       const contentType = registerResponse.headers.get("content-type");
-      if (contentType && contentType.indexOf("application/json") !== -1) {
+      if (contentType && contentType.includes("application/json")) {
         data = await registerResponse.json();
       } else {
         const textData = await registerResponse.text();
@@ -91,9 +105,7 @@ export default function SignupPage() {
         throw new Error(data.message || "Registration failed");
       }
 
-      // Redirect to login page with email pre-filled
       router.push(`/login?email=${encodeURIComponent(formData.email)}&registered=true`);
-      
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : "Registration failed";
       
@@ -129,24 +141,24 @@ export default function SignupPage() {
       <NavBar />
       <div className={styles.formContainer}>
         <h2>Sign Up</h2>
-        
-        {errorMessage && (
-          <div className={styles.errorMessage}>{errorMessage}</div>
-        )}
-        
+
+        {errorMessage && <div className={styles.errorMessage}>{errorMessage}</div>}
+
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.nameFields}>
             <FormField
               id="firstName"
+      
               label="First Name"
               type="text"
               value={formData.firstName}
               onChange={handleChange}
               required
             />
-            
+
             <FormField
               id="lastName"
+
               label="Last Name"
               type="text"
               value={formData.lastName}
@@ -154,51 +166,66 @@ export default function SignupPage() {
               required
             />
           </div>
-          
+
           <FormField
             id="email"
+
             label="Email"
             type="email"
             value={formData.email}
             onChange={handleChange}
             required
           />
-          
+
           <FormField
             id="password"
+
             label="Password"
             type="password"
             value={formData.password}
             onChange={handleChange}
             required
           />
-          
+
           <FormField
             id="confirmPassword"
+
             label="Confirm Password"
             type="password"
             value={formData.confirmPassword}
             onChange={handleChange}
             required
           />
-          
+
           <FormField
             id="phone"
+
             label="Phone (Optional)"
             type="tel"
             value={formData.phone}
             onChange={handleChange}
           />
-          
+
           <FormField
             id="dob"
+
             label="Date of Birth (Optional)"
             type="date"
             value={formData.dob}
             onChange={handleChange}
           />
-          
-          {/* Optional Information Sections */}
+
+          {/* ✅ New Checkbox for optPromotion (Does not send data) */}
+          <label className={styles.checkboxLabel}>
+            <input
+              type="checkbox"
+              name="optPromotion"
+              checked={formData.optPromotion}
+              onChange={handleChange}
+            />
+            Opt-in for Promotions?
+          </label>
+
           <div className={styles.inputGroup}>
             <button
               type="button"
@@ -206,15 +233,14 @@ export default function SignupPage() {
               onClick={() => setShowOptionalShipping(!showOptionalShipping)}
             >
               <span>Optional Information - Shipping Address</span>
-              <span className={styles.toggleIcon}>
-                {showOptionalShipping ? "−" : "+"}
-              </span>
+              <span className={styles.toggleIcon}>{showOptionalShipping ? "−" : "+"}</span>
             </button>
-            
+
             {showOptionalShipping && (
               <div className={styles.optionalContent}>
                 <FormField
                   id="shippingAddress"
+   
                   label="Shipping Address"
                   type="text"
                   value={formData.shippingAddress}
@@ -223,68 +249,63 @@ export default function SignupPage() {
                 />
               </div>
             )}
-            
+
             <button
               type="button"
               className={styles.sectionHeader}
               onClick={() => setShowOptionalPayment(!showOptionalPayment)}
             >
               <span>Optional Information - Payment Card</span>
-              <span className={styles.toggleIcon}>
-                {showOptionalPayment ? "−" : "+"}
-              </span>
+              <span className={styles.toggleIcon}>{showOptionalPayment ? "−" : "+"}</span>
             </button>
-            
+
             {showOptionalPayment && (
               <div className={styles.optionalContent}>
                 <FormField
                   id="cardNumber"
+
                   label="Card Number"
                   type="text"
                   value={formData.cardNumber}
                   onChange={handleChange}
                   placeholder="Enter your card number"
                 />
-                
+
                 <div className={styles.cardDetails}>
                   <FormField
                     id="cardExpiry"
+ 
                     label="Expiry Date"
                     type="text"
                     value={formData.cardExpiry}
                     onChange={handleChange}
                     placeholder="MM/YY"
                   />
-                  
+
                   <FormField
-                    id="cardCVC"
-                    label="CVC"
+                    id="billingAddress"
+
+                    label="Billing Address"
                     type="text"
-                    value={formData.cardCVC}
+                    value={formData.billingAddress}
                     onChange={handleChange}
-                    placeholder="Enter CVC"
+                    placeholder="Enter Billing Address"
                   />
                 </div>
               </div>
             )}
           </div>
-          
-          <button 
-            type="submit" 
-            className={styles.formButton}
-            disabled={isLoading}
-          >
+
+          <button type="submit" className={styles.formButton} disabled={isLoading}>
             {isLoading ? "Creating Account..." : "Sign Up"}
           </button>
         </form>
-        
+
         <p className={styles.linkContainer}>
           Already have an account?{" "}
-          <Link href="/login" className={styles.authLink}>
-            Login
-          </Link>
+          <Link href="/login" className={styles.authLink}>Login</Link>
         </p>
       </div>
     </div>
   );
-} 
+}

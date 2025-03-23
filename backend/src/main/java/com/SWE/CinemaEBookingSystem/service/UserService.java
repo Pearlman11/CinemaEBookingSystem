@@ -1,8 +1,11 @@
 package com.SWE.CinemaEBookingSystem.service;
 
+import com.SWE.CinemaEBookingSystem.config.AESUtil;
 import com.SWE.CinemaEBookingSystem.entity.User;
+import com.SWE.CinemaEBookingSystem.entity.PaymentCards;
 import com.SWE.CinemaEBookingSystem.entity.UserStatus;
 import com.SWE.CinemaEBookingSystem.repository.UserRepository;
+import com.SWE.CinemaEBookingSystem.repository.PaymentCardRepository;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,13 +23,18 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PaymentCardRepository paymentCardRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final AESUtil aesUtil;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailService emailService) {
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailService emailService, PaymentCardRepository paymentCardRepository,AESUtil aesUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
+        this.paymentCardRepository = paymentCardRepository;
+        this.aesUtil = aesUtil;
     }
 
     /**
@@ -45,6 +54,7 @@ public class UserService {
         user.setVerificationToken(verificationToken);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setStatus(UserStatus.INACTIVE);
+
         userRepository.save(user);
         
         // Send verification email with exception handling
@@ -58,6 +68,20 @@ public class UserService {
             System.err.println("Failed to send verification email to " + user.getEmail() + ": " + e.getMessage());
             e.printStackTrace();
             // Registration should still succeed even if email fails
+        }
+        AESUtil aesUtil = new AESUtil();
+        PaymentCards primaryCard = user.getPrimaryCard();
+        user.addPaymentCard(primaryCard);
+        
+        if (primaryCard != null) {
+             primaryCard.setCardNumber(aesUtil.encrypt(primaryCard.getCardNumber()));
+
+    
+            primaryCard.setUser(user);
+            user.addPaymentCard(primaryCard); 
+
+            paymentCardRepository.save(primaryCard);
+            userRepository.save(user);
         }
     }
 
@@ -101,7 +125,7 @@ public class UserService {
             + "We received a request to reset your password for your CinemaEBooking account. To reset your password, click the link below:\n\n"
             + resetUrl + "\n\n"
             + "If you did not request this password reset, please ignore this email. Your account is secure, and no changes have been made.\n\n"
-            + "This link will expire in 24 hours. If you do not reset your password within this time, you will need to submit another request.\n\n"
+            + "This link will expire in 24 hours or after clicked. If you do not reset your password within this time, you will need to submit another request.\n\n"
             + "If you have any questions or need further assistance, please contact our support team at support@cinemaebooking.com.\n\n"
             + "Thank you,\n"
             + "Team A9";
@@ -143,7 +167,9 @@ public class UserService {
     
             emailService.sendEmail(updatedUser.getEmail(), subject, message);
         }
-
+    public User findById(Integer userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
     
     
     

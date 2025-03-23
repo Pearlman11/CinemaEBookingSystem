@@ -1,6 +1,7 @@
 package com.SWE.CinemaEBookingSystem.controller;
 
 import com.SWE.CinemaEBookingSystem.entity.User;
+import com.SWE.CinemaEBookingSystem.entity.UserRole;
 import com.SWE.CinemaEBookingSystem.service.UserService;
 import com.SWE.CinemaEBookingSystem.security.JwtUtil;
 
@@ -64,21 +65,55 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody User loginRequest, @RequestParam(defaultValue = "false") boolean rememberMe) {
         try {
             User user = userService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword());
-            long accessTokenExpiry = 1000L * 60 * 60 * 10; // 10 hours
+    
+            // Ensure the user is verified before allowing login
             if (!user.getIsVerified()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please verify your email before logging in.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Please verify your email before logging in."));
             }
-            if (rememberMe) {
-                accessTokenExpiry = 1000L * 60 * 60 * 24 * 7; // Extend if "Remember Me" is checked
+    
+            // Block admins from logging in through this endpoint
+            if (user.getRole() == UserRole.ADMIN) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Admins must log in through the admin portal."));
             }
+    
+            // Set token expiration based on "Remember Me" selection
+            long accessTokenExpiry = rememberMe ? (1000L * 60 * 60 * 24 * 7) : (1000L * 60 * 60 * 10); // 7 days or 10 hours
+    
+            // Generate tokens
             String accessToken = jwtUtil.generateToken(user.getEmail(), accessTokenExpiry);
             String refreshToken = jwtUtil.generateRefreshToken(user.getEmail());
-
+    
             return ResponseEntity.ok(new AuthResponse(accessToken, refreshToken));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Invalid credentials"));
         }
     }
+    @PostMapping("/admin/login")
+    public ResponseEntity<?> adminLogin(@RequestBody User loginRequest) {
+        try {
+            User user = userService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword());
+    
+            // Ensure only admins can log in here
+            if (user.getRole() != UserRole.ADMIN) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Only admins can log in here."));
+            }
+    
+            // Generate admin-specific tokens (24-hour token for admins)
+            String accessToken = jwtUtil.generateToken(user.getEmail(), 1000L * 60 * 60 * 24);
+            String refreshToken = jwtUtil.generateRefreshToken(user.getEmail());
+    
+            return ResponseEntity.ok(new AuthResponse(accessToken, refreshToken));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Invalid admin credentials"));
+        }
+    }
+    
+
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(@RequestBody RefreshRequest request) {
