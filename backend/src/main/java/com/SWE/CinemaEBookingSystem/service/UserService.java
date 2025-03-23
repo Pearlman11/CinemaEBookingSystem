@@ -46,11 +46,19 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setStatus(UserStatus.INACTIVE);
         userRepository.save(user);
-        // Send verification email
-        String subject = "Email Verification";
-        String verificationUrl = "http://localhost:8080/api/auth/verify?token=" + verificationToken;
-        String message = "Click the link below to verify your email:\n" + verificationUrl;
-        emailService.sendEmail(user.getEmail(), subject, message);
+        
+        // Send verification email with exception handling
+        try {
+            String subject = "Email Verification";
+            String verificationUrl = "http://localhost:8080/api/auth/verify?token=" + verificationToken;
+            String message = "Click the link below to verify your email:\n" + verificationUrl;
+            emailService.sendEmail(user.getEmail(), subject, message);
+            System.out.println("Verification email sent to: " + user.getEmail());
+        } catch (Exception e) {
+            System.err.println("Failed to send verification email to " + user.getEmail() + ": " + e.getMessage());
+            e.printStackTrace();
+            // Registration should still succeed even if email fails
+        }
     }
 
     public boolean verifyUser(String token) {

@@ -25,9 +25,28 @@ public class AuthController {
     public ResponseEntity<String> register(@RequestBody User user) {
         try {
             userService.registerUser(user);
-            return ResponseEntity.ok("User registered successfully!");
+            return ResponseEntity.ok("User registered successfully! Please check your email for verification instructions.");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            // Log the full exception for troubleshooting
+            e.printStackTrace();
+            
+            // Return a more informative error message
+            String errorMessage = e.getMessage();
+            if (errorMessage == null || errorMessage.isEmpty()) {
+                errorMessage = "Registration failed due to an unexpected error.";
+            }
+            
+            // Check for specific known issues
+            if (errorMessage.contains("Duplicate")) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("An account with this email already exists.");
+            } else if (errorMessage.contains("mail") || errorMessage.contains("SMTP")) {
+                // Still register the user but inform about email issue
+                return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
+                    .body("Account created but verification email could not be sent. Please contact support.");
+            }
+            
+            return ResponseEntity.badRequest().body(errorMessage);
         }
     }
 

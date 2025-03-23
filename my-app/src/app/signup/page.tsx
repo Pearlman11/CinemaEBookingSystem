@@ -1,3 +1,4 @@
+//signup
 "use client";
 
 import { useState, useEffect } from "react";
@@ -25,7 +26,7 @@ export default function SignupPage() {
   
   const [showOptionalShipping, setShowOptionalShipping] = useState(false);
   const [showOptionalPayment, setShowOptionalPayment] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState<React.ReactNode>("");
   const [isLoading, setIsLoading] = useState(false);
   
   const router = useRouter();
@@ -94,7 +95,30 @@ export default function SignupPage() {
       router.push(`/login?email=${encodeURIComponent(formData.email)}&registered=true`);
       
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Registration failed");
+      const errorMsg = error instanceof Error ? error.message : "Registration failed";
+      
+      // Check if the error is about duplicate email
+      if (errorMsg.includes("Duplicate entry") && errorMsg.includes("email")) {
+        setErrorMessage(
+          <div>
+            This email is already registered. Please{" "}
+            <Link href={`/login?email=${encodeURIComponent(formData.email)}`} className={styles.authLink}>
+              log in
+            </Link>{" "}
+            instead.
+          </div>
+        );
+      } 
+      // Check for email service failures
+      else if (errorMsg.includes("email") && errorMsg.includes("service")) {
+        setErrorMessage(
+          <div>
+            Account created, but we couldn&apos;t send a verification email. Please contact support.
+          </div>
+        );
+      } else {
+        setErrorMessage(errorMsg);
+      }
     } finally {
       setIsLoading(false);
     }
