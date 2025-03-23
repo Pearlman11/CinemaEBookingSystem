@@ -1,15 +1,11 @@
 package com.SWE.CinemaEBookingSystem.config;
 import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.validation.constraints.Null;
 import org.springframework.stereotype.Component;
-
-import javax.crypto.KeyGenerator;
 
 @Component
 public class AESUtil { 
