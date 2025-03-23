@@ -300,3 +300,70 @@
   font-weight: bold;
   color: var(--highlight-color);
 }
+
+/* Add these new styles for form validation */
+
+.inputError {
+  border-color: #f44336 !important;
+  background-color: rgba(244, 67, 54, 0.05);
+}
+
+.errorText {
+  color: #f44336;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+.addCardForm {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border: 1px dashed #ddd;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+/* Add these new styles for the add card form and buttons */
+
+.cardFormButtons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.cancelCardButton {
+  padding: 0.7rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  background-color: #f5f5f5;
+  color: #666;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.cancelCardButton:hover {
+  background-color: #e5e5e5;
+  color: #333;
+}
+
+.addCardForm {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border: 1px dashed #ddd;
+  border-radius: 8px;
+  background-color: #fafafa;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

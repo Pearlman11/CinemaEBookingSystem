@@ -89,14 +89,73 @@ interface PaymentCard {
     setCards(updatedCards);
   };
 
-  // Placeholder for adding a new card (add your logic)
+  // Add this state for validation errors
+  const [cardFormErrors, setCardFormErrors] = useState({
+    cardNumber: false,
+    expDate: false,
+    billingAddress: false
+  });
+
+  // Add this state to control visibility of the add card form
+  const [showAddCardForm, setShowAddCardForm] = useState(false);
+
+  // Update the handleAddCard function
   const handleAddCard = async() => {
+    // Reset previous errors
+    const errors = {
+      cardNumber: !cardNumber.trim(),
+      expDate: !expDate.trim(),
+      billingAddress: !billingAddress.trim()
+    };
+    
+    setCardFormErrors(errors);
+    
+    // Check if any fields are empty
+    if (errors.cardNumber || errors.expDate || errors.billingAddress) {
+      setErrorMessage('Please fill out all card fields');
+      return;
+    }
+    
     if (cards.length >= 4) {
       alert("You can only add up to 4 payment cards.");
       return;
     }
-    setCards([...cards, { cardNumber,billingAddress,expirationDate:expDate }]);
+    
+    // Clear error message if it was set
+    setErrorMessage('');
+    
+    // Add the card and reset input fields
+    setCards([...cards, { cardNumber, billingAddress, expirationDate: expDate }]);
+    setCardNumber('');
+    setExpDate('');
+    setBillingAddress('');
     setShowOptionalPayment(true);
+    
+    // Hide the add card form after successful addition
+    setShowAddCardForm(false);
+  };
+
+  // Add a function to cancel adding a card
+  const handleCancelAddCard = () => {
+    // Reset form fields
+    setCardNumber('');
+    setExpDate('');
+    setBillingAddress('');
+    
+    // Clear any errors
+    setCardFormErrors({
+      cardNumber: false,
+      expDate: false,
+      billingAddress: false
+    });
+    
+    // Hide the form
+    setShowAddCardForm(false);
+    
+    // Clear error message if any
+    if (errorMessage) {
+      setErrorMessage('');
+    }
   };
 
   // Add this function to handle card removal
@@ -104,11 +163,23 @@ interface PaymentCard {
     setCards(cards.filter((_, index) => index !== indexToRemove));
   };
 
+  // Update the form submission to validate existing cards
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setErrorMessage('');
-    const allCardsValid = cards.every((card) => card.cardNumber && card.billingAddress && card.expirationDate);
+    
+    // Validate all existing cards
+    const invalidCardIndex = cards.findIndex(card => 
+      !card.cardNumber.trim() || !card.expirationDate.trim() || !card.billingAddress.trim()
+    );
+    
+    if (invalidCardIndex !== -1) {
+      setErrorMessage(`Card #${invalidCardIndex + 1} has incomplete information`);
+      setIsSubmitting(false);
+      return;
+    }
+    
     if (newPassword && newPassword !== confirmPassword) {
       setErrorMessage('New passwords do not match');
       setIsSubmitting(false);
@@ -177,26 +248,6 @@ interface PaymentCard {
       } catch {
         console.warn('Confirmation email could not be sent, but profile was updated');
       }
-    //   try {
-    //     const response = await fetch(`http://localhost:8080/api/users/${user.id}/payment-cards`, {
-    //       method: 'POST',
-    //       headers: {
-    //         'Content-Type': 'application/json',
-    //       },
-          
-    //       body: JSON.stringify(cards),
-          
-    //     });
-    //     console.log(response);
-    //     if (!response.ok) {
-    //       throw new Error('Failed to add payment card');
-    //     }
-    //     const newCard = await response.json();
-    //     setCards((prevCards) => [...prevCards, newCard]);
-      
-    // }catch (error){
-    //   console.error('Error adding card:',error);
-    // }
       
       // Update auth context with new user data
       login(updatedUser);
@@ -209,10 +260,8 @@ interface PaymentCard {
       setIsSubmitting(false);
     }
     
-   
-}
+  }
   
-
   // Show loading state while checking authentication
   if (!isAuthenticated || !user) {
     return (
@@ -313,7 +362,7 @@ interface PaymentCard {
             {isPaymentOpen && (
               <div className={styles.sectionContent}>
                 {cards.length > 0 ? (
-                  // Display actual payment cards if available
+                  // Display  payment cards from DB if available
                   cards.map((card, index) => (
                     <div key={index} className={styles.card}>
                       <button 
@@ -364,6 +413,7 @@ interface PaymentCard {
                             updatedCards[index].billingAddress = e.target.value;
                             setCards(updatedCards);
                           }}
+                          required
                         />
                       </div>
                     </div>
@@ -378,9 +428,85 @@ interface PaymentCard {
                     <div>Add a payment card to simplify your checkout experience</div>
                   </div>
                 )}
-                <button type="button" onClick={handleAddCard} className={styles.addCardButton}>
-                  Add Another Card
-                </button>
+                
+                {/* Button to show the add card form */}
+                {!showAddCardForm && (
+                  <button 
+                    type="button" 
+                    onClick={() => setShowAddCardForm(true)} 
+                    className={styles.addCardButton}
+                  >
+                    Add New Card
+                  </button>
+                )}
+                
+                {/* Add card form - only shown when showAddCardForm is true */}
+                {showAddCardForm && (
+                  <div className={styles.addCardForm}>
+                    <div className={styles.field}>
+                      <label htmlFor="cardNumber">Card Number</label>
+                      <input
+                        type="text"
+                        id="cardNumber"
+                        placeholder="Enter card number"
+                        className={`${styles.input} ${cardFormErrors.cardNumber ? styles.inputError : ''}`}
+                        value={cardNumber}
+                        onChange={(e) => {
+                          setCardNumber(e.target.value);
+                          if (e.target.value.trim() && cardFormErrors.cardNumber) {
+                            setCardFormErrors({...cardFormErrors, cardNumber: false});
+                          }
+                        }}
+                      />
+                      {cardFormErrors.cardNumber && <div className={styles.errorText}>Card number is required</div>}
+                    </div>
+                    
+                    <div className={styles.field}>
+                      <label htmlFor="expDate">Expiration Date</label>
+                      <input
+                        type="text"
+                        id="expDate"
+                        placeholder="MM/YY"
+                        className={`${styles.input} ${cardFormErrors.expDate ? styles.inputError : ''}`}
+                        value={expDate}
+                        onChange={(e) => {
+                          setExpDate(e.target.value);
+                          if (e.target.value.trim() && cardFormErrors.expDate) {
+                            setCardFormErrors({...cardFormErrors, expDate: false});
+                          }
+                        }}
+                      />
+                      {cardFormErrors.expDate && <div className={styles.errorText}>Expiration date is required</div>}
+                    </div>
+                    
+                    <div className={styles.field}>
+                      <label htmlFor="billingAddress">Billing Address</label>
+                      <input
+                        type="text"
+                        id="billingAddress"
+                        placeholder="Enter billing address"
+                        className={`${styles.input} ${cardFormErrors.billingAddress ? styles.inputError : ''}`}
+                        value={billingAddress}
+                        onChange={(e) => {
+                          setBillingAddress(e.target.value);
+                          if (e.target.value.trim() && cardFormErrors.billingAddress) {
+                            setCardFormErrors({...cardFormErrors, billingAddress: false});
+                          }
+                        }}
+                      />
+                      {cardFormErrors.billingAddress && <div className={styles.errorText}>Billing address is required</div>}
+                    </div>
+                    
+                    <div className={styles.cardFormButtons}>
+                      <button type="button" onClick={handleAddCard} className={styles.addCardButton}>
+                        Add Card
+                      </button>
+                      <button type="button" onClick={handleCancelAddCard} className={styles.cancelCardButton}>
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
