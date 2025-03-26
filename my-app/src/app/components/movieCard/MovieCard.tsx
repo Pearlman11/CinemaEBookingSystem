@@ -31,7 +31,6 @@ interface Movie {
   description: string;
   reviews?: string[];
   rating: string;
-  showTimes: Showdate[];
 }
 interface MovieCardProps {
   movies?: Movie[];
@@ -109,32 +108,11 @@ export default function MovieCard({ movies: propsMovies }: MovieCardProps) {
                     <span className={style.inlineFlipInfo}>Click to see movie details</span>
                   </div>
                   <div className={style.showtimes}>
-                    {movie.showTimes && movie.showTimes.length > 0 ? (
-                      movie.showTimes.map((show, idx) => (
-                        <div key={idx} className={style.showtimeEntry}>
-                          <p className={style.screeningDay}>
-                            {show.screeningDay}
-                          </p>
-                          <div className={style.timesList}>
-                            {show.times && show.times.length > 0 ? (
-                              show.times.map((timeSlot, timeIdx) => (
-                                <p key={timeIdx} className={style.screentime}>
-                                  {timeSlot.screentime}
-                                </p>
-                              ))
-                            ) : (
-                              <p className={style.noTimes}>
-                                No times available
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      ))
-                    ) : (
+                    
                       <p className={style.noShowtimes}>
                         No showtimes available
                       </p>
-                    )}
+    
                   </div>
                 </div>
               </div>
