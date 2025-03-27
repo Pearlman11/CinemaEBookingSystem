@@ -17,9 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <title>Cinema E-Booking System</title>
-      </head>
+      
       <body className={inter.className}>
         <AuthProvider>
           <MovieProvider>

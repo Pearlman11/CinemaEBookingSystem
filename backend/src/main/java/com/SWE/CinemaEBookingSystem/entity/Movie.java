@@ -3,6 +3,8 @@ package com.SWE.CinemaEBookingSystem.entity;
 import jakarta.persistence.*;
 import java.util.*;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Entity
 @Table(name = "movies") // Ensure table name is explicitly defined
 public class Movie {
@@ -47,6 +49,7 @@ public class Movie {
     private MovieRating rating;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Showtime> showTimes;
 
     public Movie() {
