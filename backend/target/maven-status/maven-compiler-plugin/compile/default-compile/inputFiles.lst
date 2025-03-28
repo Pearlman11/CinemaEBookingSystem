@@ -11,6 +11,7 @@ C:\Users\mayas\OneDrive\Desktop\CinemaEBookingSystem-1\backend\src\main\java\com
 C:\Users\mayas\OneDrive\Desktop\CinemaEBookingSystem-1\backend\src\main\java\com\SWE\CinemaEBookingSystem\controller\TicketController.java
 C:\Users\mayas\OneDrive\Desktop\CinemaEBookingSystem-1\backend\src\main\java\com\SWE\CinemaEBookingSystem\controller\UserController.java
 C:\Users\mayas\OneDrive\Desktop\CinemaEBookingSystem-1\backend\src\main\java\com\SWE\CinemaEBookingSystem\controller\UserPromotionsController.java
+C:\Users\mayas\OneDrive\Desktop\CinemaEBookingSystem-1\backend\src\main\java\com\SWE\CinemaEBookingSystem\dto\ErrorResponse.java
 C:\Users\mayas\OneDrive\Desktop\CinemaEBookingSystem-1\backend\src\main\java\com\SWE\CinemaEBookingSystem\entity\AgeCategory.java
 C:\Users\mayas\OneDrive\Desktop\CinemaEBookingSystem-1\backend\src\main\java\com\SWE\CinemaEBookingSystem\entity\Booking.java
 C:\Users\mayas\OneDrive\Desktop\CinemaEBookingSystem-1\backend\src\main\java\com\SWE\CinemaEBookingSystem\entity\BookingStatus.java
@@ -35,6 +36,7 @@ C:\Users\mayas\OneDrive\Desktop\CinemaEBookingSystem-1\backend\src\main\java\com
 C:\Users\mayas\OneDrive\Desktop\CinemaEBookingSystem-1\backend\src\main\java\com\SWE\CinemaEBookingSystem\repository\MovieRepository.java
 C:\Users\mayas\OneDrive\Desktop\CinemaEBookingSystem-1\backend\src\main\java\com\SWE\CinemaEBookingSystem\repository\PaymentCardRepository.java
 C:\Users\mayas\OneDrive\Desktop\CinemaEBookingSystem-1\backend\src\main\java\com\SWE\CinemaEBookingSystem\repository\PromotionRepository.java
+C:\Users\mayas\OneDrive\Desktop\CinemaEBookingSystem-1\backend\src\main\java\com\SWE\CinemaEBookingSystem\repository\ShowroomRepository.java
 C:\Users\mayas\OneDrive\Desktop\CinemaEBookingSystem-1\backend\src\main\java\com\SWE\CinemaEBookingSystem\repository\ShowTimeRepository.java
 C:\Users\mayas\OneDrive\Desktop\CinemaEBookingSystem-1\backend\src\main\java\com\SWE\CinemaEBookingSystem\repository\TicketRepository.java
 C:\Users\mayas\OneDrive\Desktop\CinemaEBookingSystem-1\backend\src\main\java\com\SWE\CinemaEBookingSystem\repository\UserPromotionRepository.java

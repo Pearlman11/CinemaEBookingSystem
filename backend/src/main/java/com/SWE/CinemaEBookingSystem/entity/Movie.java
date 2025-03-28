@@ -1,6 +1,9 @@
 package com.SWE.CinemaEBookingSystem.entity;
 
 import jakarta.persistence.*;
+
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.*;
 
 @Entity
@@ -49,6 +52,9 @@ public class Movie {
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Showtime> showTimes;
 
+    @Column(nullable = false)
+    private Long durationInMinutes;
+
     public Movie() {
         this.cast = new ArrayList<>();
         this.showTimes = new ArrayList<>();
@@ -57,7 +63,7 @@ public class Movie {
 
     public Movie(String title, String category, List<String> cast, String director, String producer,
                  String trailer, String poster, String description, Set<String> reviews, 
-                 MovieRating rating, List<Showtime> showTimes) {
+                 MovieRating rating, List<Showtime> showTimes,Duration duration) {
         this.title = title;
         this.category = category;
         this.cast = cast != null ? cast : new ArrayList<>();
@@ -69,6 +75,7 @@ public class Movie {
         this.reviews = reviews != null ? reviews : new HashSet<>();
         this.rating = rating;
         this.showTimes = showTimes != null ? showTimes : new ArrayList<>();
+        this.durationInMinutes = duration.toMinutes();
     }
 
     // ✅ Getters
@@ -84,6 +91,7 @@ public String getDescription() { return description; } // Added getter for movie
 public MovieRating getRating() { return rating; }
 public List<Showtime> getshowTimes() { return new ArrayList<>(showTimes); } // Returns a copy for safety
 public Set<String> getReviews() { return new HashSet<>(reviews); } // Returns a copy for safety
+public Long getDuration(){return durationInMinutes;}
 
 // ✅ Setters
 public void setId(Long id) { this.id = id; }
@@ -98,5 +106,6 @@ public void setDescription(String description) { this.description = description;
 public void setRating(MovieRating rating) { this.rating = rating; }
 public void setshowTimes(List<Showtime> showTimes) { this.showTimes = (showTimes != null) ? new ArrayList<>(showTimes) : new ArrayList<>(); }
 public void setReviews(Set<String> reviews) { this.reviews = (reviews != null) ? new HashSet<>(reviews) : new HashSet<>(); }
+public void setDuration(Duration duration){this.durationInMinutes = duration.toMinutes();}
 
 }
