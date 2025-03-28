@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import styles from "./MovieDetailPage.module.css";
 import NavBar from "@/app/components/NavBar/NavBar";
 import Link from "next/link";
+import { useMovies } from "@/app/context/MovieContext";
 
 interface Showtime {
   id: number;
@@ -34,6 +35,7 @@ interface Movie {
 
 const MovieDetailPage = () => {
   const { id } = useParams();
+  const { movies, isLoading, error: contextError } = useMovies();
   const [movie, setMovie] = useState<Movie | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,7 +47,32 @@ const MovieDetailPage = () => {
   };
 
   useEffect(() => {
-    if (id) {
+    if (!id) return;
+    
+    // Convert id to number for comparison
+    const movieId = typeof id === 'string' ? parseInt(id) : Array.isArray(id) ? parseInt(id[0]) : -1;
+    
+    // Try to get movie from context first
+    const foundMovie = movies.find(m => m.id === movieId);
+    
+    if (foundMovie) {
+      // Adapt the MovieContext movie to the local Movie interface
+      setMovie({
+        id: foundMovie.id,
+        title: foundMovie.title,
+        showTimes: foundMovie.showTimes,
+        filmRatingCode: foundMovie.rating, // Map rating to filmRatingCode
+        trailer: foundMovie.trailer,
+        poster: foundMovie.poster,
+        category: foundMovie.category,
+        cast: foundMovie.cast,
+        director: foundMovie.director,
+        producer: foundMovie.producer,
+        reviews: foundMovie.reviews,
+        description: foundMovie.description
+      });
+    } else {
+      // Fallback to API call if not in context
       fetch(`http://localhost:8080/api/movies/${id}`)
         .then((response) => {
           if (!response.ok) {
@@ -61,10 +88,10 @@ const MovieDetailPage = () => {
           setError("Failed to load movie details.");
         });
     }
-  }, [id]);
+  }, [id, movies]);
 
-  if (error) return <div className={styles.error}>{error}</div>;
-  if (!movie) return <div className={styles.loading}>Loading...</div>;
+  if (error || contextError) return <div className={styles.error}>{error || contextError}</div>;
+  if (isLoading || !movie) return <div className={styles.loading}>Loading...</div>;
 
   return (
     <div>

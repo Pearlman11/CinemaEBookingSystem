@@ -4,6 +4,7 @@ import React, { useEffect, useState, FormEvent } from "react";
 import { useRouter, useParams } from "next/navigation";
 import style from "./editMovie.module.css";
 import { useAuth } from "@/app/context/AuthContext";
+import { useMovies } from "@/app/context/MovieContext";
 
 interface Showtime {
   id?: number;
@@ -33,6 +34,7 @@ interface Movie {
 
 export default function EditMovie() {
   const { isAdmin } = useAuth();
+  const { movies, updateMovie, isLoading: contextLoading, error: contextError } = useMovies();
   const router = useRouter();
   const { id } = useParams(); 
   const [movie, setMovie] = useState<Movie | null>(null);
@@ -43,33 +45,55 @@ export default function EditMovie() {
 
   useEffect(() => {
     if (!isAdmin) return;
-
-    fetch(`http://localhost:8080/api/movies/${id}`)
-      .then((response) => {
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        return response.json();
-      })
-      .then((data: Movie) => {
-        setMovie(data);
-        setOriginalMovie({ ...data }); 
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
-  }, [id, isAdmin]);
+    
+    // Convert id param to number for comparison
+    const movieId = typeof id === 'string' ? parseInt(id) : Array.isArray(id) ? parseInt(id[0]) : -1;
+    
+    // First try to get the movie from context
+    const foundMovie = movies.find(m => m.id === movieId);
+    
+    if (foundMovie) {
+      // Create a deep copy while ensuring compatible types
+      const movieCopy = {
+        ...foundMovie,
+        showTimes: foundMovie.showTimes.map(date => ({
+          ...date,
+          times: date.times.map(time => ({ ...time }))
+        }))
+      };
+      
+      setMovie(movieCopy as Movie);
+      setOriginalMovie({ ...movieCopy } as Movie);
+      setLoading(false);
+    } else {
+      // Fallback to API call if not in context
+      fetch(`http://localhost:8080/api/movies/${id}`)
+        .then((response) => {
+          if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+          return response.json();
+        })
+        .then((data: Movie) => {
+          setMovie(data);
+          setOriginalMovie({ ...data }); 
+          setLoading(false);
+        })
+        .catch((err) => {
+          setError(err.message);
+          setLoading(false);
+        });
+    }
+  }, [id, isAdmin, movies]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     if (!movie) return;
 
     if (name === "screeningDay") {
-      setMovie((prev) => (prev ? { ...prev, showTimes: [{ ...prev.showTimes[0], screeningDay: value }] } : null));
+      setMovie((prev: Movie | null) => (prev ? { ...prev, showTimes: [{ ...prev.showTimes[0], screeningDay: value }] } : null));
     } else if (name === "screentime") {
-      setMovie((prev) => (prev ? { ...prev, showTimes: [{ ...prev.showTimes[0], times: [{ screentime: value }] }] } : null));
+      setMovie((prev: Movie | null) => (prev ? { ...prev, showTimes: [{ ...prev.showTimes[0], times: [{ screentime: value }] }] } : null));
     } else {
-      setMovie((prev) => (prev ? { ...prev, [name]: value } : null));
+      setMovie((prev: Movie | null) => (prev ? { ...prev, [name]: value } : null));
     }
   };
 
@@ -77,19 +101,19 @@ export default function EditMovie() {
     if (!movie) return;
     const updatedArray = [...movie[field]!];
     updatedArray[index] = value;
-    setMovie((prev) => (prev ? { ...prev, [field]: updatedArray } : null));
+    setMovie((prev: Movie | null) => (prev ? { ...prev, [field]: updatedArray } : null));
   };
 
   const addArrayField = (field: "cast" | "reviews") => {
     if (!movie) return;
     const updatedArray = [...movie[field]!, ""];
-    setMovie((prev) => (prev ? { ...prev, [field]: updatedArray } : null));
+    setMovie((prev: Movie | null) => (prev ? { ...prev, [field]: updatedArray } : null));
   };
 
   const removeArrayField = (index: number, field: "cast" | "reviews") => {
     if (!movie) return;
-    const updatedArray = movie[field]!.filter((_, i) => i !== index);
-    setMovie((prev) => (prev ? { ...prev, [field]: updatedArray.length > 0 ? updatedArray : [""] } : null));
+    const updatedArray = movie[field]!.filter((_, i: number) => i !== index);
+    setMovie((prev: Movie | null) => (prev ? { ...prev, [field]: updatedArray.length > 0 ? updatedArray : [""] } : null));
   };
 
   const handleCancel = () => {
@@ -117,28 +141,30 @@ export default function EditMovie() {
       "R": "R",
       "NC-17": "NC17",
     };
-    const updatedMovie = {
-      ...movie,
-      rating: ratingMap[movie.rating],
-    };
-
+    
     try {
-      const response = await fetch(`http://localhost:8080/api/movies/${movie.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedMovie),
+      // Only send fields that are definitely compatible
+      await updateMovie(movie.id, {
+        title: movie.title,
+        category: movie.category,
+        cast: movie.cast,
+        director: movie.director,
+        producer: movie.producer,
+        trailer: movie.trailer,
+        poster: movie.poster,
+        description: movie.description,
+        rating: ratingMap[movie.rating],
+        reviews: movie.reviews
+        // Omitting showTimes to avoid type conflicts
       });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to update movie: ${response.statusText} - ${errorText}`);
-      }
-
+      
       setSuccess("Movie updated successfully!");
+      setTimeout(() => {
+        router.push('/admin/manage/movies');
+      }, 1000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred.");
     }
-    router.push('/admin/manage/movies');
   };
 
   const categoryOptions = [
@@ -158,8 +184,8 @@ export default function EditMovie() {
   ];
 
   if (!isAdmin) return <p>Unauthorized. Redirecting...</p>;
-  if (loading) return <p>Loading movie...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (loading || contextLoading) return <p>Loading movie...</p>;
+  if (error || contextError) return <p style={{ color: "red" }}>{error || contextError}</p>;
   if (!movie) return <p>Movie not found.</p>;
 
   return (
