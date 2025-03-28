@@ -25,6 +25,8 @@ type AuthContextType = {
     logout: () => void;
     setAdmin: (admin: boolean) => void;
     adminLogin: (userData: User) => void;
+    isLoading: boolean;
+    refreshUserData: () => Promise<User>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -33,33 +35,46 @@ export function AuthProvider({children}: {children:ReactNode}) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
     const [user, setUser] = useState<User | null>(null); 
+    const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
 
     // Check for saved auth state on component mount
     useEffect(() => {
-        //  check if we have tokens
-        const accessToken = sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
-        
-        if (!accessToken) {
-            // No valid token, ensure user is logged out
-            setIsLoggedIn(false);
-            setIsAdmin(false);
-            setUser(null);
-            return;
-        }
+        const checkAuth = async () => {
+            setIsLoading(true);
+            try {
+                const accessToken = sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
+                
+                if (!accessToken) {
+                    // No valid token, ensure user is logged out
+                    setIsLoggedIn(false);
+                    setIsAdmin(false);
+                    setUser(null);
+                    return;
+                }
 
-        // If we have a token, check for user data
-        const savedUser = sessionStorage.getItem('user') || localStorage.getItem('user');
-        
-        if (savedUser) {
-            const userData = JSON.parse(savedUser);
-            setUser(userData);
-            setIsLoggedIn(true);
-            setIsAdmin(userData.role === 'ADMIN');
-        } else {
-            // We have a token but no user data - fetch the user data
-            fetchUserData(accessToken);
-        }
+                // If we have a token, check for user data
+                const savedUser = sessionStorage.getItem('user') || localStorage.getItem('user');
+                
+                if (savedUser) {
+                    const userData = JSON.parse(savedUser);
+                    setUser(userData);
+                    setIsLoggedIn(true);
+                    setIsAdmin(userData.role === 'ADMIN');
+                } else {
+                    // We have a token but no user data - fetch the user data
+                    await fetchUserData(accessToken);
+                }
+            } catch (error) {
+                console.error("Auth initialization error:", error);
+                // Clear auth state on error
+                logout();
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        checkAuth();
     }, []);
 
     // Function to fetch user data using token
@@ -83,17 +98,21 @@ export function AuthProvider({children}: {children:ReactNode}) {
                 } else {
                     sessionStorage.setItem('user', JSON.stringify(userData));
                 }
+                return userData;
             } else {
                 // Invalid token or other error
                 logout();
+                throw new Error('Failed to fetch user data');
             }
         } catch (error) {
             console.error('Error fetching user data:', error);
             logout();
+            throw error;
         }
     };
 
     const adminLogin = (userData: User) => {
+        console.log("Admin login called with user:", userData);
         setIsLoggedIn(true);
         setIsAdmin(true);
         setUser(userData);
@@ -102,7 +121,12 @@ export function AuthProvider({children}: {children:ReactNode}) {
         const storage = localStorage.getItem('accessToken') ? localStorage : sessionStorage;
         storage.setItem('user', JSON.stringify(userData));
         
-        router.push('/admin/manage/movies');
+        // Use a small timeout to ensure state updates before navigation
+        console.log("Preparing to redirect admin to dashboard...");
+        setTimeout(() => {
+            console.log("Redirecting admin to dashboard now");
+            router.push('/admin/manage/movies');
+        }, 100);
     }
 
     const login = (userData: User) => {
@@ -114,7 +138,12 @@ export function AuthProvider({children}: {children:ReactNode}) {
         const storage = localStorage.getItem('accessToken') ? localStorage : sessionStorage;
         storage.setItem('user', JSON.stringify(userData));
         
-        router.push('/');
+        // Route based on role
+        if (userData.role === 'ADMIN') {
+            router.push('/admin/manage/movies');
+        } else {
+            router.push('/');
+        }
     }
     
     const logout = () => {
@@ -147,7 +176,13 @@ export function AuthProvider({children}: {children:ReactNode}) {
             login, 
             logout, 
             adminLogin, 
-            setAdmin
+            setAdmin,
+            isLoading,
+            refreshUserData: () => {
+                const token = sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
+                if (token) return fetchUserData(token);
+                return Promise.reject('No token available');
+            }
         }}>
             {children}
         </AuthContext.Provider>

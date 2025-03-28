@@ -26,7 +26,16 @@ export default function LoginPage() {
   // Redirect if user is already logged in
   useEffect(() => {
     if (isAuthenticated) {
-      router.push('/');
+      const storage = localStorage.getItem('user') || sessionStorage.getItem('user');
+      if (storage) {
+        const userData = JSON.parse(storage);
+        // Only redirect regular users to home, admins should stay on login page or go to admin dashboard
+        if (userData.role !== 'ADMIN') {
+          router.push('/');
+        } else {
+          router.push('/admin/manage/movies');
+        }
+      }
     }
   }, [isAuthenticated, router]);
 
@@ -123,10 +132,15 @@ export default function LoginPage() {
         throw new Error("Please use admin login for admin accounts");
       }
   
+      // Make sure to set isLoading to false BEFORE routing occurs
+      setIsLoading(false);
+  
       // Login the user based on their role
       if (isAdminLogin) {
         setAdmin(true);
         adminLogin(userData);
+        // Add explicit router push here in case the adminLogin function's push doesn't work
+        router.push('/admin/manage/movies');
       } else {
         login(userData);
       }
