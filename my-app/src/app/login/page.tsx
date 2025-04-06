@@ -25,10 +25,12 @@ export default function LoginPage() {
 
   // Redirect if user is already logged in
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !isAdminLogin) {
       router.push('/');
+    } else if (isAuthenticated && isAdminLogin) {
+      router.push('/admin/manage/movies');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, router, isAdminLogin]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
