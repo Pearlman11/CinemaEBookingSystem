@@ -118,7 +118,7 @@
 }
 
 .movieInfo svg {
-  width: 16px;
+  width: 1px;
   height: 16px;
   color: #888;
 }
@@ -131,7 +131,7 @@
 }
 
 .editButton, .deleteButton {
-  padding: 0.5rem 1rem;
+  padding: 0.1rem 1rem;
   border: none;
   border-radius: 6px;
   font-size: 0.9rem;
@@ -151,6 +151,15 @@
 
 .editButton:hover {
   background-color: #e0e0e0;
+}
+
+.editButton svg {
+  width:3rem;
+  height:3rem;
+}
+.deleteButton svg {
+  width:3rem;
+  height:3rem;
 }
 
 .deleteButton {
