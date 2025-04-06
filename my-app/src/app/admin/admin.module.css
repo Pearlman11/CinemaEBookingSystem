@@ -1,67 +1,256 @@
+/* Admin Layout Styles */
 .layout {
   display: flex;
   min-height: 100vh;
-  position: relative; /* Ensure a positioning context */
-  overflow: hidden; /* Prevent unwanted overflow affecting fixed positioning */
+  position: relative;
+  overflow: hidden;
+  background-color: #f7f7f7;
 }
 
 .navbar {
-  width: 200px;
-  background-color: #333;
+  width: 260px;
+  background-color: var(--dark-bg-color);
   color: white;
-  padding: 1rem;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100vh; /* Full viewport height */
-  position: fixed; /* Explicitly set to fixed */
-  top: 0; /* Stick to top */
-  left: 0; /* Stick to left */
-  overflow-y: auto; /* Allow internal scrolling if content overflows */
-  z-index: 1000; /* Ensure it stays above other content */
-  box-sizing: border-box; /* Include padding in width calculation */
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  z-index: 100;
+  box-sizing: border-box;
+  box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
+
+.navHeader {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.highlight {
+  color: var(--highlight-color);
+  position: relative;
+}
+
+
 
 .navLinks {
   list-style: none;
   padding: 0;
-  flex-grow: 1; /* Allow links to take available space */
+  flex-grow: 1;
+  margin: 0 0 2rem 0;
 }
 
 .navLinks li {
-  margin: 1rem 0;
+  margin: 0.5rem 0;
 }
 
 .navLinks a {
-  color: white;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  color: #f1f1f1;
   text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
 .navLinks a:hover {
-  color: #ddd;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--highlight-color);
+  transform: translateX(5px);
+}
+
+.navLinks a.active {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: var(--highlight-color);
+  border-left: 3px solid var(--highlight-color);
+}
+
+.navLinks svg {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s ease;
+}
+
+.navLinks a:hover svg {
+  transform: scale(1.1);
+  color: var(--highlight-color);
 }
 
 .logoutButton {
-  padding: 10px 20px;
+  padding: 12px 20px;
   font-size: 1rem;
-  background-color: #dc3545;
+  background-color: #b02a37;
   color: #ffffff;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
   width: 100%;
-  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
 }
 
 .logoutButton:hover {
-  background-color: #b02a37;
+  background-color: #dc3545;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.logoutButton svg {
+  width: 16px;
+  height: 16px;
 }
 
 .main {
   flex: 1;
-  padding: 20px;
-  margin-left: 200px; /* Match sidebar width */
-  min-height: 100vh; /* Ensure main content takes full height */
-  box-sizing: border-box; /* Include padding in calculations */
+  padding: 2rem;
+  margin-left: 260px;
+  min-height: 100vh;
+  box-sizing: border-box;
+  max-width: calc(100% - 260px);
+}
+
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.pageTitle {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+.actionButton {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.actionButton:hover {
+  background-color: var(--hover-darken);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.actionButton svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Card styles for content */
+.card {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* Status indicator */
+.statusIndicator {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.statusActive {
+  background-color: #28a745;
+}
+
+.statusInactive {
+  background-color: #dc3545;
+}
+
+.statusPending {
+  background-color: #ffc107;
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 992px) {
+  .navbar {
+    width: 220px;
+  }
+  
+  .main {
+    margin-left: 220px;
+    max-width: calc(100% - 220px);
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    width: 60px;
+    padding: 1rem 0.5rem;
+  }
+  
+  .navHeader {
+    display: none;
+  }
+  
+  .navLinks a {
+    justify-content: center;
+    padding: 1rem 0.5rem;
+  }
+  
+  .navLinks a span {
+    display: none;
+  }
+  
+  .logoutButton {
+    justify-content: center;
+    padding: 0.75rem;
+  }
+  
+  .logoutButton span {
+    display: none;
+  }
+  
+  .main {
+    margin-left: 60px;
+    max-width: calc(100% - 60px);
+    padding: 1rem;
+  }
 }
