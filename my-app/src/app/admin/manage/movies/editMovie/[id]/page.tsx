@@ -5,15 +5,18 @@ import { useRouter, useParams } from "next/navigation";
 import style from "./editMovie.module.css";
 import { useAuth } from "@/app/context/AuthContext";
 
-interface Showtime {
+// Updated to match backend structure
+interface Showroom {
   id?: number;
-  screentime: string;
+  name: string;
 }
 
-interface Showdate {
+// Updated to match backend structure
+interface Showtime {
   id?: number;
-  screeningDay: string;
-  times: Showtime[];
+  showDate: string; // LocalDate from backend
+  startTime: string; // LocalTime from backend
+  showroom: Showroom;
 }
 
 interface Movie {
@@ -28,7 +31,7 @@ interface Movie {
   description: string;
   reviews?: string[];
   rating: string;
-  showTimes: Showdate[];
+  showTimes: Showtime[];
 }
 
 export default function EditMovie() {
@@ -36,14 +39,19 @@ export default function EditMovie() {
   const router = useRouter();
   const { id } = useParams(); 
   const [movie, setMovie] = useState<Movie | null>(null);
-  const [originalMovie, setOriginalMovie] = useState<Movie | null>(null);  
+  const [originalMovie, setOriginalMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [showrooms, setShowrooms] = useState<Showroom[]>([]);
+  
+  // For managing multiple showtimes
+  const [showtimes, setShowtimes] = useState<Showtime[]>([]);
 
   useEffect(() => {
     if (!isAdmin) return;
 
+    // Fetch movie data
     fetch(`http://localhost:8080/api/movies/${id}`)
       .then((response) => {
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
@@ -51,12 +59,26 @@ export default function EditMovie() {
       })
       .then((data: Movie) => {
         setMovie(data);
-        setOriginalMovie({ ...data }); 
+        setOriginalMovie({ ...data });
+        setShowtimes(data.showTimes || []);
         setLoading(false);
       })
       .catch((err) => {
         setError(err.message);
         setLoading(false);
+      });
+
+    // Fetch showrooms
+    fetch(`http://localhost:8080/api/showrooms`)
+      .then((response) => {
+        if (!response.ok) throw new Error(`Failed to fetch showrooms: ${response.status}`);
+        return response.json();
+      })
+      .then((data: Showroom[]) => {
+        setShowrooms(data);
+      })
+      .catch((err) => {
+        console.error("Error fetching showrooms:", err);
       });
   }, [id, isAdmin]);
 
@@ -64,13 +86,7 @@ export default function EditMovie() {
     const { name, value } = e.target;
     if (!movie) return;
 
-    if (name === "screeningDay") {
-      setMovie((prev) => (prev ? { ...prev, showTimes: [{ ...prev.showTimes[0], screeningDay: value }] } : null));
-    } else if (name === "screentime") {
-      setMovie((prev) => (prev ? { ...prev, showTimes: [{ ...prev.showTimes[0], times: [{ screentime: value }] }] } : null));
-    } else {
-      setMovie((prev) => (prev ? { ...prev, [name]: value } : null));
-    }
+    setMovie((prev) => (prev ? { ...prev, [name]: value } : null));
   };
 
   const handleArrayChange = (index: number, field: "cast" | "reviews", value: string) => {
@@ -92,11 +108,50 @@ export default function EditMovie() {
     setMovie((prev) => (prev ? { ...prev, [field]: updatedArray.length > 0 ? updatedArray : [""] } : null));
   };
 
+  // For handling showtime changes
+  const handleShowtimeChange = (index: number, field: string, value: string) => {
+    const updatedShowtimes = [...showtimes];
+    
+    if (field === 'showroomId') {
+      // Find showroom by ID
+      const showroomId = parseInt(value);
+      const selectedShowroom = showrooms.find(room => room.id === showroomId) || { id: showroomId, name: "Unknown" };
+      updatedShowtimes[index] = {
+        ...updatedShowtimes[index],
+        showroom: selectedShowroom
+      };
+    } else {
+      updatedShowtimes[index] = {
+        ...updatedShowtimes[index],
+        [field]: value
+      };
+    }
+    
+    setShowtimes(updatedShowtimes);
+  };
+
+  const addShowtime = () => {
+    // Add a new empty showtime
+    const defaultShowroom = showrooms.length > 0 ? showrooms[0] : { id: 1, name: "Default" };
+    setShowtimes([
+      ...showtimes,
+      {
+        showDate: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD format
+        startTime: "12:00",
+        showroom: defaultShowroom
+      }
+    ]);
+  };
+
+  const removeShowtime = (index: number) => {
+    setShowtimes(showtimes.filter((_, i) => i !== index));
+  };
+
   const handleCancel = () => {
     if (originalMovie) {
-      setMovie({ ...originalMovie }); // Revert to original movies
+      setMovie({ ...originalMovie });
     }
-    router.push("/admin/manage/movies"); // Navigate back to ManageMovies
+    router.push("/admin/manage/movies");
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -106,7 +161,7 @@ export default function EditMovie() {
     setSuccess(null);
 
     if (!movie.title || !movie.rating || !movie.director || !movie.producer || !movie.trailer || !movie.poster || !movie.description || !movie.category) {
-      setError("All fields except cast, reviews, showdate, and showtime are required.");
+      setError("All fields except cast, reviews, and showtimes are required.");
       return;
     }
 
@@ -117,9 +172,11 @@ export default function EditMovie() {
       "R": "R",
       "NC-17": "NC17",
     };
+    
     const updatedMovie = {
       ...movie,
       rating: ratingMap[movie.rating],
+      showTimes: showtimes // Use the managed showtimes
     };
 
     try {
@@ -135,17 +192,16 @@ export default function EditMovie() {
       }
 
       setSuccess("Movie updated successfully!");
+      setTimeout(() => router.push('/admin/manage/movies'), 1000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred.");
     }
-    router.push('/admin/manage/movies');
   };
 
   const categoryOptions = [
     { value: "", label: "Select Category" },
     { value: "Now Playing", label: "Now Playing" },
     { value: "Coming Soon", label: "Coming Soon" },
-   
   ];
 
   const ratingOptions = [
@@ -167,7 +223,9 @@ export default function EditMovie() {
       <button className={style.cancelButton} onClick={handleCancel}>
         Cancel Update
       </button>
-      <h1>Edit Movie</h1>
+      <div className={style.pageHeader}>
+        <h1>Edit Movie Details</h1>
+      </div>
       {error && <p className={style.error}>{error}</p>}
       {success && <p className={style.success}>{success}</p>}
       <form className={style.form} onSubmit={handleSubmit}>
@@ -200,6 +258,7 @@ export default function EditMovie() {
           </select>
         </div>
 
+        <h2 className={style.sectionHeader}>Cast & Crew</h2>
         <div className={style.formGroup}>
           <label>Cast</label>
           {movie.cast.map((actor, index) => (
@@ -248,6 +307,7 @@ export default function EditMovie() {
           />
         </div>
 
+        <h2 className={style.sectionHeader}>Media & Description</h2>
         <div className={style.formGroup}>
           <label htmlFor="trailer">Trailer URL</label>
           <input
@@ -283,6 +343,7 @@ export default function EditMovie() {
           />
         </div>
 
+        <h2 className={style.sectionHeader}>Reviews & Rating</h2>
         <div className={style.formGroup}>
           <label>Reviews</label>
           {movie.reviews?.map((review, index) => (
@@ -324,26 +385,57 @@ export default function EditMovie() {
           </select>
         </div>
 
+        <h2 className={style.sectionHeader}>Showtimes</h2>
         <div className={style.formGroup}>
-          <label htmlFor="screeningDay">Showdate</label>
-          <input
-            type="date"
-            id="screeningDay"
-            name="screeningDay"
-            value={movie.showTimes[0]?.screeningDay || ""}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className={style.formGroup}>
-          <label htmlFor="screentime">Showtime</label>
-          <input
-            type="time"
-            id="screentime"
-            name="screentime"
-            value={movie.showTimes[0]?.times[0]?.screentime || ""}
-            onChange={handleChange}
-          />
+          <label>Showtimes</label>
+          {showtimes.map((showtime, index) => (
+            <div key={index} className={style.showtimeGroup}>
+              <div className={style.showtimeForm}>
+                <div>
+                  <label htmlFor={`showDate-${index}`}>Date</label>
+                  <input
+                    type="date"
+                    id={`showDate-${index}`}
+                    value={showtime.showDate}
+                    onChange={(e) => handleShowtimeChange(index, 'showDate', e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label htmlFor={`startTime-${index}`}>Time</label>
+                  <input
+                    type="time"
+                    id={`startTime-${index}`}
+                    value={showtime.startTime}
+                    onChange={(e) => handleShowtimeChange(index, 'startTime', e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label htmlFor={`showroom-${index}`}>Showroom</label>
+                  <select
+                    id={`showroom-${index}`}
+                    value={showtime.showroom?.id}
+                    onChange={(e) => handleShowtimeChange(index, 'showroomId', e.target.value)}
+                  >
+                    {showrooms.map(room => (
+                      <option key={room.id} value={room.id}>
+                        {room.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <button
+                  type="button"
+                  className={style.removeButton}
+                  onClick={() => removeShowtime(index)}
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          ))}
+          <button type="button" className={style.addButton} onClick={addShowtime}>
+            Add Showtime
+          </button>
         </div>
 
         <button type="submit" className={style.submitButton}>
