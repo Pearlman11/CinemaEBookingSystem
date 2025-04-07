@@ -1,4 +1,243 @@
 .container {
-    padding: 20px;
-    text-align: center;
+  padding: 2rem;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.pageTitle {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+.addButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  background-color: var(--primary-color);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.addButton:hover {
+  background-color: var(--hover-darken);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.addButton svg {
+  width: 16px;
+  height: 16px;
+}
+
+.userList {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.userItem {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  padding: 1.75rem;
+  position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.userItem:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.userRole {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.userRole.admin {
+  background-color: rgba(220, 53, 69, 0.12);
+  color: #dc3545;
+  border: 1px solid rgba(220, 53, 69, 0.2);
+}
+
+.userRole.user {
+  background-color: rgba(13, 110, 253, 0.1);
+  color: #0d6efd;
+  border: 1px solid rgba(13, 110, 253, 0.2);
+}
+
+.userName {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0 0 1.2rem 0;
+  color: #333;
+  padding-right: 4.5rem; /* Make space for the role badge */
+}
+
+.userInfo {
+  margin: 0.7rem 0;
+  color: #555;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  line-height: 1.5;
+}
+
+.userInfo svg {
+  min-width: 18px;
+  height: 18px;
+  color: #aaa;
+}
+
+.userInfo span {
+  word-break: break-word;
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.75rem;
+}
+
+.deleteButton {
+  padding: 0.6rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+  font-weight: 500;
+  max-width: 150px;
+}
+
+.deleteButton:hover {
+  background-color: #dc3545;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.25);
+}
+
+.deleteButton svg {
+  width: 16px;
+  height: 16px;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem 1rem;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.emptyStateIcon {
+  font-size: 3rem;
+  color: #ccc;
+  margin-bottom: 1rem;
+}
+
+.emptyStateText {
+  font-size: 1.2rem;
+  color: #888;
+  margin-bottom: 1.5rem;
+}
+
+.loadingContainer, .errorContainer {
+  text-align: center;
+  padding: 3rem;
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.errorMessage {
+  color: #dc3545;
+  font-size: 1.1rem;
+  margin: 1rem 0;
+}
+
+@media (max-width: 992px) {
+  .userList {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .pageHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .userList {
+    grid-template-columns: 1fr;
+  }
+}
+
+.userGroups {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.userSection {
+  margin-bottom: 1rem;
+}
+
+.sectionTitle {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0 0 1.5rem 0;
+  color: #444;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #eee;
+}
