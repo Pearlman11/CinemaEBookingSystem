@@ -4,30 +4,30 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 
 
 interface Showtime {
-    id: number;
-    screentime: string; 
-  }
-  
-  interface Showdate {
-    id: number;
-    screeningDay: string;
-    times: Showtime[];
-  }
-  
-  interface Movie {
-    id: number;
-    title: string;
-    category: string;
-    cast: string[];
-    director: string;
-    producer: string;
-    trailer: string;
-    poster: string;
-    description: string;
-    reviews?: string[];
-    rating: string;
-    showTimes: Showdate[];
-  }
+  id: number;
+  screentime: string;
+}
+
+interface Showdate {
+  id: number;
+  screeningDay: string;
+  times: Showtime[];
+}
+
+interface Movie {
+  id: number;
+  title: string;
+  category: string;
+  cast: string[];
+  director: string;
+  producer: string;
+  trailer: string;
+  poster: string;
+  description: string;
+  reviews?: string[];
+  rating: string;
+  showTimes: Showdate[];
+}
 
 
 interface MovieContextType {
@@ -39,6 +39,7 @@ interface MovieContextType {
   updateMovie: (id: number, movieData: Partial<Movie>) => Promise<Movie>;
   deleteMovie: (id: number) => Promise<boolean>;
   lastFetched: number | null;
+  clearCache: () => void;
 }
 
 // Cache expiration time in milliseconds (5 minutes)
@@ -52,11 +53,15 @@ export const MovieProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [error, setError] = useState<string | null>(null);
   const [lastFetched, setLastFetched] = useState<number | null>(null);
 
+  // Function to clear the cache
+  const clearCache = useCallback(() => {
+    setLastFetched(null);
+  }, []);
+
   // Function to fetch movies from the API
   const fetchMovies = useCallback(async (forceFetch = false) => {
     // Skip fetching if cache is still valid unless forced
     if (!forceFetch && lastFetched && Date.now() - lastFetched < CACHE_EXPIRATION) {
-      console.log("Using cached movie data");
       return;
     }
 
@@ -65,15 +70,14 @@ export const MovieProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     try {
       const response = await fetch("http://localhost:8080/api/movies");
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       setMovies(data);
       setLastFetched(Date.now());
-      console.log("Movie data refreshed from server");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch movies");
       console.error("Error fetching movies:", err);
@@ -131,9 +135,14 @@ export const MovieProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
 
       const updatedMovie = await response.json();
-      setMovies(prevMovies => 
+
+      clearCache();
+
+      // Update local state
+      setMovies(prevMovies =>
         prevMovies.map(movie => movie.id === id ? updatedMovie : movie)
       );
+
       return updatedMovie;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update movie");
@@ -175,16 +184,17 @@ export const MovieProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [fetchMovies]);
 
   return (
-    <MovieContext.Provider 
-      value={{ 
-        movies, 
-        isLoading, 
-        error, 
-        fetchMovies, 
-        addMovie, 
-        updateMovie, 
+    <MovieContext.Provider
+      value={{
+        movies,
+        isLoading,
+        error,
+        fetchMovies,
+        addMovie,
+        updateMovie,
         deleteMovie,
-        lastFetched
+        lastFetched,
+        clearCache
       }}
     >
       {children}

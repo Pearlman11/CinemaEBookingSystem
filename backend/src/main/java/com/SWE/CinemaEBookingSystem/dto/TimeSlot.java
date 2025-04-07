@@ -2,18 +2,29 @@ package com.SWE.CinemaEBookingSystem.dto;
 
 import java.time.LocalTime;
 
+/**
+ * Data Transfer Object for representing a time slot for movie scheduling
+ */
 public class TimeSlot {
     private LocalTime time;
     private boolean available;
     private String movie;
     
+    /**
+     * Create a new TimeSlot with specified availability
+     * 
+     * @param time The start time of the slot
+     * @param available Whether the slot is available
+     */
     public TimeSlot(LocalTime time, boolean available) {
         this.time = time;
         this.available = available;
         this.movie = null;
     }
     
-    // Default constructor for serialization
+    /**
+     * Default constructor for serialization
+     */
     public TimeSlot() {
     }
     

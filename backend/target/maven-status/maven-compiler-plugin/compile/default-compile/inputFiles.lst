@@ -12,7 +12,9 @@
 /Users/jake/Desktop/Spring25/Engineering/CinemaEBookingSystem/backend/src/main/java/com/SWE/CinemaEBookingSystem/controller/TicketController.java
 /Users/jake/Desktop/Spring25/Engineering/CinemaEBookingSystem/backend/src/main/java/com/SWE/CinemaEBookingSystem/controller/UserController.java
 /Users/jake/Desktop/Spring25/Engineering/CinemaEBookingSystem/backend/src/main/java/com/SWE/CinemaEBookingSystem/controller/UserPromotionsController.java
+/Users/jake/Desktop/Spring25/Engineering/CinemaEBookingSystem/backend/src/main/java/com/SWE/CinemaEBookingSystem/dto/ConflictInfo.java
 /Users/jake/Desktop/Spring25/Engineering/CinemaEBookingSystem/backend/src/main/java/com/SWE/CinemaEBookingSystem/dto/ErrorResponse.java
+/Users/jake/Desktop/Spring25/Engineering/CinemaEBookingSystem/backend/src/main/java/com/SWE/CinemaEBookingSystem/dto/TimeSlot.java
 /Users/jake/Desktop/Spring25/Engineering/CinemaEBookingSystem/backend/src/main/java/com/SWE/CinemaEBookingSystem/entity/AgeCategory.java
 /Users/jake/Desktop/Spring25/Engineering/CinemaEBookingSystem/backend/src/main/java/com/SWE/CinemaEBookingSystem/entity/Booking.java
 /Users/jake/Desktop/Spring25/Engineering/CinemaEBookingSystem/backend/src/main/java/com/SWE/CinemaEBookingSystem/entity/BookingStatus.java

@@ -4,6 +4,7 @@ import React, { useEffect, useState, FormEvent } from "react";
 import { useRouter, useParams } from "next/navigation";
 import style from "./editMovie.module.css";
 import { useAuth } from "@/app/context/AuthContext";
+import { useMovies } from "@/app/context/MovieContext";
 
 // Updated to match backend structure
 interface Showroom {
@@ -44,6 +45,7 @@ interface TimeSlot {
 
 export default function EditMovie() {
   const { isAdmin } = useAuth();
+  const { clearCache } = useMovies();
   const router = useRouter();
   const { id } = useParams(); 
   const [movie, setMovie] = useState<Movie | null>(null);
@@ -254,6 +256,23 @@ export default function EditMovie() {
     }
   };
 
+  // Function to directly delete a showtime by ID
+  const deleteShowtime = async (showtimeId: number) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/movies/showtimes/${showtimeId}`, {
+        method: 'DELETE'
+      });
+      
+      if (!response.ok) {
+        return false;
+      }
+      
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!movie) return;
@@ -263,6 +282,15 @@ export default function EditMovie() {
     if (!movie.title || !movie.rating || !movie.director || !movie.producer || !movie.trailer || !movie.poster || !movie.description || !movie.category) {
       setError("All fields except cast, reviews, and showtimes are required.");
       return;
+    }
+
+    // Find removed showtimes to delete them directly if needed
+    let removedShowtimeIds: number[] = [];
+    if (originalMovie?.showTimes) {
+      removedShowtimeIds = originalMovie.showTimes
+        .filter(ost => ost.id)
+        .filter(ost => !showtimes.some(st => st.id === ost.id))
+        .map(st => st.id as number);
     }
 
     // Check each showtime for conflicts before submitting
@@ -289,7 +317,7 @@ export default function EditMovie() {
     const updatedMovie = {
       ...movie,
       rating: ratingMap[movie.rating],
-      duration: formattedDuration, // Use the properly formatted duration
+      duration: formattedDuration,
       showTimes: showtimes 
     };
 
@@ -306,8 +334,20 @@ export default function EditMovie() {
         throw new Error(errorData.message || `Failed to update movie: ${updateMovieResponse.statusText}`);
       }
 
+      // Clear the movie cache to ensure fresh data
+      clearCache();
+
       setSuccess("Movie updated successfully!");
-      setTimeout(() => router.push('/admin/manage/movies'), 1000);
+      
+      // Directly delete removed showtimes as a backup mechanism
+      if (removedShowtimeIds.length > 0) {
+        const deletePromises = removedShowtimeIds.map(id => deleteShowtime(id));
+        await Promise.all(deletePromises);
+      }
+      
+      setTimeout(() => {
+        router.push('/admin/manage/movies');
+      }, 1000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred.");
     }
