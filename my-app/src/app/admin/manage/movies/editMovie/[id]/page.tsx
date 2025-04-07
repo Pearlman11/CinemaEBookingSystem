@@ -32,6 +32,14 @@ interface Movie {
   reviews?: string[];
   rating: string;
   showTimes: Showtime[];
+  duration?: number; // Stored as minutes number in the frontend
+}
+
+// Interface for available time slots from backend
+interface TimeSlot {
+  time: string;
+  available: boolean;
+  movie: string | null;
 }
 
 export default function EditMovie() {
@@ -47,6 +55,12 @@ export default function EditMovie() {
   
   // For managing multiple showtimes
   const [showtimes, setShowtimes] = useState<Showtime[]>([]);
+  
+  // For available time slots
+  const [availableTimeSlots, setAvailableTimeSlots] = useState<TimeSlot[]>([]);
+  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [selectedShowroomId, setSelectedShowroomId] = useState<number | null>(null);
+  const [loadingTimeSlots, setLoadingTimeSlots] = useState(false);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -57,10 +71,33 @@ export default function EditMovie() {
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         return response.json();
       })
-      .then((data: Movie) => {
-        setMovie(data);
-        setOriginalMovie({ ...data });
-        setShowtimes(data.showTimes || []);
+      .then((data: { 
+        id: number;
+        title: string;
+        category: string;
+        cast: string[];
+        director: string;
+        producer: string;
+        trailer: string;
+        poster: string;
+        description: string;
+        reviews?: string[];
+        rating: string;
+        showTimes: Showtime[];
+        duration?: string | number;
+      }) => {
+        // If duration comes as a string in ISO-8601 format, extract the minutes
+        if (typeof data.duration === 'string' && data.duration.startsWith('PT')) {
+          // Extract minutes from format like "PT120M"
+          const minutesMatch = data.duration.match(/PT(\d+)M/);
+          if (minutesMatch && minutesMatch[1]) {
+            data.duration = parseInt(minutesMatch[1]);
+          }
+        }
+        
+        setMovie(data as Movie);
+        setOriginalMovie({ ...data } as Movie);
+        setShowtimes(data.showTimes ? [...data.showTimes] : []);
         setLoading(false);
       })
       .catch((err) => {
@@ -76,11 +113,36 @@ export default function EditMovie() {
       })
       .then((data: Showroom[]) => {
         setShowrooms(data);
+        if (data.length > 0) {
+          setSelectedShowroomId(data[0].id || 1);
+        }
       })
       .catch((err) => {
         console.error("Error fetching showrooms:", err);
       });
   }, [id, isAdmin]);
+
+  // Fetch available time slots when date and showroom are selected
+  useEffect(() => {
+    if (!selectedDate || !selectedShowroomId || !movie?.id) return;
+    
+    setLoadingTimeSlots(true);
+    
+    // Call the available-timeslots API
+    fetch(`http://localhost:8080/api/movies/available-timeslots?date=${selectedDate}&showroomId=${selectedShowroomId}&movieId=${movie.id}`)
+      .then(response => {
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        return response.json();
+      })
+      .then(data => {
+        setAvailableTimeSlots(data);
+        setLoadingTimeSlots(false);
+      })
+      .catch(err => {
+        console.error("Error fetching time slots:", err);
+        setLoadingTimeSlots(false);
+      });
+  }, [selectedDate, selectedShowroomId, movie?.id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -128,15 +190,30 @@ export default function EditMovie() {
     }
     
     setShowtimes(updatedShowtimes);
+    
+    // Update the date/showroom selection to check available times
+    if (field === 'showDate') {
+      setSelectedDate(value);
+    }
+    
+    if (field === 'showroomId') {
+      setSelectedShowroomId(parseInt(value));
+    }
   };
 
   const addShowtime = () => {
     // Add a new empty showtime
     const defaultShowroom = showrooms.length > 0 ? showrooms[0] : { id: 1, name: "Default" };
+    const currentDate = new Date().toISOString().split('T')[0]; // Current date in YYYY-MM-DD format
+    
+    // Update the selected date/showroom for time slot checking
+    setSelectedDate(currentDate);
+    setSelectedShowroomId(defaultShowroom.id || 1);
+    
     setShowtimes([
       ...showtimes,
       {
-        showDate: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD format
+        showDate: currentDate,
         startTime: "12:00",
         showroom: defaultShowroom
       }
@@ -154,6 +231,29 @@ export default function EditMovie() {
     router.push("/admin/manage/movies");
   };
 
+  // Helper function to check for conflicts before submitting
+  const checkForConflicts = async (showtime: Showtime): Promise<string | null> => {
+    try {
+      const response = await fetch('http://localhost:8080/api/movies/check-conflict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...showtime,
+          movie: { id: movie?.id }
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        return errorData.message || 'Unknown conflict detected';
+      }
+      
+      return null; // No conflicts
+    } catch (err) {
+      return err instanceof Error ? err.message : 'Error checking for conflicts';
+    }
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!movie) return;
@@ -165,6 +265,15 @@ export default function EditMovie() {
       return;
     }
 
+    // Check each showtime for conflicts before submitting
+    for (const showtime of showtimes) {
+      const conflictError = await checkForConflicts(showtime);
+      if (conflictError) {
+        setError(`Showtime conflict: ${conflictError}`);
+        return;
+      }
+    }
+
     const ratingMap: { [key: string]: string } = {
       "G": "G",
       "PG": "PG",
@@ -173,22 +282,28 @@ export default function EditMovie() {
       "NC-17": "NC17",
     };
     
+    // Format duration as ISO-8601 duration string (PT{minutes}M)
+    const formattedDuration = movie.duration ? `PT${movie.duration}M` : undefined;
+    
+    // This will automatically handle deleted showtimes as they won't be included
     const updatedMovie = {
       ...movie,
       rating: ratingMap[movie.rating],
-      showTimes: showtimes // Use the managed showtimes
+      duration: formattedDuration, // Use the properly formatted duration
+      showTimes: showtimes 
     };
 
     try {
-      const response = await fetch(`http://localhost:8080/api/movies/${movie.id}`, {
+      // Send the complete movie data with the current list of showtimes
+      const updateMovieResponse = await fetch(`http://localhost:8080/api/movies/${movie.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedMovie),
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to update movie: ${response.statusText} - ${errorText}`);
+      if (!updateMovieResponse.ok) {
+        const errorData = await updateMovieResponse.json();
+        throw new Error(errorData.message || `Failed to update movie: ${updateMovieResponse.statusText}`);
       }
 
       setSuccess("Movie updated successfully!");
@@ -196,6 +311,19 @@ export default function EditMovie() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred.");
     }
+  };
+
+  // Time slot selection handler
+  const handleTimeSlotSelect = (index: number, timeSlot: TimeSlot) => {
+    if (!timeSlot.available) return; // Don't allow selecting unavailable slots
+    
+    const updatedShowtimes = [...showtimes];
+    updatedShowtimes[index] = {
+      ...updatedShowtimes[index],
+      startTime: timeSlot.time
+    };
+    
+    setShowtimes(updatedShowtimes);
   };
 
   const categoryOptions = [
@@ -217,6 +345,23 @@ export default function EditMovie() {
   if (loading) return <p>Loading movie...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
   if (!movie) return <p>Movie not found.</p>;
+
+  // Format time slot for display
+  const formatTimeSlot = (time: string) => {
+    try {
+      // Parse hours and minutes from HH:MM:SS format
+      const [hours, minutes] = time.split(':');
+      const hourNum = parseInt(hours);
+      
+      // Convert to 12-hour format
+      const period = hourNum >= 12 ? 'PM' : 'AM';
+      const hour12 = hourNum % 12 || 12;
+      
+      return `${hour12}:${minutes} ${period}`;
+    } catch {
+      return time;
+    }
+  };
 
   return (
     <div className={style.container}>
@@ -343,6 +488,19 @@ export default function EditMovie() {
           />
         </div>
 
+        <div className={style.formGroup}>
+          <label htmlFor="duration">Duration (minutes)</label>
+          <input
+            type="number"
+            id="duration"
+            name="duration"
+            value={movie.duration || ""}
+            onChange={handleChange}
+            required
+            min="1"
+          />
+        </div>
+
         <h2 className={style.sectionHeader}>Reviews & Rating</h2>
         <div className={style.formGroup}>
           <label>Reviews</label>
@@ -401,15 +559,6 @@ export default function EditMovie() {
                   />
                 </div>
                 <div>
-                  <label htmlFor={`startTime-${index}`}>Time</label>
-                  <input
-                    type="time"
-                    id={`startTime-${index}`}
-                    value={showtime.startTime}
-                    onChange={(e) => handleShowtimeChange(index, 'startTime', e.target.value)}
-                  />
-                </div>
-                <div>
                   <label htmlFor={`showroom-${index}`}>Showroom</label>
                   <select
                     id={`showroom-${index}`}
@@ -423,6 +572,15 @@ export default function EditMovie() {
                     ))}
                   </select>
                 </div>
+                <div>
+                  <label htmlFor={`startTime-${index}`}>Time</label>
+                  <input
+                    type="time"
+                    id={`startTime-${index}`}
+                    value={showtime.startTime}
+                    onChange={(e) => handleShowtimeChange(index, 'startTime', e.target.value)}
+                  />
+                </div>
                 <button
                   type="button"
                   className={style.removeButton}
@@ -431,6 +589,32 @@ export default function EditMovie() {
                   Remove
                 </button>
               </div>
+              
+              {/* Available Time Slots Display */}
+              {showtime.showDate === selectedDate && 
+               showtime.showroom.id === selectedShowroomId && (
+                <div className={style.timeSlotContainer}>
+                  <h4>Available Time Slots:</h4>
+                  {loadingTimeSlots ? (
+                    <p>Loading available times...</p>
+                  ) : (
+                    <div className={style.timeSlots}>
+                      {availableTimeSlots.map((slot, slotIndex) => (
+                        <button
+                          key={slotIndex}
+                          type="button"
+                          className={`${style.timeSlot} ${!slot.available ? style.unavailable : ''} ${showtime.startTime === slot.time ? style.selected : ''}`}
+                          onClick={() => handleTimeSlotSelect(index, slot)}
+                          disabled={!slot.available}
+                          title={!slot.available ? `Booked: ${slot.movie}` : 'Available'}
+                        >
+                          {formatTimeSlot(slot.time)}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+               )}
             </div>
           ))}
           <button type="button" className={style.addButton} onClick={addShowtime}>

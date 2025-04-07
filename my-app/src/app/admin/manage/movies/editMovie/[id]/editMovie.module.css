@@ -353,3 +353,66 @@
   position: relative;
   z-index: 1;
 }
+
+.timeSlotContainer {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #f7f7f7;
+  border-radius: 5px;
+  width: 100%;
+}
+
+.timeSlots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.timeSlot {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #e6f7ff;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.timeSlot:hover:not(.unavailable) {
+  background-color: #bae7ff;
+  transform: scale(1.05);
+}
+
+.timeSlot.unavailable {
+  background-color: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.timeSlot.selected {
+  background-color: #1890ff;
+  color: white;
+  border-color: #1890ff;
+}
+
+.showtimeGroup {
+  border: 1px solid #eee;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+}
+
+.showtimeForm {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+@media (max-width: 768px) {
+  .showtimeForm {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
