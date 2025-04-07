@@ -3,6 +3,7 @@ com/SWE/CinemaEBookingSystem/service/EmailService.class
 com/SWE/CinemaEBookingSystem/entity/Seat.class
 com/SWE/CinemaEBookingSystem/controller/BookingsController.class
 com/SWE/CinemaEBookingSystem/entity/PaymentCards.class
+com/SWE/CinemaEBookingSystem/dto/ErrorResponse.class
 com/SWE/CinemaEBookingSystem/entity/TicketStatus.class
 com/SWE/CinemaEBookingSystem/controller/AuthController.class
 com/SWE/CinemaEBookingSystem/security/SecurityConfig.class
@@ -17,6 +18,7 @@ com/SWE/CinemaEBookingSystem/entity/UserPromotion.class
 com/SWE/CinemaEBookingSystem/controller/MovieController.class
 com/SWE/CinemaEBookingSystem/security/JwtUtil.class
 com/SWE/CinemaEBookingSystem/entity/SeatType.class
+com/SWE/CinemaEBookingSystem/repository/ShowroomRepository.class
 com/SWE/CinemaEBookingSystem/entity/Ticket.class
 com/SWE/CinemaEBookingSystem/entity/Movie.class
 com/SWE/CinemaEBookingSystem/entity/Showtime.class
@@ -31,6 +33,7 @@ com/SWE/CinemaEBookingSystem/entity/User.class
 com/SWE/CinemaEBookingSystem/service/UserService.class
 com/SWE/CinemaEBookingSystem/entity/Order.class
 com/SWE/CinemaEBookingSystem/repository/UserPromotionRepository.class
+com/SWE/CinemaEBookingSystem/controller/ShowroomController.class
 com/SWE/CinemaEBookingSystem/entity/UserStatus.class
 com/SWE/CinemaEBookingSystem/controller/ShowTimeController.class
 com/SWE/CinemaEBookingSystem/repository/PromotionRepository.class

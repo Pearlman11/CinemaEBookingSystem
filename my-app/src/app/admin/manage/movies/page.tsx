@@ -7,56 +7,59 @@ import styles from "./manageMovies.module.css";
 import { useAuth } from "@/app/context/AuthContext";
 import { useMovies } from "@/app/context/MovieContext";
 
+
+
+
 export default function ManageMovies() {
   const { isAdmin } = useAuth();
-  const { movies, isLoading, error, fetchMovies, deleteMovie } = useMovies();
+  const {movies,isLoading,error,fetchMovies,deleteMovie} = useMovies();
 
   // Fetch movies when the component mounts or admin status changes
   useEffect(() => {
-    if (isAdmin) {
-      // Only force refresh if coming from add/edit page
-      const shouldForceRefresh = 
-        typeof window !== 'undefined' && 
-        (window.location.pathname.includes('/addMovie') || 
-         window.location.pathname.includes('/editMovie'));
-         
+
+    if (!isAdmin) return;
+      const shouldForceRefresh = typeof window !== 'undefined' && (window.location.pathname.includes('/addMovie') || window.location.pathname.includes('/editMovie'));
+
       fetchMovies(shouldForceRefresh);
-    }
+
   }, [isAdmin, fetchMovies]);
 
-  const handleDeleteMovie = async (id: number) => {
+ const handleDeleteMovie = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this movie?")) {
       try {
-        const success = await deleteMovie(id);
+        const success = await(deleteMovie(id));
         if (!success) {
           throw new Error("Failed to delete movie");
         }
       } catch (err) {
-        console.error("Error deleting movie:", err);
+        console.error ("Error deleting movie:", err);
         alert("Failed to delete movie. Please try again.");
       }
     }
-  };
+ };
 
-  if (!isAdmin) return <p>Unauthorized. Redirecting...</p>;
-  
-  if (isLoading) {
-    return (
+ if (!isAdmin) {
+  return <p>Unauthorized. Redirecting...</p>;
+ }
+
+ if (isLoading) {
+  return (
       <div className={styles.loadingContainer}>
         <div className={styles.loadingSpinner}></div>
         <p>Loading movies...</p>
       </div>
-    );
-  }
-  
-  if (error) {
-    return (
-      <div className={styles.errorContainer}>
-        <p className={styles.errorMessage}>Error: {error}</p>
-      </div>
-    );
-  }
+  );
+ }
 
+ if (error) {
+  return (
+    <div className = {styles.errorContainer}>
+      <p className = {styles.errorMessage}> Error:{error}</p>
+    </div>
+  );
+ }
+
+ 
   return (
     <div className={styles.container}>
       <div className={styles.pageHeader}>

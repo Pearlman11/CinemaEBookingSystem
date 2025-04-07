@@ -25,19 +25,13 @@ export default function LoginPage() {
 
   // Redirect if user is already logged in
   useEffect(() => {
-    if (isAuthenticated) {
-      const storage = localStorage.getItem('user') || sessionStorage.getItem('user');
-      if (storage) {
-        const userData = JSON.parse(storage);
-        // Only redirect regular users to home, admins should stay on login page or go to admin dashboard
-        if (userData.role !== 'ADMIN') {
-          router.push('/');
-        } else {
-          router.push('/admin/manage/movies');
-        }
-      }
+
+    if (isAuthenticated && !isAdminLogin) {
+      router.push('/');
+    } else if (isAuthenticated && isAdminLogin) {
+      router.push('/admin/manage/movies');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, router, isAdminLogin]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
