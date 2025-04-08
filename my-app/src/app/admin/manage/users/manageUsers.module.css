@@ -1,5 +1,7 @@
 .container {
-  padding: 0;
+  padding: 2rem;
+  max-width: 1280px;
+  margin: 0 auto;
 }
 
 .pageHeader {
@@ -18,7 +20,7 @@
   margin: 0;
 }
 
-.actionButton {
+.addButton {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -33,236 +35,209 @@
   font-weight: 500;
 }
 
-.actionButton:hover {
+.addButton:hover {
   background-color: var(--hover-darken);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.actionButton svg {
+.addButton svg {
   width: 16px;
   height: 16px;
 }
 
-.constructionContainer {
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  padding: 3rem 2rem;
-  text-align: center;
-  max-width: 600px;
-  margin: 2rem auto;
-}
-
-.constructionIcon {
-  font-size: 4rem;
-  color: var(--highlight-color);
-  margin-bottom: 1.5rem;
-}
-
-.constructionTitle {
-  font-size: 1.8rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  color: #333;
-}
-
-.constructionText {
-  font-size: 1.1rem;
-  color: #666;
-  margin-bottom: 2rem;
-  line-height: 1.6;
-}
-
-/* Future user management UI styles */
-.userGrid {
+.userList {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
-  margin-top: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
 
-.userCard {
+.userItem {
   background-color: white;
-  border-radius: 10px;
+  border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   overflow: hidden;
   transition: all 0.3s ease;
+  padding: 1.75rem;
+  position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.userCard:hover {
+.userItem:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-}
-
-.userHeader {
-  padding: 1.5rem;
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #eaeaea;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.userAvatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background-color: var(--primary-color);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
-.userName {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #333;
-  margin: 0;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
 
 .userRole {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.4rem 0.9rem;
   border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 500;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
-.userRoleAdmin {
-  background-color: rgba(220, 53, 69, 0.1);
+.userRole.admin {
+  background-color: rgba(220, 53, 69, 0.12);
   color: #dc3545;
+  border: 1px solid rgba(220, 53, 69, 0.2);
 }
 
-.userRoleUser {
-  background-color: rgba(32, 201, 151, 0.1);
-  color: #20c997;
+.userRole.user {
+  background-color: rgba(13, 110, 253, 0.1);
+  color: #0d6efd;
+  border: 1px solid rgba(13, 110, 253, 0.2);
 }
 
-.userBody {
-  padding: 1.5rem;
+.userName {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0 0 1.2rem 0;
+  color: #333;
+  padding-right: 4.5rem; /* Make space for the role badge */
 }
 
 .userInfo {
-  margin-bottom: 0.75rem;
+  margin: 0.7rem 0;
+  color: #555;
+  font-size: 0.95rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.8rem;
+  line-height: 1.5;
 }
 
 .userInfo svg {
-  width: 16px;
-  height: 16px;
-  color: #888;
+  min-width: 18px;
+  height: 18px;
+  color: #aaa;
 }
 
 .userInfo span {
-  color: #555;
-  font-size: 0.95rem;
+  word-break: break-word;
 }
 
-.userActions {
-  margin-top: 1.5rem;
+.actionButtons {
   display: flex;
-  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 1.75rem;
 }
 
-.userActionButton {
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  border-radius: 6px;
+.deleteButton {
+  padding: 0.6rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
-  flex: 1;
-  transition: all 0.3s ease;
-}
-
-.editButton {
-  background-color: #f0f0f0;
-  color: #333;
-  border: none;
-}
-
-.editButton:hover {
-  background-color: #e0e0e0;
-}
-
-.suspendButton {
-  background-color: rgba(255, 193, 7, 0.1);
-  color: #ffc107;
-  border: none;
-}
-
-.suspendButton:hover {
-  background-color: rgba(255, 193, 7, 0.2);
-}
-
-.deleteButton {
+  gap: 0.5rem;
+  transition: all 0.2s ease;
   background-color: rgba(220, 53, 69, 0.1);
   color: #dc3545;
-  border: none;
+  font-weight: 500;
+  max-width: 150px;
 }
 
 .deleteButton:hover {
-  background-color: rgba(220, 53, 69, 0.2);
+  background-color: #dc3545;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.25);
 }
 
-/* User filters and search */
-.filters {
+.deleteButton svg {
+  width: 16px;
+  height: 16px;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem 1rem;
   background-color: white;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  padding: 1.5rem;
-  margin-bottom: 2rem;
 }
 
-.searchBar {
-  display: flex;
+.emptyStateIcon {
+  font-size: 3rem;
+  color: #ccc;
   margin-bottom: 1rem;
 }
 
-.searchInput {
-  flex: 1;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px 0 0 8px;
-  outline: none;
+.emptyStateText {
+  font-size: 1.2rem;
+  color: #888;
+  margin-bottom: 1.5rem;
 }
 
-.searchInput:focus {
-  border-color: var(--primary-color);
+.loadingContainer, .errorContainer {
+  text-align: center;
+  padding: 3rem;
 }
 
-.searchButton {
-  padding: 0 1.25rem;
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 0 8px 8px 0;
-  cursor: pointer;
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.errorMessage {
+  color: #dc3545;
+  font-size: 1.1rem;
+  margin: 1rem 0;
+}
+
+@media (max-width: 992px) {
+  .userList {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .pageHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .userList {
+    grid-template-columns: 1fr;
+  }
+}
+
+.userGroups {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 3rem;
 }
 
-.filterRow {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
+.userSection {
+  margin-bottom: 1rem;
 }
 
-.filterSelect {
-  flex: 1;
-  min-width: 200px;
-  padding: 0.75rem;
-  font-size: 0.95rem;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  outline: none;
+.sectionTitle {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0 0 1.5rem 0;
+  color: #444;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #eee;
 }

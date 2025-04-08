@@ -32,11 +32,24 @@ public class PromotionService {
         return promotionRepository.findById(promotionCode);
     }
 
+    
     public Promotion addPromotion(Promotion promotion) {
-        Promotion savedPromotion = promotionRepository.save(promotion);
-        notifyUsersOfPromotion(savedPromotion);
-        return savedPromotion;
+    try {
+        Promotion saved = promotionRepository.save(promotion);
+        System.out.println("Promotion saved to database successfully: " + saved.getPromotionCode());
+
+        notifyUsersOfPromotion(saved);
+        
+        System.out.println("Users notified successfully for promotion: " + saved.getPromotionCode());
+
+        return saved;
+    } catch (Exception e) {
+        System.err.println("Error saving promotion or notifying users: " + e.getMessage());
+        e.printStackTrace();
+        throw e; // Important to rethrow so controller catches it
     }
+}
+
 
     public Optional<Promotion> updatePromotion(String promotionCode, Promotion promotionDetails) {
         return promotionRepository.findById(promotionCode).map(promotion -> {
@@ -58,16 +71,26 @@ public class PromotionService {
     private void notifyUsersOfPromotion(Promotion promotion) {
         String subject = "🎉 New Promotion Just Dropped!";
         String message = String.format(
-                "Use code %s to get %d%% off! Hurry, offer ends on %s.",
+                "Use code %s to get %s%% off! Hurry, offer ends on %s.",
                 promotion.getPromotionCode(),
                 promotion.getDiscountPercentage(),
                 promotion.getEndDate()
         );
-
-        List<String> emails = userRepository.findAllUserEmails(); // You'll need to implement this
+    
+        List<String> emails = userRepository.findAllUserEmails();
+        System.out.println("Notifying " + emails.size() + " users of promotion...");
+    
         for (String email : emails) {
-            emailService.sendEmail(email, subject, message);
+            try {
+                emailService.sendEmail(email, subject, message);
+                System.out.println("Email sent to: " + email);
+            } catch (Exception e) {
+                System.err.println("Failed to send email to " + email + ": " + e.getMessage());
+                e.printStackTrace(); // Detailed error stack
+            }
         }
     }
+    
+    
 }
 

@@ -45,7 +45,7 @@ interface TimeSlot {
 
 export default function EditMovie() {
   const { isAdmin } = useAuth();
-  const { movies, updateMovie, isLoading: contextLoading, error: contextError } = useMovies();
+  const { clearCache } = useMovies();
   const router = useRouter();
   const { id } = useParams(); 
   const [movie, setMovie] = useState<Movie | null>(null);
@@ -67,7 +67,6 @@ export default function EditMovie() {
 
   useEffect(() => {
     if (!isAdmin) return;
-
 
     // Fetch movie data
     fetch(`http://localhost:8080/api/movies/${id}`)
@@ -126,13 +125,32 @@ export default function EditMovie() {
       });
   }, [id, isAdmin]);
 
+  // Fetch available time slots when date and showroom are selected
+  useEffect(() => {
+    if (!selectedDate || !selectedShowroomId || !movie?.id) return;
+    
+    setLoadingTimeSlots(true);
+    
+    // Call the available-timeslots API
+    fetch(`http://localhost:8080/api/movies/available-timeslots?date=${selectedDate}&showroomId=${selectedShowroomId}&movieId=${movie.id}`)
+      .then(response => {
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        return response.json();
+      })
+      .then(data => {
+        setAvailableTimeSlots(data);
+        setLoadingTimeSlots(false);
+      })
+      .catch(err => {
+        console.error("Error fetching time slots:", err);
+        setLoadingTimeSlots(false);
+      });
+  }, [selectedDate, selectedShowroomId, movie?.id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     if (!movie) return;
 
-
-  
     setMovie((prev) => (prev ? { ...prev, [name]: value } : null));
   };
 
@@ -140,19 +158,19 @@ export default function EditMovie() {
     if (!movie) return;
     const updatedArray = [...movie[field]!];
     updatedArray[index] = value;
-    setMovie((prev: Movie | null) => (prev ? { ...prev, [field]: updatedArray } : null));
+    setMovie((prev) => (prev ? { ...prev, [field]: updatedArray } : null));
   };
 
   const addArrayField = (field: "cast" | "reviews") => {
     if (!movie) return;
     const updatedArray = [...movie[field]!, ""];
-    setMovie((prev: Movie | null) => (prev ? { ...prev, [field]: updatedArray } : null));
+    setMovie((prev) => (prev ? { ...prev, [field]: updatedArray } : null));
   };
 
   const removeArrayField = (index: number, field: "cast" | "reviews") => {
     if (!movie) return;
-    const updatedArray = movie[field]!.filter((_, i: number) => i !== index);
-    setMovie((prev: Movie | null) => (prev ? { ...prev, [field]: updatedArray.length > 0 ? updatedArray : [""] } : null));
+    const updatedArray = movie[field]!.filter((_, i) => i !== index);
+    setMovie((prev) => (prev ? { ...prev, [field]: updatedArray.length > 0 ? updatedArray : [""] } : null));
   };
 
   // For handling showtime changes
@@ -299,7 +317,10 @@ export default function EditMovie() {
       "NC-17": "NC17",
     };
     
-
+    // Format duration as ISO-8601 duration string (PT{minutes}M)
+    const formattedDuration = movie.duration ? `PT${movie.duration}M` : undefined;
+    
+    // This will automatically handle deleted showtimes as they won't be included
     const updatedMovie = {
       ...movie,
       rating: ratingMap[movie.rating],
@@ -308,21 +329,21 @@ export default function EditMovie() {
     };
 
     try {
-      // Only send fields that are definitely compatible
-      await updateMovie(movie.id, {
-        title: movie.title,
-        category: movie.category,
-        cast: movie.cast,
-        director: movie.director,
-        producer: movie.producer,
-        trailer: movie.trailer,
-        poster: movie.poster,
-        description: movie.description,
-        rating: ratingMap[movie.rating],
-        reviews: movie.reviews
-        // Omitting showTimes to avoid type conflicts
+      // Send the complete movie data with the current list of showtimes
+      const updateMovieResponse = await fetch(`http://localhost:8080/api/movies/${movie.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedMovie),
       });
-      
+
+      if (!updateMovieResponse.ok) {
+        const errorData = await updateMovieResponse.json();
+        throw new Error(errorData.message || `Failed to update movie: ${updateMovieResponse.statusText}`);
+      }
+
+      // Clear the movie cache to ensure fresh data
+      clearCache();
+
       setSuccess("Movie updated successfully!");
       
       // Directly delete removed showtimes as a backup mechanism
@@ -368,8 +389,8 @@ export default function EditMovie() {
   ];
 
   if (!isAdmin) return <p>Unauthorized. Redirecting...</p>;
-  if (loading || contextLoading) return <p>Loading movie...</p>;
-  if (error || contextError) return <p style={{ color: "red" }}>{error || contextError}</p>;
+  if (loading) return <p>Loading movie...</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
   if (!movie) return <p>Movie not found.</p>;
 
   // Format time slot for display

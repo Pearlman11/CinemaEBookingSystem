@@ -3,6 +3,7 @@ package com.SWE.CinemaEBookingSystem.controller;
 import com.SWE.CinemaEBookingSystem.entity.Promotion;
 import com.SWE.CinemaEBookingSystem.service.PromotionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,12 +35,19 @@ public class PromotionsController {
                         .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // Add a new promotion
     @PostMapping
-    public ResponseEntity<Promotion> addPromotion(@RequestBody Promotion promotion) {
+public ResponseEntity<Promotion> addPromotion(@RequestBody Promotion promotion) {
+    try {
         Promotion savedPromotion = promotionService.addPromotion(promotion);
+        System.out.println("Promotion created successfully: " + savedPromotion.getPromotionCode());
         return ResponseEntity.ok(savedPromotion);
+    } catch (Exception e) {
+        System.err.println("Error creating promotion: " + e.getMessage());
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
+}
+
 
     // Update an existing promotion
     @PutMapping("/{id}")
@@ -61,4 +69,6 @@ public class PromotionsController {
             return ResponseEntity.notFound().build();
         }
     }
+
+
 }
