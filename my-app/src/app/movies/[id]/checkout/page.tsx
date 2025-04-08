@@ -63,6 +63,8 @@ const CheckoutPage = () => {
   const [billingAddress, setBillingAddress] = useState("");
   const [email, setEmail] = useState("");
 
+  
+
 
   const [confirmationVisible, setConfirmationVisible] = useState(false);
 

@@ -22,7 +22,7 @@ const SeatSelectionPage = () => {
   const seniorTickets = parseInt(searchParams.get("senior") || "0", 10);
   const totalTickets = adultTickets + childTickets + seniorTickets;
   const showtime = searchParams.get("showtime") || "TBD";
-
+  const numberToLetter = (n: number) => String.fromCharCode(64 + n); // 1 -> A, 2 -> B, ...
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   const [seats, setSeats] = useState<Seat[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -80,7 +80,7 @@ const SeatSelectionPage = () => {
 
   const groupSeatsByRow = (): Record<string, Seat[]> => {
     return seats.reduce((acc, seat) => {
-      const row = `Row ${seat.rowNumber}`;
+      const row = numberToLetter(seat.rowNumber);
       if (!acc[row]) acc[row] = [];
       acc[row].push(seat);
       return acc;
@@ -114,7 +114,7 @@ const SeatSelectionPage = () => {
                   disabled={seat.reserved}
                   onClick={() => toggleSeat(seat.id, seat.reserved)}
                 >
-                  {`R${seat.rowNumber}-${seat.seatNumber}`}
+                  {`${numberToLetter(seat.rowNumber)}-${seat.seatNumber}`}
                 </button>
               );
             })}
