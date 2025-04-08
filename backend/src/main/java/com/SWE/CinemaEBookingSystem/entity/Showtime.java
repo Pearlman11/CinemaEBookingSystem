@@ -3,8 +3,11 @@ package com.SWE.CinemaEBookingSystem.entity;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "showtimes")
@@ -13,6 +16,15 @@ public class Showtime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    
+
+    @OneToMany(mappedBy = "showtime", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Seat> seats = new ArrayList<>();
+
+
+
 
     @ManyToOne
     @JoinColumn(name = "movie_id", nullable = false)
@@ -53,4 +65,7 @@ public class Showtime {
 
     public Showroom getShowroom() { return showroom; }
     public void setShowroom(Showroom showroom) { this.showroom = showroom; }
+    public List<Seat> getSeats() { return seats; }
+
+    public void setSeats(List<Seat> seats) { this.seats = seats; }
 }

@@ -1,5 +1,8 @@
 package com.SWE.CinemaEBookingSystem.entity;
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import jakarta.persistence.*; 
+
 
 @Entity
 @Table(name = "seats")
@@ -15,11 +18,22 @@ public class Seat {
     @Column(name = "seat_number", nullable = false)
     private int seatNumber;
 
+    @Column(name = "is_reserved")
+    private boolean isReserved;
+
+    @ManyToOne
+    @JoinColumn(name = "showtime_id")
+    @JsonBackReference
+    private Showtime showtime;
+
+
     public Seat() {}
 
-    public Seat(int rowNumber, int seatNumber) {
+    public Seat(int rowNumber, int seatNumber, Showtime showtime) {
         this.seatRow = rowNumber;
         this.seatNumber = seatNumber;
+        this.showtime = showtime;
+        this.isReserved = false;
     }
 
     // Getters and Setters
@@ -32,4 +46,9 @@ public class Seat {
     public int getSeatNumber() { return seatNumber; }
     public void setSeatNumber(int seatNumber) { this.seatNumber = seatNumber; }
 
+    public boolean isReserved() { return isReserved; }
+    public void setReserved(boolean reserved) { isReserved = reserved; }
+
+    public Showtime getShowtime() { return showtime; }
+    public void setShowtime(Showtime showtime) { this.showtime = showtime; }
 }
