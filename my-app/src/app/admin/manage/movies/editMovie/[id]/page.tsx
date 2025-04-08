@@ -52,46 +52,7 @@ export default function EditMovie() {
 
   useEffect(() => {
     if (!isAdmin) return;
-<<<<<<< HEAD
-    
-    // Convert id param to number for comparison
-    const movieId = typeof id === 'string' ? parseInt(id) : Array.isArray(id) ? parseInt(id[0]) : -1;
-    
-    // First try to get the movie from context
-    const foundMovie = movies.find(m => m.id === movieId);
-    
-    if (foundMovie) {
-      // Create a deep copy while ensuring compatible types
-      const movieCopy = {
-        ...foundMovie,
-        showTimes: foundMovie.showTimes.map(date => ({
-          ...date,
-          times: date.times.map(time => ({ ...time }))
-        }))
-      };
-      
-      setMovie(movieCopy as Movie);
-      setOriginalMovie({ ...movieCopy } as Movie);
-      setLoading(false);
-    } else {
-      // Fallback to API call if not in context
-      fetch(`http://localhost:8080/api/movies/${id}`)
-        .then((response) => {
-          if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-          return response.json();
-        })
-        .then((data: Movie) => {
-          setMovie(data);
-          setOriginalMovie({ ...data }); 
-          setLoading(false);
-        })
-        .catch((err) => {
-          setError(err.message);
-          setLoading(false);
-        });
-    }
-  }, [id, isAdmin, movies]);
-=======
+
 
     // Fetch movie data
     fetch(`http://localhost:8080/api/movies/${id}`)
@@ -123,23 +84,15 @@ export default function EditMovie() {
         console.error("Error fetching showrooms:", err);
       });
   }, [id, isAdmin]);
->>>>>>> 9b13abf92552bcaacd1836d1663bbffa8be53a59
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     if (!movie) return;
 
-<<<<<<< HEAD
-    if (name === "screeningDay") {
-      setMovie((prev: Movie | null) => (prev ? { ...prev, showTimes: [{ ...prev.showTimes[0], screeningDay: value }] } : null));
-    } else if (name === "screentime") {
-      setMovie((prev: Movie | null) => (prev ? { ...prev, showTimes: [{ ...prev.showTimes[0], times: [{ screentime: value }] }] } : null));
-    } else {
-      setMovie((prev: Movie | null) => (prev ? { ...prev, [name]: value } : null));
-    }
-=======
+
+  
     setMovie((prev) => (prev ? { ...prev, [name]: value } : null));
->>>>>>> 9b13abf92552bcaacd1836d1663bbffa8be53a59
   };
 
   const handleArrayChange = (index: number, field: "cast" | "reviews", value: string) => {
@@ -226,15 +179,13 @@ export default function EditMovie() {
       "NC-17": "NC17",
     };
     
-<<<<<<< HEAD
-=======
+
     const updatedMovie = {
       ...movie,
       rating: ratingMap[movie.rating],
       showTimes: showtimes // Use the managed showtimes
     };
 
->>>>>>> 9b13abf92552bcaacd1836d1663bbffa8be53a59
     try {
       // Only send fields that are definitely compatible
       await updateMovie(movie.id, {
@@ -252,13 +203,7 @@ export default function EditMovie() {
       });
       
       setSuccess("Movie updated successfully!");
-<<<<<<< HEAD
-      setTimeout(() => {
-        router.push('/admin/manage/movies');
-      }, 1000);
-=======
       setTimeout(() => router.push('/admin/manage/movies'), 1000);
->>>>>>> 9b13abf92552bcaacd1836d1663bbffa8be53a59
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred.");
     }
