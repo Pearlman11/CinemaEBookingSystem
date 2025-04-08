@@ -1,5 +1,6 @@
 package com.SWE.CinemaEBookingSystem.controller;
 
+import com.SWE.CinemaEBookingSystem.entity.Movie;
 import com.SWE.CinemaEBookingSystem.entity.Showtime;
 import com.SWE.CinemaEBookingSystem.service.ShowTimeService;
 
@@ -45,6 +46,25 @@ public class ShowTimeController {
         return showtimeService.getShowtimesByMovieId(movieId);
     }
 
-    
+    @GetMapping("/{showtimeId}/seats")
+public ResponseEntity<?> getSeatsForShowtime(@PathVariable Long showtimeId) {
+    Optional<Showtime> showtimeOpt = showtimeService.getShowtimeById(showtimeId);
+    if (showtimeOpt.isEmpty()) {
+        return ResponseEntity.notFound().build();
+    }
+
+    Showtime showtime = showtimeOpt.get();
+
+    // Assuming you have a List<Seat> in your Showtime entity
+    return ResponseEntity.ok(showtime.getSeats());
+}
+@GetMapping("/{showtimeId}/movie")
+public Movie getMovieForShowtime(@PathVariable Long showtimeId) {
+    Showtime showtime = showtimeService.getShowtimeById(showtimeId)
+        .orElseThrow(() -> new RuntimeException("Showtime not found"));
+    return showtime.getMovie();
+}
+
+
 
 }
