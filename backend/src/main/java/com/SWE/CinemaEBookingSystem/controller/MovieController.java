@@ -1,10 +1,8 @@
 package com.SWE.CinemaEBookingSystem.controller;
 import java.util.Optional;
 import com.SWE.CinemaEBookingSystem.entity.Movie;
-import com.SWE.CinemaEBookingSystem.entity.PaymentCards;
 import com.SWE.CinemaEBookingSystem.entity.Showroom;
 import com.SWE.CinemaEBookingSystem.entity.Showtime;
-import com.SWE.CinemaEBookingSystem.entity.User;
 import com.SWE.CinemaEBookingSystem.repository.MovieRepository;
 import com.SWE.CinemaEBookingSystem.repository.ShowTimeRepository;
 import com.SWE.CinemaEBookingSystem.repository.ShowroomRepository;
@@ -51,7 +49,7 @@ public class MovieController {
         if(optionalShowtimes.isPresent()) {
             List<Showtime> retrieved_showtimes = optionalShowtimes.get();
             for(Showtime showtime:retrieved_showtimes) {
-                // Skip if it's the same showtime (for updates)
+                // skip if it's the same showtime (for updates)
                 if(updated_showtime.getId() != null && updated_showtime.getId().equals(showtime.getId())) {
                     continue;
                 }
@@ -61,7 +59,7 @@ public class MovieController {
                     Integer start_of_retrieved_movie = showtime.getStartTime().toSecondOfDay()/60;
                     Long retrieved_end_time_in_minutes = start_of_retrieved_movie + retrieved_movie_duration_in_minutes;
                     
-                    // Check for any overlap between the time slots
+                    // check for any overlap between the time slots
                     boolean hasOverlap = !(end_time_in_minutes <= start_of_retrieved_movie || start_time_in_minutes >= retrieved_end_time_in_minutes);
                     
                     if(hasOverlap) {
@@ -131,7 +129,7 @@ public class MovieController {
         
         Movie movie = retrievedMovie.get();
         
-        // Force a clean fetch of the movie's showtimes to ensure we have accurate data
+        // forcing a fetch to make sure data is up to date
         List<Showtime> existingShowtimes = showTimeRepository.findByMovieId(id);
         
         // Update basic movie information
@@ -141,7 +139,7 @@ public class MovieController {
         List<Showtime> updatedShowtimes = movieDetails.getshowTimes();
         List<Showtime> oldShowtimes = movie.getshowTimes();
         
-        // Keep track of processed showtime IDs
+        // to keep track of processed showtime IDs
         Set<Long> processedShowtimeIds = new java.util.HashSet<>();
         
         // Process each showtime from the update request
@@ -152,10 +150,10 @@ public class MovieController {
             }
         }
         
-        // Delete showtimes that were removed
+        // delete showtimes that were removed
         deleteRemovedShowtimes(existingShowtimes, processedShowtimeIds);
         
-        // Refresh movie data to return the updated state
+        // refresh the movie data to return the updated state
         Movie refreshedMovie = movieRepository.findById(id).orElse(savedMovie);
 
         return new ResponseEntity<>(refreshedMovie, HttpStatus.OK);
@@ -236,7 +234,7 @@ public class MovieController {
      */
     private ResponseEntity<?> processExistingShowtime(Showtime showtime, Showtime existingShowtime, 
                                                     Movie movie, Set<Long> processedShowtimeIds) {
-        // Track ID as processed
+        // track ID as they are processed
         if (showtime.getId() != null) {
             processedShowtimeIds.add(showtime.getId());
         }
@@ -309,7 +307,7 @@ public class MovieController {
         showtime.setShowroom(showroomToUpdate);
         Showtime savedShowtime = showTimeRepository.save(showtime);
         
-        // Track newly created showtime
+        // keep track of the created showtime
         if (savedShowtime.getId() != null) {
             processedShowtimeIds.add(savedShowtime.getId());
         }
@@ -329,7 +327,7 @@ public class MovieController {
                 try {
                     showTimeRepository.deleteById(showtime.getId());
                 } catch (Exception e) {
-                    // Log error and continue
+                    System.out.println(e.getMessage());
                 }
             }
         }
@@ -468,12 +466,11 @@ public class MovieController {
                 continue;
             }
             
-            // Check if we can fit the movie from this start time
+            // check if the movie can be scheudled here
             boolean canFit = true;
             LocalTime startTime = startSlot.getTime();
             LocalTime endTime = startTime.plusMinutes(movieDuration);
             
-            // Check if it ends after closing time
             if (endTime.isAfter(closingTime)) {
                 canFit = false;
             } else {
@@ -523,7 +520,7 @@ public class MovieController {
         if(optionalShowtimes.isPresent()) {
             List<Showtime> showtimes = optionalShowtimes.get();
             for(Showtime existingShowtime : showtimes) {
-                // Skip comparing with itself
+                // skip comparing with itself
                 if(newShowtime.getId() != null && newShowtime.getId().equals(existingShowtime.getId())) {
                     continue;
                 }
@@ -532,8 +529,7 @@ public class MovieController {
                     Long existingDuration = existingShowtime.getMovie().getDuration();
                     Integer existingStartMins = existingShowtime.getStartTime().toSecondOfDay()/60;
                     Long existingEndMins = existingStartMins + existingDuration;
-                    
-                    // Check if there's an overlap
+
                     boolean hasOverlap = !(newEndMins <= existingStartMins || newStartMins >= existingEndMins);
                     
                     if(hasOverlap) {
@@ -621,14 +617,13 @@ public class MovieController {
     @DeleteMapping("/showtimes/{id}")
     public ResponseEntity<?> deleteShowtime(@PathVariable Long id) {
         try {
-            // Check if the showtime exists
             boolean exists = showTimeRepository.existsById(id);
             if (!exists) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ErrorResponse("Showtime not found with id: " + id));
             }
             
-            // Delete the showtime
+            // delete the showtime
             showTimeRepository.deleteById(id);
             
             return ResponseEntity.ok("Showtime deleted successfully");
