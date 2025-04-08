@@ -237,15 +237,11 @@ public class MovieController {
     private ResponseEntity<?> processExistingShowtime(Showtime showtime, Showtime existingShowtime, 
                                                   Movie movie, Set<Long> processedShowtimeIds) {
     showtime.setMovie(movie);
-    
     Showroom showroomToUpdate;
+
     if(showtime.getShowroom().getId() != null) {
-        Optional<Showroom> optShowroom = showRoomRepository.findById(showtime.getShowroom().getId());
-        if(optShowroom.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorResponse("Showroom not found with id: " + showtime.getShowroom().getId()));
-        }
-        showroomToUpdate = optShowroom.get();
+        showroomToUpdate = showRoomRepository.findById(showtime.getShowroom().getId())
+            .orElseThrow(() -> new RuntimeException("Showroom not found"));
     } else {
         showroomToUpdate = showRoomRepository.save(showtime.getShowroom());
     }
@@ -260,7 +256,7 @@ public class MovieController {
     existingShowtime.setStartTime(showtime.getStartTime());
     existingShowtime.setMovie(movie);
 
-    Showtime savedShowtime = showTimeService.createShowtime(existingShowtime); // if you wish to regenerate seats
+    Showtime savedShowtime = showTimeService.createOrUpdateShowtime(existingShowtime);
 
     if(savedShowtime.getId() != null) {
         processedShowtimeIds.add(savedShowtime.getId());
@@ -269,48 +265,33 @@ public class MovieController {
     return null;
 }
 
+private ResponseEntity<?> processNewShowtime(Showtime showtime, Movie movie, Set<Long> processedShowtimeIds) {
+    showtime.setMovie(movie);
 
-    /**
-     * Process a new showtime during update
-     * 
-     * @param showtime The new showtime
-     * @param movie The movie being updated
-     * @param processedShowtimeIds Set of already processed showtime IDs
-     * @return ResponseEntity with conflict error if found, null otherwise
-     */
-    private ResponseEntity<?> processNewShowtime(Showtime showtime, Movie movie, Set<Long> processedShowtimeIds) {
-        Showroom showroomToUpdate;
-    
-        showtime.setMovie(movie);
-    
-        if(showtime.getShowroom().getId() != null) {
-            Optional<Showroom> optShowroom = showRoomRepository.findById(showtime.getShowroom().getId());
-            if (optShowroom.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse("Showroom not found with id: " + showtime.getShowroom().getId()));
-            }
-            showroomToUpdate = optShowroom.get();
-        } else {
-            showroomToUpdate = showRoomRepository.save(showtime.getShowroom());
-        }
-    
-        showtime.setShowroom(showroomToUpdate);
-    
-        ResponseEntity<?> conflictResponse = checkForConflictsAndPrepareResponse(showroomToUpdate, showtime);
-        if (conflictResponse != null) {
-            return conflictResponse;
-        }
-    
-        // HERE: Call the ShowTimeService to properly create showtime with seats
-        Showtime savedShowtime = showTimeService.createShowtime(showtime);
-    
-        if (savedShowtime.getId() != null) {
-            processedShowtimeIds.add(savedShowtime.getId());
-        }
-    
-        return null;
+    Showroom showroomToUpdate;
+    if(showtime.getShowroom().getId() != null) {
+        showroomToUpdate = showRoomRepository.findById(showtime.getShowroom().getId())
+            .orElseThrow(() -> new RuntimeException("Showroom not found"));
+    } else {
+        showroomToUpdate = showRoomRepository.save(showtime.getShowroom());
     }
-    
+
+    showtime.setShowroom(showroomToUpdate);
+
+    ResponseEntity<?> conflictResponse = checkForConflictsAndPrepareResponse(showroomToUpdate, showtime);
+    if (conflictResponse != null) {
+        return conflictResponse;
+    }
+
+    Showtime savedShowtime = showTimeService.createOrUpdateShowtime(showtime);
+
+    if (savedShowtime.getId() != null) {
+        processedShowtimeIds.add(savedShowtime.getId());
+    }
+
+    return null;
+}
+
 
     /**
      * Delete showtimes that were removed from the movie

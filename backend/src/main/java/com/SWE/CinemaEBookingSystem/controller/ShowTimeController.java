@@ -33,7 +33,7 @@ public class ShowTimeController {
 
     @PostMapping
     public Showtime createShowtime(@RequestBody Showtime showtime) {
-        return showtimeService.createShowtime(showtime);
+        return showtimeService.createOrUpdateShowtime(showtime);
     }
 
     @DeleteMapping("/{id}")
