@@ -40,14 +40,14 @@ const MovieDetailPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [groupedShowtimes, setGroupedShowtimes] = useState<Record<string, Showtime[]>>({});
 
-  // Function to extract YouTube video ID
+
   const getYouTubeVideoId = (url: string) => {
     const regex = /(?:youtube\.com\/.*[?&]v=|youtu\.be\/)([^"&?\/\s]{11})/;
     const match = url.match(regex);
     return match ? match[1] : "";
   };
   
-  // Format time display
+
   const formatTime = (time: string | undefined) => {
     try {
       if (!time) return "TBA";
