@@ -63,6 +63,7 @@ export default function EditMovie() {
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedShowroomId, setSelectedShowroomId] = useState<number | null>(null);
   const [loadingTimeSlots, setLoadingTimeSlots] = useState(false);
+  const [activeShowtimeIndex, setActiveShowtimeIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -196,10 +197,12 @@ export default function EditMovie() {
     // Update the date/showroom selection to check available times
     if (field === 'showDate') {
       setSelectedDate(value);
+      setActiveShowtimeIndex(index);
     }
     
     if (field === 'showroomId') {
       setSelectedShowroomId(parseInt(value));
+      setActiveShowtimeIndex(index);
     }
   };
 
@@ -212,6 +215,7 @@ export default function EditMovie() {
     setSelectedDate(currentDate);
     setSelectedShowroomId(defaultShowroom.id || 1);
     
+    const newIndex = showtimes.length;
     setShowtimes([
       ...showtimes,
       {
@@ -220,6 +224,9 @@ export default function EditMovie() {
         showroom: defaultShowroom
       }
     ]);
+    
+    // Set the newly added showtime as active
+    setActiveShowtimeIndex(newIndex);
   };
 
   const removeShowtime = (index: number) => {
@@ -631,7 +638,7 @@ export default function EditMovie() {
               </div>
               
               {/* Available Time Slots Display */}
-              {showtime.showDate === selectedDate && 
+              {index === activeShowtimeIndex && showtime.showDate === selectedDate && 
                showtime.showroom.id === selectedShowroomId && (
                 <div className={style.timeSlotContainer}>
                   <h4>Available Time Slots:</h4>
