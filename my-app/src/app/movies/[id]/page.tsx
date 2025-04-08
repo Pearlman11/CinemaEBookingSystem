@@ -8,19 +8,21 @@ import Link from "next/link";
 
 interface Showtime {
   id: number;
-  screentime: string;
+  screentime?: string;
+  startTime?: string;
+  showDate?: string;
+  theater?: string;
+  showroom?: {
+    id?: number;
+    name: string;
+  };
 }
 
-interface Showdate {
-  id: number;
-  screeningDay: string; // LocalDate serialized as string from backend
-  times: Showtime[];
-}
 
 interface Movie {
   id: number;
   title: string;
-  showTimes?: Showdate[];
+  showTimes?: Showtime[]; 
   filmRatingCode: string;
   trailer: string;
   poster: string;
@@ -36,12 +38,91 @@ const MovieDetailPage = () => {
   const { id } = useParams();
   const [movie, setMovie] = useState<Movie | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [groupedShowtimes, setGroupedShowtimes] = useState<Record<string, Showtime[]>>({});
 
   // Function to extract YouTube video ID
   const getYouTubeVideoId = (url: string) => {
     const regex = /(?:youtube\.com\/.*[?&]v=|youtu\.be\/)([^"&?\/\s]{11})/;
     const match = url.match(regex);
     return match ? match[1] : "";
+  };
+  
+  // Format time display
+  const formatTime = (time: string | undefined) => {
+    try {
+      if (!time) return "TBA";
+      const [hours, minutes] = time.split(':');
+      const hourNum = parseInt(hours);
+
+      const period = hourNum >= 12 ? 'PM' : 'AM';
+      const hour12 = hourNum % 12 || 12;
+      
+      return `${hour12}:${minutes} ${period}`;
+    } catch {
+      return time || "TBA";
+    }
+  };
+  
+  // Format date display
+  const formatDate = (dateString: string) => {
+    try {
+      if (!dateString) return "Unknown Date";
+
+      const parts = dateString.split('-');
+      
+      if (parts.length === 3 && parts[0].length === 4) {
+        const year = parseInt(parts[0]);
+        const month = parseInt(parts[1]) - 1;
+        const day = parseInt(parts[2]);
+        
+        const date = new Date(year, month, day);
+
+        if (isNaN(date.getTime())) {
+          return "Unknown Date";
+        }
+        
+        return date.toLocaleDateString('en-US', { 
+          weekday: 'short', 
+          month: 'short', 
+          day: 'numeric',
+          year: 'numeric'
+        });
+      } else {
+        const date = new Date(dateString);
+        
+        if (isNaN(date.getTime())) {
+          return "Unknown Date";
+        }
+        
+        return date.toLocaleDateString('en-US', { 
+          weekday: 'short', 
+          month: 'short', 
+          day: 'numeric',
+          year: 'numeric'
+        });
+      }
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return "Unknown Date";
+    }
+  };
+  
+  // Group showtimes by date
+  const groupShowtimesByDate = (showtimes: Showtime[]) => {
+    const grouped: Record<string, Showtime[]> = {};
+    
+    if (!showtimes || !Array.isArray(showtimes)) return grouped;
+    
+    showtimes.forEach(showtime => {
+      if (!showtime.showDate) return;
+      
+      if (!grouped[showtime.showDate]) {
+        grouped[showtime.showDate] = [];
+      }
+      grouped[showtime.showDate].push(showtime);
+    });
+    
+    return grouped;
   };
 
   useEffect(() => {
@@ -55,6 +136,31 @@ const MovieDetailPage = () => {
         })
         .then((data) => {
           setMovie(data);
+
+          if (data.showTimes && Array.isArray(data.showTimes)) {
+
+            if (data.showTimes.length > 0 && 'showDate' in data.showTimes[0]) {
+              setGroupedShowtimes(groupShowtimesByDate(data.showTimes));
+            } 
+            else if (data.showTimes.length > 0 && 'screeningDay' in data.showTimes[0]) {
+              const convertedShowtimes: Showtime[] = [];
+              
+              data.showTimes.forEach((showdate: { screeningDay: string; times: { id: number; screentime: string }[] }) => {
+                if (showdate.times && Array.isArray(showdate.times)) {
+                  showdate.times.forEach((time: { id: number; screentime: string }) => {
+                    convertedShowtimes.push({
+                      id: time.id,
+                      showDate: showdate.screeningDay,
+                      startTime: time.screentime,
+                      theater: "default" //
+                    });
+                  });
+                }
+              });
+              
+              setGroupedShowtimes(groupShowtimesByDate(convertedShowtimes));
+            }
+          }
         })
         .catch((error) => {
           console.error("Error fetching movie:", error);
@@ -65,6 +171,9 @@ const MovieDetailPage = () => {
 
   if (error) return <div className={styles.error}>{error}</div>;
   if (!movie) return <div className={styles.loading}>Loading...</div>;
+
+  // make sure we have at least one valid showtimes
+  const hasShowtimes = Object.keys(groupedShowtimes).length > 0;
 
   return (
     <div>
@@ -91,7 +200,6 @@ const MovieDetailPage = () => {
                 movie.trailer
               )}`}
               title={movie.title}
-              frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             ></iframe>
@@ -121,34 +229,44 @@ const MovieDetailPage = () => {
             <p className={styles.noReviews}>No reviews available</p>
           )}
         </div>
+        
         {/* Showtimes Section */}
         <div className={styles.showtimes}>
           <h2>Showtimes</h2>
-          {movie.showTimes && movie.showTimes.length > 0 ? (
-            movie.showTimes.map((show, idx) => (
-              <div key={idx} className={styles.showdate}>
-                <p>
-                  <strong>Date:</strong> {show.screeningDay}
-                </p>
-                {show.times && show.times.length > 0 ? (
-                  show.times.map((timeSlot, timeIdx) => (
-                    <p key={timeIdx} className={styles.timeSlot}>
-                      Time: {timeSlot.screentime}
-                    </p>
-                  ))
-                ) : (
-                  <p className={styles.noTimes}>No showtimes available</p>
-                )}
-              </div>
-            ))
+          {hasShowtimes ? (
+            <div className={styles.showtimesContainer}>
+              {Object.entries(groupedShowtimes).map(([date, times], idx) => (
+                <div key={idx} className={styles.showdate}>
+                  <h3 className={styles.showdateHeader}>
+                    {formatDate(date)}
+                  </h3>
+                  {times && times.length > 0 ? (
+                    <div className={styles.timeSlotContainer}>
+                      {times.map((timeSlot, timeIdx) => (
+                        <div key={timeIdx} className={styles.timeSlot}>
+                          {formatTime(timeSlot.startTime || timeSlot.screentime)}
+                          <span className={styles.theater}>
+                            {timeSlot.showroom?.name || timeSlot.theater || "TheMovie"}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className={styles.noTimes}>No showtimes available for this date</p>
+                  )}
+                </div>
+              ))}
+            </div>
           ) : (
-            <p className={styles.noTimes}>No showtimes available</p>
+            <div className={styles.noShowtimesContainer}>
+              <p className={styles.noTimes}>No showtimes available for this movie</p>
+            </div>
           )}
         </div>
       </div>
       <div className={styles.cancelButtonContainer}>
         <Link href={"/"} className={styles.cancelButton}>
-          Cancel Order
+          Back to Home
         </Link>
       </div>
     </div>
