@@ -9,20 +9,19 @@ import { useMovies } from "@/app/context/MovieContext";
 
 interface Showtime {
   id: number;
-  screentime: string;
-}
-
-interface Showdate {
-  id: number;
-  screeningDay: string; // LocalDate serialized as string from backend
-  times: Showtime[];
+  screentime?: string;
+  startTime?: string;
+  showDate?: string;
+  showroom?: {
+    name: string;
+  };
 }
 
 interface Movie {
   id: number;
   title: string;
-  showTimes?: Showdate[];
-  filmRatingCode: string;
+  showTimes?: Showtime[];
+  rating: string;
   trailer: string;
   poster: string;
   category: string;
@@ -35,112 +34,115 @@ interface Movie {
 
 const MovieDetailPage = () => {
   const { id } = useParams();
-  const { movies, isLoading, error: contextError } = useMovies();
+  const { movies, isLoading: contextLoading, error: contextError } = useMovies();
   const [movie, setMovie] = useState<Movie | null>(null);
+  const [groupedShowtimes, setGroupedShowtimes] = useState<Record<string, Showtime[]>>({});
   const [error, setError] = useState<string | null>(null);
 
-  // Function to extract YouTube video ID
   const getYouTubeVideoId = (url: string) => {
     const regex = /(?:youtube\.com\/.*[?&]v=|youtu\.be\/)([^"&?\/\s]{11})/;
     const match = url.match(regex);
     return match ? match[1] : "";
   };
 
+  const formatTime = (time?: string) => {
+    if (!time) return "TBA";
+    const [hours, minutes] = time.split(":");
+    const hour = parseInt(hours);
+    const period = hour >= 12 ? "PM" : "AM";
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${minutes} ${period}`;
+  };
+
+  const formatDate = (date: string) => {
+    const d = new Date(date);
+    return isNaN(d.getTime())
+      ? date
+      : d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+  };
+
+  const groupShowtimesByDate = (showtimes: Showtime[]) => {
+    return showtimes.reduce((acc, st) => {
+      if (st.showDate) {
+        if (!acc[st.showDate]) acc[st.showDate] = [];
+        acc[st.showDate].push(st);
+      }
+      return acc;
+    }, {} as Record<string, Showtime[]>);
+  };
+
   useEffect(() => {
     if (!id) return;
-    
-    // Convert id to number for comparison
-    const movieId = typeof id === 'string' ? parseInt(id) : Array.isArray(id) ? parseInt(id[0]) : -1;
-    
-    // Try to get movie from context first
-    const foundMovie = movies.find(m => m.id === movieId);
-    
-    if (foundMovie) {
-      // Adapt the MovieContext movie to the local Movie interface
-      setMovie({
-        id: foundMovie.id,
-        title: foundMovie.title,
-        showTimes: foundMovie.showTimes,
-        filmRatingCode: foundMovie.rating, // Map rating to filmRatingCode
-        trailer: foundMovie.trailer,
-        poster: foundMovie.poster,
-        category: foundMovie.category,
-        cast: foundMovie.cast,
-        director: foundMovie.director,
-        producer: foundMovie.producer,
-        reviews: foundMovie.reviews,
-        description: foundMovie.description
-      });
+
+    const movieId = typeof id === "string" ? parseInt(id) : Array.isArray(id) ? parseInt(id[0]) : -1;
+
+    const found = movies.find((m) => m.id === movieId);
+    if (found) {
+      setMovie(found);
+      if (found.showTimes) {
+        setGroupedShowtimes(groupShowtimesByDate(found.showTimes));
+      }
     } else {
-      // Fallback to API call if not in context
-      fetch(`http://localhost:8080/api/movies/${id}`)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-          return response.json();
-        })
+      fetch(`http://localhost:8080/api/movies/${movieId}`)
+        .then((res) => res.json())
         .then((data) => {
           setMovie(data);
+          if (data.showTimes) {
+            setGroupedShowtimes(groupShowtimesByDate(data.showTimes));
+          }
         })
-        .catch((error) => {
-          console.error("Error fetching movie:", error);
+        .catch((err) => {
+          console.error(err);
           setError("Failed to load movie details.");
         });
     }
   }, [id, movies]);
 
+  if (contextLoading || !movie) return <div className={styles.loading}>Loading...</div>;
   if (error || contextError) return <div className={styles.error}>{error || contextError}</div>;
-  if (isLoading || !movie) return <div className={styles.loading}>Loading...</div>;
 
   return (
     <div>
-      <NavBar></NavBar>
+      <NavBar />
       <div className={styles.container}>
         <div className={styles.topBar}>
-          <Link
-            href={`/movies/${movie.id}/booking`}
-            className={styles.bookTicketButton}
-          >
+          <Link href={`/movies/${movie.id}/booking`} className={styles.bookTicketButton}>
             Book Tickets
           </Link>
         </div>
         <h1 className={styles.title}>{movie.title}</h1>
         <p className={styles.description}>{movie.description}</p>
 
-        {/* Trailer Section */}
+        {/* Trailer */}
         <div className={styles.trailer}>
           {movie.trailer ? (
             <iframe
               width="100%"
               height="450px"
-              src={`https://www.youtube.com/embed/${getYouTubeVideoId(
-                movie.trailer
-              )}`}
+              src={`https://www.youtube.com/embed/${getYouTubeVideoId(movie.trailer)}`}
               title={movie.title}
-              frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
-            ></iframe>
+            />
           ) : (
             <p className={styles.noTrailer}>Trailer not available</p>
           )}
         </div>
 
-        {/* Cast Section */}
+        {/* Cast */}
         <div className={styles.cast}>
           <h2>Cast</h2>
           <p>{movie.cast.join(", ")}</p>
         </div>
 
-        {/* Reviews Section */}
+        {/* Reviews */}
         <div className={styles.reviews}>
           <h2>Reviews</h2>
           {movie.reviews?.length ? (
             <ul className={styles.reviewList}>
-              {movie.reviews.map((review, index) => (
-                <li key={index} className={styles.reviewItem}>
-                  {review}
+              {movie.reviews.map((r, i) => (
+                <li key={i} className={styles.reviewItem}>
+                  {r}
                 </li>
               ))}
             </ul>
@@ -148,24 +150,22 @@ const MovieDetailPage = () => {
             <p className={styles.noReviews}>No reviews available</p>
           )}
         </div>
-        {/* Showtimes Section */}
+
+        {/* Showtimes */}
         <div className={styles.showtimes}>
           <h2>Showtimes</h2>
-          {movie.showTimes && movie.showTimes.length > 0 ? (
-            movie.showTimes.map((show, idx) => (
-              <div key={idx} className={styles.showdate}>
-                <p>
-                  <strong>Date:</strong> {show.screeningDay}
-                </p>
-                {show.times && show.times.length > 0 ? (
-                  show.times.map((timeSlot, timeIdx) => (
-                    <p key={timeIdx} className={styles.timeSlot}>
-                      Time: {timeSlot.screentime}
-                    </p>
-                  ))
-                ) : (
-                  <p className={styles.noTimes}>No showtimes available</p>
-                )}
+          {Object.entries(groupedShowtimes).length > 0 ? (
+            Object.entries(groupedShowtimes).map(([date, times]) => (
+              <div key={date} className={styles.showdate}>
+                <h3>{formatDate(date)}</h3>
+                {times.map((t) => (
+                  <div key={t.id} className={styles.timeSlot}>
+                    {formatTime(t.startTime || t.screentime)}{" "}
+                    <span className={styles.theater}>
+                      {t.showroom?.name || "Default Showroom"}
+                    </span>
+                  </div>
+                ))}
               </div>
             ))
           ) : (
@@ -174,8 +174,8 @@ const MovieDetailPage = () => {
         </div>
       </div>
       <div className={styles.cancelButtonContainer}>
-        <Link href={"/"} className={styles.cancelButton}>
-          Cancel Order
+        <Link href="/" className={styles.cancelButton}>
+          Back to Home
         </Link>
       </div>
     </div>
