@@ -6,6 +6,7 @@ import com.SWE.CinemaEBookingSystem.entity.Showtime;
 import com.SWE.CinemaEBookingSystem.repository.MovieRepository;
 import com.SWE.CinemaEBookingSystem.repository.ShowTimeRepository;
 import com.SWE.CinemaEBookingSystem.repository.ShowroomRepository;
+import com.SWE.CinemaEBookingSystem.service.ShowTimeService;
 import com.SWE.CinemaEBookingSystem.dto.ConflictInfo;
 import com.SWE.CinemaEBookingSystem.dto.ErrorResponse;
 import com.SWE.CinemaEBookingSystem.dto.TimeSlot;
@@ -26,7 +27,7 @@ import java.time.LocalTime;
 @RestController
 @RequestMapping("/api/movies")
 public class MovieController {
-
+    private final ShowTimeService showTimeService;
     private final MovieRepository movieRepository;
     private final ShowTimeRepository showTimeRepository;
     private final ShowroomRepository showRoomRepository;
@@ -71,12 +72,13 @@ public class MovieController {
         return false;
     }       
 
-    @Autowired
-    public MovieController(MovieRepository movieRepository, ShowTimeRepository showTimeRepository, ShowroomRepository showRoomRepository) {
-        this.movieRepository = movieRepository;
-        this.showTimeRepository = showTimeRepository;
-        this.showRoomRepository = showRoomRepository;
-    }
+    public MovieController(MovieRepository movieRepository, ShowTimeRepository showTimeRepository, 
+                       ShowroomRepository showRoomRepository, ShowTimeService showTimeService) {
+    this.movieRepository = movieRepository;
+    this.showTimeRepository = showTimeRepository;
+    this.showRoomRepository = showRoomRepository;
+    this.showTimeService = showTimeService;
+}
 
     /**
      * Get all movies
@@ -233,46 +235,40 @@ public class MovieController {
      * @return ResponseEntity with conflict error if found, null otherwise
      */
     private ResponseEntity<?> processExistingShowtime(Showtime showtime, Showtime existingShowtime, 
-                                                    Movie movie, Set<Long> processedShowtimeIds) {
-        // track ID as they are processed
-        if (showtime.getId() != null) {
-            processedShowtimeIds.add(showtime.getId());
+                                                  Movie movie, Set<Long> processedShowtimeIds) {
+    showtime.setMovie(movie);
+    
+    Showroom showroomToUpdate;
+    if(showtime.getShowroom().getId() != null) {
+        Optional<Showroom> optShowroom = showRoomRepository.findById(showtime.getShowroom().getId());
+        if(optShowroom.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse("Showroom not found with id: " + showtime.getShowroom().getId()));
         }
-        
-        Showroom showroomToUpdate;
-        
-        showtime.setMovie(movie);
-        showtime.setShowDate(showtime.getShowDate());
-        showtime.setStartTime(showtime.getStartTime());
-        
-        if(showtime.getShowroom().getId() != null) {
-            Optional<Showroom> optshowroom = showRoomRepository.findById(showtime.getShowroom().getId());
-            showroomToUpdate = optshowroom.get();
-            
-            ResponseEntity<?> conflictResponse = checkForConflictsAndPrepareResponse(showroomToUpdate, showtime);
-            if (conflictResponse != null) {
-                return conflictResponse;
-            }
-            
-            showtime.setShowroom(showroomToUpdate);
-            showTimeRepository.save(showtime);
-        } else {
-            showroomToUpdate = showtime.getShowroom();
-            
-            ResponseEntity<?> conflictResponse = checkForConflictsAndPrepareResponse(showroomToUpdate, showtime);
-            if (conflictResponse != null) {
-                return conflictResponse;
-            }
-            
-            existingShowtime.setMovie(showtime.getMovie());
-            existingShowtime.setShowDate(showtime.getShowDate());
-            existingShowtime.setStartTime(showtime.getStartTime());
-            existingShowtime.setShowroom(showroomToUpdate);
-            showTimeRepository.save(existingShowtime);
-        }
-        
-        return null;
+        showroomToUpdate = optShowroom.get();
+    } else {
+        showroomToUpdate = showRoomRepository.save(showtime.getShowroom());
     }
+
+    ResponseEntity<?> conflictResponse = checkForConflictsAndPrepareResponse(showroomToUpdate, showtime);
+    if (conflictResponse != null) {
+        return conflictResponse;
+    }
+
+    existingShowtime.setShowroom(showroomToUpdate);
+    existingShowtime.setShowDate(showtime.getShowDate());
+    existingShowtime.setStartTime(showtime.getStartTime());
+    existingShowtime.setMovie(movie);
+
+    Showtime savedShowtime = showTimeService.createShowtime(existingShowtime); // if you wish to regenerate seats
+
+    if(savedShowtime.getId() != null) {
+        processedShowtimeIds.add(savedShowtime.getId());
+    }
+
+    return null;
+}
+
 
     /**
      * Process a new showtime during update
@@ -284,36 +280,37 @@ public class MovieController {
      */
     private ResponseEntity<?> processNewShowtime(Showtime showtime, Movie movie, Set<Long> processedShowtimeIds) {
         Showroom showroomToUpdate;
-        
+    
         showtime.setMovie(movie);
-        showtime.setShowDate(showtime.getShowDate());
-        showtime.setStartTime(showtime.getStartTime());
-        
+    
         if(showtime.getShowroom().getId() != null) {
-            Optional<Showroom> optshowroom = showRoomRepository.findById(showtime.getShowroom().getId());
-            showroomToUpdate = optshowroom.get();
-        } else {
-            showroomToUpdate = showtime.getShowroom();
-            if (showroomToUpdate.getId() == null) {
-                showRoomRepository.save(showroomToUpdate);
+            Optional<Showroom> optShowroom = showRoomRepository.findById(showtime.getShowroom().getId());
+            if (optShowroom.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse("Showroom not found with id: " + showtime.getShowroom().getId()));
             }
+            showroomToUpdate = optShowroom.get();
+        } else {
+            showroomToUpdate = showRoomRepository.save(showtime.getShowroom());
         }
-        
+    
+        showtime.setShowroom(showroomToUpdate);
+    
         ResponseEntity<?> conflictResponse = checkForConflictsAndPrepareResponse(showroomToUpdate, showtime);
         if (conflictResponse != null) {
             return conflictResponse;
         }
-        
-        showtime.setShowroom(showroomToUpdate);
-        Showtime savedShowtime = showTimeRepository.save(showtime);
-        
-        // keep track of the created showtime
+    
+        // HERE: Call the ShowTimeService to properly create showtime with seats
+        Showtime savedShowtime = showTimeService.createShowtime(showtime);
+    
         if (savedShowtime.getId() != null) {
             processedShowtimeIds.add(savedShowtime.getId());
         }
-        
+    
         return null;
     }
+    
 
     /**
      * Delete showtimes that were removed from the movie
