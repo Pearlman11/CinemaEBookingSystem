@@ -63,7 +63,7 @@ const MovieDetailPage = () => {
     }
   };
   
-  // Format date display
+  // Format date 
   const formatDate = (dateString: string) => {
     try {
       if (!dateString) return "Unknown Date";
