@@ -7,16 +7,10 @@ import style from "./MovieCard.module.css";
 //import { useAuth } from "@/app/context/AuthContext";
 import { useMovies } from "@/app/context/MovieContext";
 
-
 interface Showtime {
   id: number;
-  screentime: string; 
-}
-
-interface Showdate {
-  id: number;
-  screeningDay: string;
-  times: Showtime[];
+  showDate: string;
+  startTime: string;
 }
 
 interface Movie {
@@ -31,13 +25,15 @@ interface Movie {
   description: string;
   reviews?: string[];
   rating: string;
+  showTimes?: Showtime[]; // ✅ Added flat showtimes array
 }
+
 interface MovieCardProps {
   movies?: Movie[];
 }
 
 export default function MovieCard({ movies: propsMovies }: MovieCardProps) {
-//  const { isAdmin } = useAuth();
+  //  const { isAdmin } = useAuth();
   const router = useRouter();
   const [flipped, setFlipped] = useState<number[]>([]);
   const { movies: contextMovies } = useMovies();
@@ -63,96 +59,114 @@ export default function MovieCard({ movies: propsMovies }: MovieCardProps) {
 
   return (
     <div className={style.container}>
-      {movies.map((movie, movieIndex) => (
-        <div className={style.movie} key={movie.id}>
-          <div className={style.posterContainer}>
-            <Image
-              src={movie.poster}
-              alt={movie.title}
-              width={300}
-              height={450}
-              priority
-            />
-          </div>
-          <div className={style.movieinfocontainer}>
-            <div className={style.titleRatingContainer}>
-              <h2
-                className={style.title}
-                onClick={() => handleTitleClick(movie.id)}
+      {movies.map((movie, movieIndex) => {
+        const groupedShowtimes = (movie.showTimes as Showtime[])?.reduce((acc: Record<string, Showtime[]>, curr) => {
+          if (!acc[curr.showDate]) acc[curr.showDate] = [];
+          acc[curr.showDate].push(curr);
+          return acc;
+        }, {});
+        
+
+        return (
+          <div className={style.movie} key={movie.id}>
+            <div className={style.posterContainer}>
+              <Image
+                src={movie.poster}
+                alt={movie.title}
+                width={300}
+                height={450}
+                priority
+              />
+            </div>
+            <div className={style.movieinfocontainer}>
+              <div className={style.titleRatingContainer}>
+                <h2
+                  className={style.title}
+                  onClick={() => handleTitleClick(movie.id)}
+                >
+                  {movie.title}
+                </h2>
+                <div>
+                  <span className={style.category}>{movie.category}</span>
+                  <span className={style.filmRatingCode}>{movie.rating}</span>
+                </div>
+              </div>
+
+              <div
+                className={`${style.flipContainer} ${
+                  flipped.includes(movieIndex) ? style.flipped : ""
+                }`}
+                role="button"
+                tabIndex={0}
+                onClick={() => handleCardFlip(movieIndex)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    handleCardFlip(movieIndex);
+                  }
+                }}
               >
-                {movie.title}
-              </h2>
-              <div>
-                <span className={style.category}>{movie.category}</span>
-                <span className={style.filmRatingCode}>{movie.rating}</span>
-              </div>
-            </div>
-
-            <div
-              className={`${style.flipContainer} ${
-                flipped.includes(movieIndex) ? style.flipped : ""
-              }`}
-              role="button"
-              tabIndex={0}
-              onClick={() => handleCardFlip(movieIndex)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  handleCardFlip(movieIndex);
-                }
-              }}
-            >
-              <div className={style.front}>
-                <div className={style.additionalInfo}>
-                  <div className={style.showtimeHeader}>
-                    <strong className={style.showtimeTitle}>Showtimes</strong>
-                    <span className={style.inlineFlipInfo}>Click to see movie details</span>
-                  </div>
-                  <div className={style.showtimes}>
-                    
-                      <p className={style.noShowtimes}>
-                        No showtimes available
-                      </p>
-    
+                <div className={style.front}>
+                  <div className={style.additionalInfo}>
+                    <div className={style.showtimeHeader}>
+                      <strong className={style.showtimeTitle}>Showtimes</strong>
+                      <span className={style.inlineFlipInfo}>Click to see movie details</span>
+                    </div>
+                    <div className={style.showtimes}>
+                      {groupedShowtimes && Object.entries(groupedShowtimes).length > 0 ? (
+                        Object.entries(groupedShowtimes).map(([date, times]) => (
+                          <div key={date} className={style.showdate}>
+                            <p><strong>Date:</strong> {date}</p>
+                            {times.map((showtime) => (
+                              <p key={showtime.id} className={style.timeSlot}>
+                                Time: {showtime.startTime}
+                              </p>
+                            ))}
+                          </div>
+                        ))
+                      ) : (
+                        <p className={style.noShowtimes}>No showtimes available</p>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className={style.back}>
-                <div className={style.additionalInfo}>
-                  <div className={style.showtimeHeader}>
-                    <strong className={style.showtimeTitle}>Movie Details</strong>
-                    <span className={style.inlineFlipInfo}>Click to see showtimes</span>
-                  </div>
-                  <div className={style.productionCrew}>
-                    <p>
-                      <strong>Director:</strong> {movie.director}
-                    </p>
-                    <p>
-                      <strong>Producer:</strong> {movie.producer}
-                    </p>
-                    <p>
-                      <strong>Cast:</strong> {formatCast(movie.cast)}
-                    </p>
-                  </div>
-                  <div className={style.reviews}>
-                    <p>
-                      <strong>Description:</strong> {movie.description}
-                    </p>
-                    {movie.reviews && movie.reviews.length > 0 && (
-                      <>
-                        <strong>Reviews:</strong>
-                        {movie.reviews.map((review, reviewIndex) => (
-                          <p key={reviewIndex}>{review}</p>
-                        ))}
-                      </>
-                    )}
+                <div className={style.back}>
+                  <div className={style.additionalInfo}>
+                    <div className={style.showtimeHeader}>
+                      <strong className={style.showtimeTitle}>Movie Details</strong>
+                      <span className={style.inlineFlipInfo}>Click to see showtimes</span>
+                    </div>
+                    <div className={style.productionCrew}>
+                      <p>
+                        <strong>Director:</strong> {movie.director}
+                      </p>
+                      <p>
+                        <strong>Producer:</strong> {movie.producer}
+                      </p>
+                      <p>
+                        <strong>Cast:</strong> {formatCast(movie.cast)}
+                      </p>
+                    </div>
+                    <div className={style.reviews}>
+                      <p>
+                        <strong>Description:</strong> {movie.description}
+                      </p>
+                      {movie.reviews && movie.reviews.length > 0 && (
+                        <>
+                          <strong>Reviews:</strong>
+                          {movie.reviews.map((review, reviewIndex) => (
+                            <p key={reviewIndex}>{review}</p>
+                          ))}
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

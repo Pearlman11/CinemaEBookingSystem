@@ -1,59 +1,96 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams, useRouter, useParams } from "next/navigation";
 import styles from "./seatSelection.module.css";
+
+interface Seat {
+  id: number;
+  seatNumber: number;
+  rowNumber: number;
+  reserved: boolean;
+}
 
 const SeatSelectionPage = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { id } = useParams();
+  const { id } = useParams(); // movie ID
+  const showtimeId = searchParams.get("showtimeId");
 
-  // Parse ticket counts from search params
   const adultTickets = parseInt(searchParams.get("adult") || "0", 10);
   const childTickets = parseInt(searchParams.get("child") || "0", 10);
   const seniorTickets = parseInt(searchParams.get("senior") || "0", 10);
   const totalTickets = adultTickets + childTickets + seniorTickets;
-
-
   const showtime = searchParams.get("showtime") || "TBD";
 
-  // State for selected seats
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
+  const [seats, setSeats] = useState<Seat[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Define a simple seat map (rows A–E and columns 1–8)
-  const rows = ["A", "B", "C", "D", "E"];
-  const cols = Array.from({ length: 8 }, (_, i) => i + 1);
+  useEffect(() => {
+    if (showtimeId) {
+      fetch(`http://localhost:8080/api/showtimes/${showtimeId}/seats`)
+        .then((res) => {
+          if (!res.ok) throw new Error("Failed to fetch seats");
+          return res.json();
+        })
+        .then((data) => {
+          console.log("Fetched seat data:", data);
+          setSeats(data);
+          setLoading(false);
+        })
+        .catch((err) => {
+          setError("Failed to load seat data.");
+          setLoading(false);
+        });
+    }
+  }, [showtimeId]);
 
-  // Toggle seat selection: prevent selecting more than the total required seats.
-  const toggleSeat = (seat: string) => {
-    if (selectedSeats.includes(seat)) {
-      setSelectedSeats(selectedSeats.filter((s) => s !== seat));
+  const toggleSeat = (seatId: number, isReserved: boolean) => {
+    const idStr = seatId.toString();
+    if (isReserved) return;
+
+    if (selectedSeats.includes(idStr)) {
+      setSelectedSeats(selectedSeats.filter((s) => s !== idStr));
     } else {
       if (selectedSeats.length < totalTickets) {
-        setSelectedSeats([...selectedSeats, seat]);
+        setSelectedSeats([...selectedSeats, idStr]);
       } else {
         alert("You have already selected all required seats.");
       }
     }
   };
 
-  // Confirm selection and navigate to checkout (or next step)
   const handleConfirmSelection = () => {
     if (selectedSeats.length !== totalTickets) {
       alert(`Please select exactly ${totalTickets} seats.`);
       return;
     }
-    // Build query parameters to pass along the seat selection, ticket counts, and showtime
+
     const params = new URLSearchParams();
     params.set("seats", selectedSeats.join(","));
     params.set("adult", adultTickets.toString());
     params.set("child", childTickets.toString());
     params.set("senior", seniorTickets.toString());
-    params.set("showtime", showtime); // Pass the showtime to the checkout page
+    params.set("showtime", showtime);
 
-    router.push(`/movies/${id}/checkout?${params.toString()}`);
+    router.push(`/movies/${showtimeId}/checkout?${params.toString()}`);
   };
+
+  const groupSeatsByRow = (): Record<string, Seat[]> => {
+    return seats.reduce((acc, seat) => {
+      const row = `Row ${seat.rowNumber}`;
+      if (!acc[row]) acc[row] = [];
+      acc[row].push(seat);
+      return acc;
+    }, {} as Record<string, Seat[]>);
+  };
+
+  if (loading) return <p className={styles.loading}>Loading seat map...</p>;
+  if (error) return <p className={styles.error}>{error}</p>;
+
+  const seatsByRow = groupSeatsByRow();
 
   return (
     <div className={styles.container}>
@@ -63,20 +100,21 @@ const SeatSelectionPage = () => {
       </p>
 
       <div className={styles.seatMap}>
-        {rows.map((row) => (
-          <div key={row} className={styles.seatRow}>
-            {cols.map((col) => {
-              const seatId = `${row}${col}`;
-              const isSelected = selectedSeats.includes(seatId);
+        {Object.entries(seatsByRow).map(([rowLabel, rowSeats]) => (
+          <div key={rowLabel} className={styles.seatRow}>
+            {rowSeats.map((seat) => {
+              const seatIdStr = seat.id.toString();
+              const isSelected = selectedSeats.includes(seatIdStr);
               return (
                 <button
-                  key={seatId}
+                  key={seat.id}
                   className={`${styles.seat} ${
-                    isSelected ? styles.selectedSeat : ""
-                  }`}
-                  onClick={() => toggleSeat(seatId)}
+                    seat.reserved ? styles.reservedSeat : ""
+                  } ${isSelected ? styles.selectedSeat : ""}`}
+                  disabled={seat.reserved}
+                  onClick={() => toggleSeat(seat.id, seat.reserved)}
                 >
-                  {seatId}
+                  {`R${seat.rowNumber}-${seat.seatNumber}`}
                 </button>
               );
             })}
@@ -91,10 +129,7 @@ const SeatSelectionPage = () => {
         </p>
       </div>
 
-      <button
-        className={styles.confirmButton}
-        onClick={handleConfirmSelection}
-      >
+      <button className={styles.confirmButton} onClick={handleConfirmSelection}>
         Confirm Seat Selection
       </button>
     </div>

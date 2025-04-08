@@ -8,19 +8,14 @@ import Link from "next/link";
 
 interface Showtime {
   id: number;
-  screentime: string; // LocalTime serialized as string from backend
-}
-
-interface Showdate {
-  id: number;
-  screeningDay: string; // LocalDate serialized as string from backend
-  times: Showtime[];
+  showDate: string;
+  startTime: string;
 }
 
 interface Movie {
   id: number;
   title: string;
-  showTimes?: Showdate[];
+  showTimes?: Showtime[]; // Flat list, not grouped by date
   filmRatingCode: string;
   trailer: string;
   poster: string;
@@ -46,6 +41,7 @@ export default function MovieDetailPage(){
 
   useEffect(() => {
     if (id) {
+      // Fetch movie
       fetch(`http://localhost:8080/api/movies/${id}`)
         .then((response) => {
           if (!response.ok) {
@@ -55,16 +51,37 @@ export default function MovieDetailPage(){
         })
         .then((data) => {
           setMovie(data);
+  
+          // Fetch showtimes for this movie
+          return fetch(`http://localhost:8080/api/showtimes/movie/${id}`);
+        })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((showtimes) => {
+          // Attach showtimes to the movie object
+          setMovie((prevMovie) => prevMovie ? { ...prevMovie, showTimes: showtimes } : null);
         })
         .catch((error) => {
-          console.error("Error fetching movie:", error);
+          console.error("Error fetching movie or showtimes:", error);
           setError("Failed to load movie details.");
         });
     }
   }, [id]);
+  
 
   if (error) return <div className={styles.error}>{error}</div>;
   if (!movie) return <div className={styles.loading}>Loading...</div>;
+
+  // Group showtimes by showDate
+  const groupedShowtimes = movie.showTimes?.reduce((acc: Record<string, Showtime[]>, curr) => {
+    if (!acc[curr.showDate]) acc[curr.showDate] = [];
+    acc[curr.showDate].push(curr);
+    return acc;
+  }, {});
 
   return (
     <div>
@@ -121,35 +138,29 @@ export default function MovieDetailPage(){
             <p className={styles.noReviews}>No reviews available</p>
           )}
         </div>
+
         {/* Showtimes Section */}
         <div className={styles.showtimes}>
           <h2>Showtimes</h2>
-          {movie.showTimes && movie.showTimes.length > 0 ? (
-            movie.showTimes.map((show, idx) => (
-              <div key={idx} className={styles.showdate}>
-                <p>
-                  <strong>Date:</strong> {show.screeningDay}
-                </p>
-                {show.times && show.times.length > 0 ? (
-                  show.times.map((timeSlot, timeIdx) => (
-                    <p key={timeIdx} className={styles.timeSlot}>
-                      Time: {timeSlot.screentime}
-                    </p>
-                  ))
-                ) : (
-                  <p className={styles.noTimes}>No showtimes available</p>
-                )}
+          {groupedShowtimes && Object.entries(groupedShowtimes).length > 0 ? (
+            Object.entries(groupedShowtimes).map(([date, times]) => (
+              <div key={date} className={styles.showdate}>
+                <p><strong>Date:</strong> {date}</p>
+                {times.map((showtime) => (
+                  <p key={showtime.id} className={styles.timeSlot}>
+                    Time: {showtime.startTime}
+                  </p>
+                ))}
               </div>
             ))
           ) : (
             <p className={styles.noTimes}>No showtimes available</p>
           )}
-          
         </div>
       </div>
     </div>
   );
-
 };
+
 
 

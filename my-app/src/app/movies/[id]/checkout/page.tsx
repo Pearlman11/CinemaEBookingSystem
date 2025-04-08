@@ -31,7 +31,7 @@ interface Movie {
 }
 
 const CheckoutPage = () => {
-  const { id } = useParams();
+  const { id: showtimeId } = useParams(); // This gives you the showtimeId from the URL
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -67,11 +67,9 @@ const CheckoutPage = () => {
   const [confirmationVisible, setConfirmationVisible] = useState(false);
 
   useEffect(() => {
-    fetch(`http://localhost:8080/api/movies/${id}`)
+    fetch(`http://localhost:8080/api/showtimes/${showtimeId}/movie`)
       .then((res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! Status: ${res.status}`);
-        }
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
         return res.json();
       })
       .then((data: Movie) => {
@@ -82,30 +80,58 @@ const CheckoutPage = () => {
         setError("Failed to fetch movie details.");
         setLoading(false);
       });
-  }, [id]);
+  }, [showtimeId]);
+  
+  
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // Log payment and order details send to backend in future
-    console.log("Payment Info:", {
-      promoCode,
-      cardNumber,
-      billingAddress,
-      email,
-    });
-    console.log("Order Summary:", {
-      adultTickets,
-      childTickets,
-      seniorTickets,
-      selectedSeats,
-      orderTotal,
-    });
-    setConfirmationVisible(true);
-    // After 3 seconds, navigate to the home page 
-    setTimeout(() => {
-      router.push(`/`);
-    }, 3000);
+  
+    try {
+      // Send seat reservation request
+      const response = await fetch("http://localhost:8080/api/seats/reserve", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          seatIds: selectedSeats,
+          showtimeId: showtimeId
+        })
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to reserve seats.");
+      }
+  
+      // Log payment and order details (future implementation)
+      console.log("Payment Info:", {
+        promoCode,
+        cardNumber,
+        billingAddress,
+        email,
+      });
+      console.log("Order Summary:", {
+        adultTickets,
+        childTickets,
+        seniorTickets,
+        selectedSeats,
+        orderTotal,
+      });
+  
+      // Show confirmation
+      setConfirmationVisible(true);
+      
+      // Redirect after 3 seconds
+      setTimeout(() => {
+        router.push(`/`);
+      }, 3000);
+    } catch (err) {
+      alert("There was an error finalizing your order. Please try again.");
+      console.error(err);
+    }
   };
+  
 
   if (loading) return <div className={styles.loading}>Loading checkout details...</div>;
   if (error) return <div className={styles.error}>{error}</div>;
