@@ -548,3 +548,59 @@
 .overlayActionButton:hover {
   background-color: #c82333;
 }
+
+
+.successHeader {
+  color: #28a745 !important;
+  border-bottom: 2px solid #28a745 !important;
+}
+
+.successButton {
+  background-color: #28a745 !important;
+}
+
+.successButton:hover {
+  background-color: #218838 !important;
+}
+
+/* Loading Spinner */
+.loadingSpinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.loadingSpinner::before {
+  content: "";
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+  display: inline-block;
+}
+
+.loadingText {
+  font-weight: 600;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.submitButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.submitButton:disabled:hover {
+  background: linear-gradient(135deg, var(--hover-darken, #3a80d2), var(--highlight-color));
+  transform: none;
+}

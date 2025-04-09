@@ -56,8 +56,10 @@ export default function EditMovie() {
   const [movie, setMovie] = useState<Movie | null>(null);
   const [originalMovie, setOriginalMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showErrorOverlay, setShowErrorOverlay] = useState(false);
+  const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
   const [errorDetail, setErrorDetail] = useState<string | null>(null);
   const [conflictingShowtime, setConflictingShowtime] = useState<Showtime | null>(null);
   const [, setConflictingMovieTitle] = useState<string>("Unknown movie");
@@ -99,15 +101,31 @@ export default function EditMovie() {
         duration?: string | number;
       }) => {
 
-        if (typeof data.duration === 'string' && data.duration.startsWith('PT')) {
-          const minutesMatch = data.duration.match(/PT(\d+)M/);
-          if (minutesMatch && minutesMatch[1]) {
-            data.duration = parseInt(minutesMatch[1]);
+        // Parse duration value into a number, whether it comes as a string or number
+        let durationValue: number | undefined = undefined;
+        
+        if (typeof data.duration === 'number') {
+          durationValue = data.duration;
+        } else if (typeof data.duration === 'string') {
+          if (data.duration.startsWith('PT')) {
+            // Parse ISO-8601 duration format (PT92M)
+            const minutesMatch = data.duration.match(/PT(\d+)M/);
+            if (minutesMatch && minutesMatch[1]) {
+              durationValue = parseInt(minutesMatch[1]);
+            }
+          } else {
+            // Try to parse as a plain number string
+            durationValue = parseInt(data.duration);
           }
         }
         
-        setMovie(data as Movie);
-        setOriginalMovie({ ...data } as Movie);
+        const parsedData = {
+          ...data,
+          duration: durationValue
+        };
+        
+        setMovie(parsedData as Movie);
+        setOriginalMovie({ ...parsedData } as Movie);
         setShowtimes(data.showTimes ? [...data.showTimes] : []);
         setLoading(false);
       })
@@ -296,9 +314,19 @@ export default function EditMovie() {
     if (!movie) return;
     setError(null);
     setSuccess(null);
+    setIsSubmitting(true);
 
     if (!movie.title || !movie.rating || !movie.director || !movie.producer || !movie.trailer || !movie.poster || !movie.description || !movie.category) {
       setError("All fields except cast, reviews, and showtimes are required.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Ensure movie duration is a number
+    const duration = movie.duration ? Number(movie.duration) : undefined;
+    if (!duration || isNaN(duration)) {
+      setError("Movie duration must be a valid number in minutes.");
+      setIsSubmitting(false);
       return;
     }
 
@@ -319,6 +347,7 @@ export default function EditMovie() {
         setShowErrorOverlay(true);
       
         setConflictingMovieTitle(conflictingMovie || "Unknown movie");
+        setIsSubmitting(false);
         return;
       }
     }
@@ -331,13 +360,10 @@ export default function EditMovie() {
       "NC-17": "NC17",
     };
    
-    const formattedDuration = movie.duration ? `PT${movie.duration}M` : undefined;
-    
-
     const updatedMovie = {
       ...movie,
       rating: ratingMap[movie.rating],
-      duration: formattedDuration,
+      duration: movie.duration ? Number(movie.duration) : undefined,
       showTimes: showtimes 
     };
 
@@ -358,7 +384,7 @@ export default function EditMovie() {
       clearCache();
 
       setSuccess("Movie updated successfully!");
-      
+      setShowSuccessOverlay(true);
 
       if (removedShowtimeIds.length > 0) {
         const deletePromises = removedShowtimeIds.map(id => deleteShowtime(id));
@@ -367,9 +393,11 @@ export default function EditMovie() {
       
       setTimeout(() => {
         router.push('/admin/manage/movies');
-      }, 1000);
+      }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -407,6 +435,12 @@ export default function EditMovie() {
     setErrorDetail(null);
     setConflictingShowtime(null);
     setConflictingMovieTitle("Unknown movie");
+  };
+
+  // Function to close the success overlay
+  const closeSuccessOverlay = () => {
+    setShowSuccessOverlay(false);
+    router.push('/admin/manage/movies');
   };
 
   // Function to format date for display
@@ -481,6 +515,28 @@ export default function EditMovie() {
         </div>
       )}
 
+      {/* Success Overlay */}
+      {showSuccessOverlay && (
+        <div className={style.overlay} onClick={() => closeSuccessOverlay()}>
+          <div className={style.overlayContent} onClick={(e) => e.stopPropagation()}>
+            <button className={style.overlayCloseButton} onClick={closeSuccessOverlay}>
+              ×
+            </button>
+            <div className={`${style.overlayHeader} ${style.successHeader}`}>
+              <span className={style.overlayIcon}>✅</span>
+              <h3>Success!</h3>
+            </div>
+            <div className={style.overlayMessage}>
+              <p>{success}</p>
+              <p>You will be redirected to the movies list.</p>
+            </div>
+            <button className={`${style.overlayActionButton} ${style.successButton}`} onClick={closeSuccessOverlay}>
+              Return to Movies
+            </button>
+          </div>
+        </div>
+      )}
+
       <button className={style.cancelButton} onClick={handleCancel}>
         Cancel Update
       </button>
@@ -488,7 +544,6 @@ export default function EditMovie() {
         <h1>Edit Movie Details</h1>
       </div>
       {error && !showErrorOverlay && <p className={style.error}>{error}</p>}
-      {success && <p className={style.success}>{success}</p>}
       <form className={style.form} onSubmit={handleSubmit}>
         <div className={style.formGroup}>
           <label htmlFor="title">Title</label>
@@ -675,21 +730,7 @@ export default function EditMovie() {
                   />
                 </div>
                 <div>
-                  <label htmlFor={`showroom-${index}`}>Showroom</label>
-                  <select
-                    id={`showroom-${index}`}
-                    value={showtime.showroom?.id}
-                    onChange={(e) => handleShowtimeChange(index, 'showroomId', e.target.value)}
-                  >
-                    {showrooms.map(room => (
-                      <option key={room.id} value={room.id}>
-                        {room.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor={`startTime-${index}`}>Time</label>
+                  <label htmlFor={`startTime-${index}`}>Start Time</label>
                   <input
                     type="time"
                     id={`startTime-${index}`}
@@ -697,40 +738,54 @@ export default function EditMovie() {
                     onChange={(e) => handleShowtimeChange(index, 'startTime', e.target.value)}
                   />
                 </div>
-                <button
-                  type="button"
-                  className={style.removeButton}
-                  onClick={() => removeShowtime(index)}
-                >
-                  Remove
-                </button>
-              </div>
-              
-              {/* Available Time Slots Display */}
-              {index === activeShowtimeIndex && showtime.showDate === selectedDate && 
-               showtime.showroom.id === selectedShowroomId && (
-                <div className={style.timeSlotContainer}>
-                  <h4>Available Time Slots:</h4>
-                  {loadingTimeSlots ? (
-                    <p>Loading available times...</p>
-                  ) : (
-                    <div className={style.timeSlots}>
-                      {availableTimeSlots.map((slot, slotIndex) => (
-                        <button
-                          key={slotIndex}
-                          type="button"
-                          className={`${style.timeSlot} ${!slot.available ? style.unavailable : ''} ${showtime.startTime === slot.time ? style.selected : ''}`}
-                          onClick={() => handleTimeSlotSelect(index, slot)}
-                          disabled={!slot.available}
-                          title={!slot.available ? `Booked: ${slot.movie}` : 'Available'}
-                        >
-                          {formatTimeSlot(slot.time)}
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                <div>
+                  <label htmlFor={`showroom-${index}`}>Showroom</label>
+                  <select
+                    id={`showroom-${index}`}
+                    value={showtime.showroom.id?.toString() || ''}
+                    onChange={(e) => handleShowtimeChange(index, 'showroomId', e.target.value)}
+                  >
+                    {showrooms.map(room => (
+                      <option key={room.id} value={room.id}>{room.name}</option>
+                    ))}
+                  </select>
                 </div>
-               )}
+                <div>
+                  <button
+                    type="button"
+                    className={style.removeButton}
+                    onClick={() => removeShowtime(index)}
+                  >
+                    Remove
+                  </button>
+                </div>
+                
+                {/* Available Time Slots Display */}
+                {index === activeShowtimeIndex && showtime.showDate === selectedDate && 
+                 showtime.showroom.id === selectedShowroomId && (
+                  <div className={style.timeSlotContainer}>
+                    <h4>Available Time Slots:</h4>
+                    {loadingTimeSlots ? (
+                      <p>Loading available times...</p>
+                    ) : (
+                      <div className={style.timeSlots}>
+                        {availableTimeSlots.map((slot, slotIndex) => (
+                          <button
+                            key={slotIndex}
+                            type="button"
+                            className={`${style.timeSlot} ${!slot.available ? style.unavailable : ''} ${showtime.startTime === slot.time ? style.selected : ''}`}
+                            onClick={() => handleTimeSlotSelect(index, slot)}
+                            disabled={!slot.available}
+                            title={!slot.available ? `Booked: ${slot.movie}` : 'Available'}
+                          >
+                            {formatTimeSlot(slot.time)}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                 )}
+              </div>
             </div>
           ))}
           <button type="button" className={style.addButton} onClick={addShowtime}>
@@ -738,8 +793,18 @@ export default function EditMovie() {
           </button>
         </div>
 
-        <button type="submit" className={style.submitButton}>
-          Update Movie
+        <button 
+          type="submit" 
+          className={style.submitButton}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <span className={style.loadingSpinner}>
+              <span className={style.loadingText}>Updating...</span>
+            </span>
+          ) : (
+            "Update Movie"
+          )}
         </button>
       </form>
     </div>
