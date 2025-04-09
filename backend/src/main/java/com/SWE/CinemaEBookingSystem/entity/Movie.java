@@ -3,7 +3,7 @@ package com.SWE.CinemaEBookingSystem.entity;
 import jakarta.persistence.*;
 
 import java.time.Duration;
-import java.time.LocalTime;
+
 import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;

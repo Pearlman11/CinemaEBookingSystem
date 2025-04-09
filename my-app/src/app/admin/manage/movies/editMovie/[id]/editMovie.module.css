@@ -225,7 +225,7 @@
   border-left: 4px solid #28a745;
 }
 
-/* Showtime specific styling - improved */
+
 .showtimeGroup {
   background-color: #f0f7ff;
   border-radius: 6px;
@@ -334,7 +334,7 @@
   }
 }
 
-/* Add a subtle background pattern to make the form more visually interesting */
+
 .container::before {
   content: "";
   position: absolute;
@@ -415,4 +415,136 @@
     flex-direction: column;
     align-items: stretch;
   }
+}
+
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.overlayContent {
+  background-color: white;
+  border-radius: 8px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2);
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.overlayHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  color: #dc3545;
+  border-bottom: 2px solid #dc3545;
+  padding-bottom: 0.75rem;
+}
+
+.overlayHeader h3 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.overlayMessage {
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+  color: #333;
+}
+
+.overlayMessage p {
+  margin-bottom: 1rem;
+}
+
+.conflictDetails {
+  background-color: #fff8f8;
+  border-left: 3px solid #dc3545;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-top: 1rem;
+}
+
+.conflictDetails h4 {
+  color: #dc3545;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+}
+
+.conflictDetails ul {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.conflictDetails li {
+  margin-bottom: 0.5rem;
+}
+
+.conflictDetails p {
+  font-style: italic;
+  margin-bottom: 0;
+  color: #666;
+}
+
+.conflictMovie {
+  font-weight: 600;
+  color: #dc3545;
+}
+
+.overlayIcon {
+  margin-right: 10px;
+  color: #dc3545;
+  font-size: 1.5rem;
+}
+
+.overlayCloseButton {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.overlayCloseButton:hover {
+  color: #dc3545;
+}
+
+.overlayActionButton {
+  padding: 10px 20px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.overlayActionButton:hover {
+  background-color: #c82333;
 }
