@@ -180,7 +180,7 @@ public class MovieController {
         movie.setRating(movieDetails.getRating());
         
         if (movieDetails.getDuration() != null) {
-            movie.setDuration(java.time.Duration.ofMinutes(movieDetails.getDuration()));
+            movie.setDuration(movieDetails.getDuration());
         }
     }
 

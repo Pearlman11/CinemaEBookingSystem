@@ -7,7 +7,7 @@ import NavBar from "@/app/components/NavBar/NavBar";
 import { ToastContainer, toast } from 'react-toastify';
 
 interface Showtime {
-  id: number;
+  showtimeId: number;
   screentime: string;
   showDate?: string;
   startTime?: string;
@@ -42,7 +42,7 @@ const CombinedBookingPage = () => {
   const [showTimes, setShowTimes] = useState<Showdate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  
   const [adultTickets, setAdultTickets] = useState<number>(0);
   const [childTickets, setChildTickets] = useState<number>(0);
   const [seniorTickets, setSeniorTickets] = useState<number>(0);
@@ -55,7 +55,8 @@ const CombinedBookingPage = () => {
 
   const [showSeatSelection, setShowSeatSelection] = useState<boolean>(false);
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
-
+  const [reservedSeats, setReservedSeats] = useState<string[]>([]);
+  
   const rows = ["A", "B", "C", "D", "E"];
   const cols = Array.from({ length: 8 }, (_, i) => i + 1);
 
@@ -147,7 +148,7 @@ const CombinedBookingPage = () => {
           const time = show.startTime?.substring(0, 5);
           if (!date || !time) return acc;
           if (!acc[date]) acc[date] = [];
-          acc[date].push({ id: show.id, screentime: time, showDate: date, startTime: time });
+          acc[date].push({ showtimeId: show.id, screentime: time, showDate: date, startTime: time });
           return acc;
         }, {});
 
@@ -177,6 +178,23 @@ const CombinedBookingPage = () => {
     }
   }, [selectedDate, showTimes]);
 
+  useEffect(() => {
+    const selectedShowtime = showTimes
+      .find((s) => s.screeningDay === selectedDate)
+      ?.times.find((t) => t.screentime === selectedTime);
+
+    if (selectedShowtime?.showtimeId) {
+      fetch(`http://localhost:8080/api/showtimes/${selectedShowtime.showtimeId}/seats`)
+        .then((res) => res.json())
+        .then((data: string[]) => {
+          setReservedSeats(data);
+        })
+        .catch((err) => {
+          console.error("Failed to fetch reserved seats", err);
+        });
+    }
+  }, [selectedDate, selectedTime, showTimes]);
+
   const toggleSeat = (seat: string) => {
     if (selectedSeats.includes(seat)) {
       setSelectedSeats(selectedSeats.filter((s) => s !== seat));
@@ -188,6 +206,7 @@ const CombinedBookingPage = () => {
       }
     }
   };
+
   const handleTicketSelectionConfirm = (e: FormEvent) => {
     e.preventDefault();
     if (totalTickets === 0) {
@@ -196,31 +215,61 @@ const CombinedBookingPage = () => {
     }
     setShowSeatSelection(true);
   };
+
   const handleSeatSelectionConfirm = (e: FormEvent) => {
     e.preventDefault();
+  
     if (selectedSeats.length !== totalTickets) {
-      toast.error(`Please select exactly ${totalTickets} seat${totalTickets !== 1 ? "s" : ""}.`, { className: styles['custom-toast'] });
+      toast.error(`Please select exactly ${totalTickets} seat${totalTickets !== 1 ? "s" : ""}.`, {
+        className: styles['custom-toast']
+      });
       return;
     }
-
+  
     const selectedShowtime = showTimes
-      .find(s => s.screeningDay === selectedDate)
-      ?.times.find(t => t.screentime === selectedTime);
-
+      .find((s) => s.screeningDay === selectedDate)
+      ?.times.find((t) => t.screentime === selectedTime);
+  
     if (!selectedShowtime) {
       toast.error("Invalid showtime selected.");
       return;
     }
-
-    const params = new URLSearchParams();
-    params.set("adult", adultTickets.toString());
-    params.set("child", childTickets.toString());
-    params.set("senior", seniorTickets.toString());
-    params.set("showtime", `${selectedDate} ${selectedTime}`);
-    params.set("showtimeId", selectedShowtime.id.toString());
-
-    router.push(`/movies/${id}/seatSelection?${params.toString()}`);
+  
+    const seatPayload = {
+      showtimeId: selectedShowtime.showtimeId,
+      seats: selectedSeats,
+      ticketCounts: {
+        adult: adultTickets,
+        child: childTickets,
+        senior: seniorTickets,
+      },
+    };
+  
+    fetch("http://localhost:8080/api/seats/reserve", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(seatPayload),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to reserve seats");
+        return res.json();
+      })
+      .then(() => {
+        const params = new URLSearchParams();
+        params.set("adult", adultTickets.toString());
+        params.set("child", childTickets.toString());
+        params.set("senior", seniorTickets.toString());
+        params.set("showtime", `${selectedDate} ${selectedTime}`);
+        params.set("seats", selectedSeats.join(","));
+  
+        router.push(`/movies/${selectedShowtime.showtimeId}/checkout?${params.toString()}`);
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error("Could not complete booking. Please try again.");
+      });
   };
+  
 
   if (loading) return <div className={styles.loading}>Loading...</div>;
   if (error) return <div className={styles.error}>{error}</div>;
@@ -340,17 +389,19 @@ const CombinedBookingPage = () => {
                     {cols.map((col) => {
                       const seatId = `${row}${col}`;
                       const isSelected = selectedSeats.includes(seatId);
+                      const isReserved = reservedSeats.includes(seatId);
                       return (
+                        
                         <button
                           key={seatId}
                           type="button"
-                          className={`${styles.seat} ${
-                            isSelected ? styles.selectedSeat : ""
-                          }`}
-                          onClick={() => toggleSeat(seatId)}
+                          className={`${styles.seat} ${isSelected ? styles.selectedSeat : ""} ${isReserved ? styles.reservedSeat : ""}`}
+                          onClick={() => !isReserved && toggleSeat(seatId)}
+                          disabled={isReserved}
                         >
                           {seatId}
                         </button>
+                        
                       );
                     })}
                   </div>

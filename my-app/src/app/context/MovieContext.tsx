@@ -26,8 +26,10 @@ interface Movie {
   description: string;
   reviews?: string[];
   rating: string;
-  showTimes: Showdate[];
+  showTimes: Showtime[]; // or Showdate[]
+  durationInMinutes: number; // ✅ add this!
 }
+
 
 
 interface MovieContextType {

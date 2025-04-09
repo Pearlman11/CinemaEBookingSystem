@@ -3,7 +3,6 @@ package com.SWE.CinemaEBookingSystem.entity;
 import jakarta.persistence.*;
 
 import java.time.Duration;
-
 import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -66,7 +65,7 @@ public class Movie {
 
     public Movie(String title, String category, List<String> cast, String director, String producer,
                  String trailer, String poster, String description, Set<String> reviews, 
-                 MovieRating rating, List<Showtime> showTimes,Duration duration) {
+                 MovieRating rating, List<Showtime> showTimes,Long durationInMinutes) {
         this.title = title;
         this.category = category;
         this.cast = cast != null ? cast : new ArrayList<>();
@@ -78,7 +77,7 @@ public class Movie {
         this.reviews = reviews != null ? reviews : new HashSet<>();
         this.rating = rating;
         this.showTimes = showTimes != null ? showTimes : new ArrayList<>();
-        this.durationInMinutes = duration.toMinutes();
+        this.durationInMinutes = durationInMinutes;
     }
 
     // ✅ Getters
@@ -109,6 +108,6 @@ public void setDescription(String description) { this.description = description;
 public void setRating(MovieRating rating) { this.rating = rating; }
 public void setshowTimes(List<Showtime> showTimes) { this.showTimes = (showTimes != null) ? new ArrayList<>(showTimes) : new ArrayList<>(); }
 public void setReviews(Set<String> reviews) { this.reviews = (reviews != null) ? new HashSet<>(reviews) : new HashSet<>(); }
-public void setDuration(Duration duration){this.durationInMinutes = duration.toMinutes();}
+public void setDuration(Long duration){this.durationInMinutes = duration;}
 
 }

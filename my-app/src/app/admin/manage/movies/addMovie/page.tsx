@@ -4,7 +4,6 @@ import React, { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import style from "./AddMovie.module.css";
 import { useAuth } from "@/app/context/AuthContext";
-import { useMovies } from "@/app/context/MovieContext";
 
 
 interface Showroom {
@@ -43,8 +42,7 @@ interface Movie {
 
 export default function AddMovie() {
   const { isAdmin } = useAuth();
-  const { addMovie } = useMovies();
-  const router = useRouter(); // Initialize router for navigation
+  const router = useRouter();
 
   // Initial state
   const initialMovie = {
@@ -274,27 +272,38 @@ export default function AddMovie() {
       "R": "R",
       "NC-17": "NC17",
     };
-    
+
+    const formattedDuration = movie.duration || undefined;
+
+    const mappedMovie = {
+      ...movie,
+      rating: ratingMap[movie.rating],
+      duration: formattedDuration,
+      showTimes: showtimes
+    };
+
     try {
-      // Use addMovie from context instead of direct fetch
-      await addMovie({
-        title: movie.title,
-        category: movie.category,
-        cast: movie.cast,
-        director: movie.director,
-        producer: movie.producer,
-        trailer: movie.trailer,
-        poster: movie.poster,
-        description: movie.description,
-        rating: ratingMap[movie.rating],
-        reviews: movie.reviews,
-        // Omit showTimes to avoid type conflicts, API will set default if needed
-        showTimes: []
+      const response = await fetch("http://localhost:8080/api/movies", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(mappedMovie),
       });
 
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to add movie: ${response.statusText} - ${errorText}`);
+      }
+
       setSuccess("Movie added successfully!");
+
+      // reset form 
+      setMovie({
+        ...initialMovie
+      });
+      setShowtimes([]);
+
       setTimeout(() => {
-        router.push('/admin/manage/movies');
+        router.push("/admin/manage/movies");
       }, 1000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred.");
