@@ -188,7 +188,14 @@ const CombinedBookingPage = () => {
       }
     }
   };
-
+  const handleTicketSelectionConfirm = (e: FormEvent) => {
+    e.preventDefault();
+    if (totalTickets === 0) {
+      toast.error("Please select at least one ticket.", { className: styles['custom-toast'] });
+      return;
+    }
+    setShowSeatSelection(true);
+  };
   const handleSeatSelectionConfirm = (e: FormEvent) => {
     e.preventDefault();
     if (selectedSeats.length !== totalTickets) {
@@ -231,7 +238,137 @@ const CombinedBookingPage = () => {
         className={styles.toastContainer}
         limit={2}
       />
-      {/* Continue rendering booking form and seat selection UI here */}
+      <div className={styles.container}>
+        <h1 className={styles.heading}>Book Tickets for {movie?.title}</h1>
+        <div className={styles.movieInfo}>
+          {movie?.poster && (
+            <img src={movie.poster} alt={movie.title} className={styles.poster} />
+          )}
+        </div>
+
+        {!showSeatSelection && (
+          <form onSubmit={handleTicketSelectionConfirm} className={styles.form}>
+            <div className={styles.ticketSection}>
+              <h2 className={styles.sectionHeading}>Ticket Selection</h2>
+              <label className={styles.label}>
+                Adult Tickets:
+                <input
+                  type="text"
+                  value={adultTickets === 0 ? '' : adultTickets.toString()}
+                  onChange={(e) => handleTicketChange(setAdultTickets, e.target.value)}
+                  className={styles.input}
+                  placeholder="0"
+                />
+              </label>
+              <label className={styles.label}>
+                Child Tickets:
+                <input
+                  type="text"
+                  value={childTickets === 0 ? '' : childTickets.toString()}
+                  onChange={(e) => handleTicketChange(setChildTickets, e.target.value)}
+                  className={styles.input}
+                  placeholder="0"
+                />
+              </label>
+              <label className={styles.label}>
+                Senior Tickets:
+                <input
+                  type="text"
+                  value={seniorTickets === 0 ? '' : seniorTickets.toString()}
+                  onChange={(e) => handleTicketChange(setSeniorTickets, e.target.value)}
+                  className={styles.input}
+                  placeholder="0"
+                />
+              </label>
+              <p className={styles.ticketTotal}>
+                Total Tickets: {totalTickets}
+              </p>
+            </div>
+
+            {availableDates.length > 0 && (
+              <div className={styles.inputGroup}>
+                <h2 className={styles.sectionHeading}>Select Showtime</h2>
+                <div className={styles.selectGroup}>
+                  <label className={styles.label}>
+                    Date:
+                    <select
+                      value={selectedDate}
+                      onChange={(e) => setSelectedDate(e.target.value)}
+                      className={styles.input}
+                    >
+                      {availableDates.map((date, index) => (
+                        <option key={index} value={date}>
+                          {formatDate(date)}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className={styles.label}>
+                    Time:
+                    <select
+                      value={selectedTime}
+                      onChange={(e) => setSelectedTime(e.target.value)}
+                      className={styles.input}
+                    >
+                      {groupedShowtimes[selectedDate]?.map((time, index) => (
+                        <option key={index} value={time}>
+                          {formatTime(time)}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+              </div>
+            )}
+
+            <button type="submit" className={styles.confirmButton}>
+              Confirm Ticket Selection
+            </button>
+          </form>
+        )}
+
+        {showSeatSelection && (
+          <form onSubmit={handleSeatSelectionConfirm} className={styles.form}>
+            <div className={styles.seatSection}>
+              <h2 className={styles.sectionHeading}>Seat Selection</h2>
+              <p>
+                Select {totalTickets} seat{totalTickets !== 1 && "s"}:
+              </p>
+              <div className={styles.seatMap}>
+                {rows.map((row) => (
+                  <div key={row} className={styles.seatRow}>
+                    {cols.map((col) => {
+                      const seatId = `${row}${col}`;
+                      const isSelected = selectedSeats.includes(seatId);
+                      return (
+                        <button
+                          key={seatId}
+                          type="button"
+                          className={`${styles.seat} ${
+                            isSelected ? styles.selectedSeat : ""
+                          }`}
+                          onClick={() => toggleSeat(seatId)}
+                        >
+                          {seatId}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+              <div className={styles.selectedInfo}>
+                <p>
+                  Selected Seats:{" "}
+                  {selectedSeats.length > 0 ? selectedSeats.join(", ") : "None"}
+                </p>
+              </div>
+            </div>
+            <button type="submit" className={styles.confirmButton}>
+              Confirm and Proceed to Checkout
+            </button>
+          </form>
+        )}
+      </div>
     </div>
   );
 };

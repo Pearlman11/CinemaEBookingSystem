@@ -32,7 +32,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByResetToken(String resetToken);
 
 
-    @Query("SELECT u.email FROM User u WHERE u.email IS NOT NULL")
-    List<String> findAllUserEmails(); // ✅ Now it's defined
+    @Query("SELECT u.email FROM User u WHERE u.promotionOptIn = true")
+    List<String> findAllOptedInUserEmails();
+
 }
 

@@ -1,4 +1,4 @@
-//signup
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -28,7 +28,7 @@ export default function SignupPage() {
   const [showOptionalPayment, setShowOptionalPayment] = useState(false);
   const [errorMessage, setErrorMessage] = useState<React.ReactNode>("");
   const [isLoading, setIsLoading] = useState(false);
-
+  const [showOptionalShipping, setShowOptionalShipping] = useState(false);
   const router = useRouter();
   const { isAuthenticated } = useAuth();
 
@@ -85,7 +85,7 @@ export default function SignupPage() {
           role: "USER",
           isVerified: false,
           resetTokenUsed: false,
-
+          promotionOptIn: formData.optPromotion,
           cards: null,
           primaryCard: paymentCard,
         }),

@@ -77,7 +77,7 @@ public class PromotionService {
                 promotion.getEndDate()
         );
     
-        List<String> emails = userRepository.findAllUserEmails();
+        List<String> emails = userRepository.findAllOptedInUserEmails();
         System.out.println("Notifying " + emails.size() + " users of promotion...");
     
         for (String email : emails) {
