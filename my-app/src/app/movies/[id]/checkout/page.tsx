@@ -5,15 +5,15 @@ import { useParams, useSearchParams, useRouter } from "next/navigation";
 import styles from "./checkout.module.css";
 import NavBar from "@/app/components/NavBar/NavBar";
 
+
 interface Showtime {
   id?: number;
-  screentime: string;
-}
-
-interface Showdate {
-  id?: number;
-  screeningDay: string;
-  times: Showtime[];
+  showDate: string;
+  startTime: string;
+  showroom?: {
+    id: number;
+    name?: string;
+  };
 }
 
 interface Movie {
@@ -27,7 +27,7 @@ interface Movie {
   description: string;
   reviews?: string[];
   rating: string;
-  showTimes: Showdate[];
+  showTimes?: Showtime[];
 }
 
 const CheckoutPage = () => {
@@ -43,6 +43,8 @@ const CheckoutPage = () => {
   const showtime = searchParams.get("showtime") || "TBD";
 
 
+  const [showtimeDate, showtimeTime] = showtime.split(' ');
+
   const ADULT_PRICE = 10.0;
   const CHILD_PRICE = 6.0;
   const SENIOR_PRICE = 8.0;
@@ -52,21 +54,50 @@ const CheckoutPage = () => {
   const seniorSubtotal = seniorTickets * SENIOR_PRICE;
   const orderTotal = adultSubtotal + childSubtotal + seniorSubtotal;
 
-
   const [movie, setMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
 
   const [promoCode, setPromoCode] = useState("");
   const [cardNumber, setCardNumber] = useState("");
   const [billingAddress, setBillingAddress] = useState("");
   const [email, setEmail] = useState("");
 
-  
-
 
   const [confirmationVisible, setConfirmationVisible] = useState(false);
+
+  // Function to format date for display (Weekday, MM-DD-YYYY)
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      const options: Intl.DateTimeFormatOptions = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: '2-digit', 
+        day: '2-digit' 
+      };
+      return date.toLocaleDateString('en-US', options);
+    } catch {
+      return dateString;
+    }
+  };
+
+
+  const formatTime = (time: string) => {
+    try {
+      // Parse hours and minutes from HH:MM:SS format
+      const [hours, minutes] = time.split(':');
+      const hourNum = parseInt(hours, 10);
+      
+      // Convert to 12-hour format
+      const period = hourNum >= 12 ? 'PM' : 'AM';
+      const hour12 = hourNum % 12 || 12;
+      
+      return `${hour12}:${minutes} ${period}`;
+    } catch {
+      return time;
+    }
+  };
 
   useEffect(() => {
     fetch(`http://localhost:8080/api/showtimes/${showtimeId}/movie`)
@@ -132,6 +163,25 @@ const CheckoutPage = () => {
       alert("There was an error finalizing your order. Please try again.");
       console.error(err);
     }
+    // Log payment and order details send to backend in future
+    console.log("Payment Info:", {
+      promoCode,
+      cardNumber,
+      billingAddress,
+      email,
+    });
+    console.log("Order Summary:", {
+      adultTickets,
+      childTickets,
+      seniorTickets,
+      selectedSeats,
+      orderTotal,
+    });
+    setConfirmationVisible(true);
+
+    setTimeout(() => {
+      router.push(`/`);
+    }, 3000);
   };
   
 
@@ -150,7 +200,8 @@ const CheckoutPage = () => {
               <img src={movie.poster} alt={movie.title} className={styles.poster} />
               <div className={styles.details}>
                 <h2>{movie.title}</h2>
-                <p><strong>Showtime:</strong> {showtime}</p>
+                <p><strong>Date:</strong> {formatDate(showtimeDate)}</p>
+                <p><strong>Time:</strong> {formatTime(showtimeTime)}</p>
               </div>
             </>
           )}

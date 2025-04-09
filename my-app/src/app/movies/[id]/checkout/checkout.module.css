@@ -1,141 +1,425 @@
-
-
 .container {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    font-family: Arial, sans-serif;
+  max-width: 1000px;
+  margin: 2rem auto 4rem;
+  padding: 2rem;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  font-family: 'Roboto', Arial, sans-serif;
+  position: relative;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.02;
+  background-image: radial-gradient(#000 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.heading {
+  background-color: #f9f9f9;
+  padding: 1.25rem;
+  border-radius: 8px 8px 0 0;
+  margin: -2rem -2rem 2rem -2rem;
+  text-align: center;
+  font-size: 2.2rem;
+  position: relative;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  z-index: 1;
+  text-shadow: none;
+  color: transparent;
+  background-image: linear-gradient(135deg, var(--hover-darken), var(--highlight-color));
+  -webkit-background-clip: text;
+  background-clip: text;
+
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modalContent {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  animation: modalSlideIn 0.4s ease-out;
+  max-width: 90%;
+  width: 400px;
+}
+
+@keyframes modalSlideIn {
+  from { opacity: 0; transform: translateY(-30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.checkmark {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  color: #4CAF50;
+  animation: bounceIn 0.6s ease-out;
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.movieInfo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+  position: relative;
+  z-index: 1;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-left: 5px solid var(--highlight-color);
+  transition: all 0.2s ease;
+  animation: slideUp 0.6s ease-out;
+  animation-delay: 0.1s;
+  animation-fill-mode: both;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.movieInfo:hover {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.poster {
+  width: 40%;
+  height: auto;
+  margin-right: 20px;
+  border-radius: 8px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+  object-fit: cover;
+  border: 3px solid #f8f8f8;
+}
+
+.poster:hover {
+  transform: scale(1.05);
+}
+
+.details h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #222;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.details p {
+  margin: 8px 0;
+  color: #555;
+  font-size: 1.1rem;
+  line-height: 1.4;
+}
+
+.orderSummary {
+  margin-bottom: 30px;
+  padding: 1.25rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-left: 5px solid var(--highlight-color);
+  position: relative;
+  z-index: 1;
+  transition: all 0.2s ease;
+  animation: slideUp 0.6s ease-out;
+  animation-delay: 0.2s;
+  animation-fill-mode: both;
+}
+
+.orderSummary:hover {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.orderSummary h2 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: black;
+  font-weight: 550;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--hover-darken);
+
+
+
+}
+
+.summaryTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.summaryTable th,
+.summaryTable td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: center;
+}
+
+.summaryTable th {
+  background-color: var(--hover-darken);
+  color: #fff;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.summaryTable tbody tr:nth-child(even) {
+  background-color: #f5f5f5;
+}
+
+.summaryTable tbody tr:hover {
+  background-color: #f0f0f0;
+}
+
+.summaryTable tfoot {
+  background-color: rgba(var(--highlight-color-rgb, 74, 144, 226), 0.1);
+  font-weight: bold;
+}
+
+.seatsInfo {
+  margin-top: 15px;
+  font-size: 1rem;
+  color: #333;
+  background-color: #f9f9f9;
+  padding: 10px;
+  border-radius: 4px;
+  text-align: center;
+  border-left: 3px solid var(--highlight-color);
+}
+
+.paymentForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 1.25rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-left: 5px solid var(--highlight-color);
+  position: relative;
+  z-index: 1;
+  transition: all 0.2s ease;
+  animation: slideUp 0.6s ease-out;
+  animation-delay: 0.3s;
+  animation-fill-mode: both;
+}
+
+.paymentForm:hover {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.paymentForm h2 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: black;
+  font-weight: 550;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--hover-darken);
+
+
+
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 5px;
+}
+
+.formGroup label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 8px;
+}
+
+.input {
+  padding: 12px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--highlight-color);
+  box-shadow: 0 0 0 2px rgba(var(--highlight-color-rgb, 74, 144, 226), 0.25);
+}
+
+.submitButton {
+  padding: 16px;
+  font-size: 1.1rem;
+  background: linear-gradient(135deg, var(--hover-darken), var(--highlight-color));
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+  align-self: center;
+  width: 100%;
+  max-width: 300px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.submitButton:hover {
+  background: linear-gradient(135deg, var(--highlight-color), var(--hover-darken));
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.submitButton::after {
+  content: "";
+  position: absolute;
+  width: 50px;
+  height: 100%;
+  top: 0;
+  left: -100px;
+  background-image: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transition: all 0.5s ease;
+}
+
+.submitButton:hover::after {
+  left: 100%;
+}
+
+.loading {
+  text-align: center;
+  font-style: italic;
+  padding: 15px;
+  color: #555;
+  animation: pulse 1.5s infinite;
+  margin: 40px;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+.error {
+  color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.1);
+  padding: 15px;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  text-align: center;
+  margin: 40px;
+  border-left: 4px solid #dc3545;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+    margin: 1rem auto;
+    max-width: 95%;
+  }
+
+  .heading {
+    padding: 1rem;
+    margin: -1rem -1rem 1.5rem -1rem;
+    font-size: 1.8rem;
+  }
+
+  .movieInfo {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .poster {
+    width: 150px;
+    margin-right: 0;
+    margin-bottom: 15px;
+  }
+
+  .input,
+  .select {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+
+  .submitButton {
+    font-size: 1rem;
+    padding: 12px;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.75rem;
   }
   
   .heading {
-    font-size: 2rem;
-    text-align: center;
-    margin-bottom: 20px;
-    color: #222;
+    padding: 0.75rem;
+    margin: -0.75rem -0.75rem 1.25rem -0.75rem;
+    font-size: 1.6rem;
   }
   
-
-  .modalOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0,0,0,0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  }
-  
-  .modalContent {
-    background: #fff;
-    padding: 2rem;
-    border-radius: 8px;
-    text-align: center;
-  }
-  
-  .checkmark {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-  }
-  
-  
-  .movieInfo {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  
-  .poster {
-    width: 150px;
-    height: auto;
-    margin-right: 20px;
-    border-radius: 8px;
-  }
-  
-  .details h2 {
-    margin: 0;
-    font-size: 1.5rem;
-    color: #222;
-  }
-  
-  .details p {
-    margin: 5px 0;
-    color: #555;
-  }
-  
-  .orderSummary {
-    margin-bottom: 30px;
-  }
-  
-  .summaryTable {
+  .submitButton {
     width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 15px;
+    padding: 0.8rem 1.5rem;
   }
   
   .summaryTable th,
   .summaryTable td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: center;
+    padding: 8px;
+    font-size: 0.9rem;
   }
-  
-  .summaryTable th {
-    background-color: #f4f4f4;
-  }
-  
-  .seatsInfo {
-    margin-top: 10px;
-    font-size: 1rem;
-    color: #333;
-  }
-  
-  .paymentForm {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .formGroup {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .input {
-    padding: 10px;
-    font-size: 1rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-  }
-  
-  .submitButton {
-    padding: 12px;
-    font-size: 1rem;
-    background-color: var(--highlight-color, #e94560);
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .submitButton:hover {
-    background-color: var(--hover-darken, #d73750);
-  }
-  
-  .loading {
-    text-align: center;
-    font-size: 1.2rem;
-    color: #555;
-  }
-  
-  .error {
-    text-align: center;
-    font-size: 1.2rem;
-    color: red;
-  }
+}

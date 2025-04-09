@@ -53,13 +53,20 @@ const MovieDetailPage = () => {
     const hour12 = hour % 12 || 12;
     return `${hour12}:${minutes} ${period}`;
   };
-
+  
   const formatDate = (date: string) => {
     const d = new Date(date);
     return isNaN(d.getTime())
       ? date
-      : d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+      : d.toLocaleDateString("en-US", {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
   };
+  
+  
 
   const groupShowtimesByDate = (showtimes: Showtime[]) => {
     return showtimes.reduce((acc, st) => {

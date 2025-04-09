@@ -43,6 +43,11 @@ interface TimeSlot {
   movie: string | null;
 }
 
+interface ConflictResponse {
+  message: string;
+  conflictingMovie?: string;
+}
+
 export default function EditMovie() {
   const { isAdmin } = useAuth();
   const { clearCache } = useMovies();
@@ -52,13 +57,17 @@ export default function EditMovie() {
   const [originalMovie, setOriginalMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showErrorOverlay, setShowErrorOverlay] = useState(false);
+  const [errorDetail, setErrorDetail] = useState<string | null>(null);
+  const [conflictingShowtime, setConflictingShowtime] = useState<Showtime | null>(null);
+  const [, setConflictingMovieTitle] = useState<string>("Unknown movie");
   const [success, setSuccess] = useState<string | null>(null);
   const [showrooms, setShowrooms] = useState<Showroom[]>([]);
   
-  // For managing multiple showtimes
+
   const [showtimes, setShowtimes] = useState<Showtime[]>([]);
   
-  // For available time slots
+
   const [availableTimeSlots, setAvailableTimeSlots] = useState<TimeSlot[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedShowroomId, setSelectedShowroomId] = useState<number | null>(null);
@@ -89,9 +98,8 @@ export default function EditMovie() {
         showTimes: Showtime[];
         duration?: string | number;
       }) => {
-        // If duration comes as a string in ISO-8601 format, extract the minutes
+
         if (typeof data.duration === 'string' && data.duration.startsWith('PT')) {
-          // Extract minutes from format like "PT120M"
           const minutesMatch = data.duration.match(/PT(\d+)M/);
           if (minutesMatch && minutesMatch[1]) {
             data.duration = parseInt(minutesMatch[1]);
@@ -125,13 +133,13 @@ export default function EditMovie() {
       });
   }, [id, isAdmin]);
 
-  // Fetch available time slots when date and showroom are selected
+  // fetch available time slots when date and showroom are selected
   useEffect(() => {
     if (!selectedDate || !selectedShowroomId || !movie?.id) return;
     
     setLoadingTimeSlots(true);
     
-    // Call the available-timeslots API
+    // call the available-timeslots API
     fetch(`http://localhost:8080/api/movies/available-timeslots?date=${selectedDate}&showroomId=${selectedShowroomId}&movieId=${movie.id}`)
       .then(response => {
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
@@ -178,7 +186,7 @@ export default function EditMovie() {
     const updatedShowtimes = [...showtimes];
     
     if (field === 'showroomId') {
-      // Find showroom by ID
+      // find showroom by ID
       const showroomId = parseInt(value);
       const selectedShowroom = showrooms.find(room => room.id === showroomId) || { id: showroomId, name: "Unknown" };
       updatedShowtimes[index] = {
@@ -194,7 +202,7 @@ export default function EditMovie() {
     
     setShowtimes(updatedShowtimes);
     
-    // Update the date/showroom selection to check available times
+    // update the date/showroom selection to check available times
     if (field === 'showDate') {
       setSelectedDate(value);
       setActiveShowtimeIndex(index);
@@ -207,11 +215,11 @@ export default function EditMovie() {
   };
 
   const addShowtime = () => {
-    // Add a new empty showtime
+    // add a new empty showtime
     const defaultShowroom = showrooms.length > 0 ? showrooms[0] : { id: 1, name: "Default" };
-    const currentDate = new Date().toISOString().split('T')[0]; // Current date in YYYY-MM-DD format
+    const currentDate = new Date().toISOString().split('T')[0];
     
-    // Update the selected date/showroom for time slot checking
+    // update the selected date/showroom for time slot checking
     setSelectedDate(currentDate);
     setSelectedShowroomId(defaultShowroom.id || 1);
     
@@ -225,7 +233,7 @@ export default function EditMovie() {
       }
     ]);
     
-    // Set the newly added showtime as active
+    // set the newly added showtime as active
     setActiveShowtimeIndex(newIndex);
   };
 
@@ -240,8 +248,8 @@ export default function EditMovie() {
     router.push("/admin/manage/movies");
   };
 
-  // Helper function to check for conflicts before submitting
-  const checkForConflicts = async (showtime: Showtime): Promise<string | null> => {
+  // helper function to check for conflicts before submitting
+  const checkForConflicts = async (showtime: Showtime): Promise<{ error: string | null; conflictingMovie?: string }> => {
     try {
       const response = await fetch('http://localhost:8080/api/movies/check-conflict', {
         method: 'POST',
@@ -253,17 +261,20 @@ export default function EditMovie() {
       });
       
       if (!response.ok) {
-        const errorData = await response.json();
-        return errorData.message || 'Unknown conflict detected';
+        const errorData = await response.json() as ConflictResponse;
+        return { 
+          error: errorData.message || 'Unknown conflict detected',
+          conflictingMovie: errorData.conflictingMovie 
+        };
       }
       
-      return null; // No conflicts
+      return { error: null }; // no conflicts
     } catch (err) {
-      return err instanceof Error ? err.message : 'Error checking for conflicts';
+      return { error: err instanceof Error ? err.message : 'Error checking for conflicts' };
     }
   };
 
-  // Function to directly delete a showtime by ID
+  // function to directly delete a showtime by ID
   const deleteShowtime = async (showtimeId: number) => {
     try {
       const response = await fetch(`http://localhost:8080/api/movies/showtimes/${showtimeId}`, {
@@ -291,7 +302,7 @@ export default function EditMovie() {
       return;
     }
 
-    // Find removed showtimes to delete them directly if needed
+    // find removed showtimes to delete them directly if needed
     let removedShowtimeIds: number[] = [];
     if (originalMovie?.showTimes) {
       removedShowtimeIds = originalMovie.showTimes
@@ -300,11 +311,14 @@ export default function EditMovie() {
         .map(st => st.id as number);
     }
 
-    // Check each showtime for conflicts before submitting
     for (const showtime of showtimes) {
-      const conflictError = await checkForConflicts(showtime);
+      const { error: conflictError, conflictingMovie } = await checkForConflicts(showtime);
       if (conflictError) {
-        setError(`Showtime conflict: ${conflictError}`);
+        setErrorDetail(conflictError);
+        setConflictingShowtime(showtime);
+        setShowErrorOverlay(true);
+      
+        setConflictingMovieTitle(conflictingMovie || "Unknown movie");
         return;
       }
     }
@@ -316,11 +330,10 @@ export default function EditMovie() {
       "R": "R",
       "NC-17": "NC17",
     };
-    
-    // Format duration as ISO-8601 duration string (PT{minutes}M)
+   
     const formattedDuration = movie.duration ? `PT${movie.duration}M` : undefined;
     
-    // This will automatically handle deleted showtimes as they won't be included
+
     const updatedMovie = {
       ...movie,
       rating: ratingMap[movie.rating],
@@ -329,7 +342,7 @@ export default function EditMovie() {
     };
 
     try {
-      // Send the complete movie data with the current list of showtimes
+
       const updateMovieResponse = await fetch(`http://localhost:8080/api/movies/${movie.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -341,12 +354,12 @@ export default function EditMovie() {
         throw new Error(errorData.message || `Failed to update movie: ${updateMovieResponse.statusText}`);
       }
 
-      // Clear the movie cache to ensure fresh data
+      // clear the movie cache to ensure fresh data
       clearCache();
 
       setSuccess("Movie updated successfully!");
       
-      // Directly delete removed showtimes as a backup mechanism
+
       if (removedShowtimeIds.length > 0) {
         const deletePromises = removedShowtimeIds.map(id => deleteShowtime(id));
         await Promise.all(deletePromises);
@@ -362,7 +375,7 @@ export default function EditMovie() {
 
   // Time slot selection handler
   const handleTimeSlotSelect = (index: number, timeSlot: TimeSlot) => {
-    if (!timeSlot.available) return; // Don't allow selecting unavailable slots
+    if (!timeSlot.available) return; 
     
     const updatedShowtimes = [...showtimes];
     updatedShowtimes[index] = {
@@ -388,19 +401,37 @@ export default function EditMovie() {
     { value: "NC-17", label: "NC-17" },
   ];
 
-  if (!isAdmin) return <p>Unauthorized. Redirecting...</p>;
-  if (loading) return <p>Loading movie...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
-  if (!movie) return <p>Movie not found.</p>;
+  // Function to close the error overlay
+  const closeErrorOverlay = () => {
+    setShowErrorOverlay(false);
+    setErrorDetail(null);
+    setConflictingShowtime(null);
+    setConflictingMovieTitle("Unknown movie");
+  };
 
-  // Format time slot for display
+  // Function to format date for display
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { 
+        weekday: 'long',
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
+
   const formatTimeSlot = (time: string) => {
     try {
-      // Parse hours and minutes from HH:MM:SS format
+
       const [hours, minutes] = time.split(':');
       const hourNum = parseInt(hours);
-      
-      // Convert to 12-hour format
+
+
       const period = hourNum >= 12 ? 'PM' : 'AM';
       const hour12 = hourNum % 12 || 12;
       
@@ -410,15 +441,53 @@ export default function EditMovie() {
     }
   };
 
+  if (!isAdmin) return <p>Unauthorized. Redirecting...</p>;
+  if (loading) return <p>Loading movie...</p>;
+  if (error && !showErrorOverlay) return <p style={{ color: "red" }}>{error}</p>;
+  if (!movie) return <p>Movie not found.</p>;
+
   return (
     <div className={style.container}>
+      {/* Error Overlay */}
+      {showErrorOverlay && (
+        <div className={style.overlay} onClick={() => closeErrorOverlay()}>
+          <div className={style.overlayContent} onClick={(e) => e.stopPropagation()}>
+            <button className={style.overlayCloseButton} onClick={closeErrorOverlay}>
+              ×
+            </button>
+            <div className={style.overlayHeader}>
+              <span className={style.overlayIcon}>⚠️</span>
+              <h3>Showtime Conflict Detected</h3>
+            </div>
+            <div className={style.overlayMessage}>
+              <p>{errorDetail}</p>
+              
+              {conflictingShowtime && (
+                <div className={style.conflictDetails}>
+                  <h4>Conflicting Showtime:</h4>
+                  <ul>
+                    <li><strong>Date:</strong> {formatDate(conflictingShowtime.showDate)}</li>
+                    <li><strong>Time:</strong> {formatTimeSlot(conflictingShowtime.startTime)}</li>
+                    <li><strong>Showroom:</strong> {conflictingShowtime.showroom.name}</li>
+                  </ul>
+                  <p>This time slot is already booked for another movie screening.</p>
+                </div>
+              )}
+            </div>
+            <button className={style.overlayActionButton} onClick={closeErrorOverlay}>
+              I Understand
+            </button>
+          </div>
+        </div>
+      )}
+
       <button className={style.cancelButton} onClick={handleCancel}>
         Cancel Update
       </button>
       <div className={style.pageHeader}>
         <h1>Edit Movie Details</h1>
       </div>
-      {error && <p className={style.error}>{error}</p>}
+      {error && !showErrorOverlay && <p className={style.error}>{error}</p>}
       {success && <p className={style.success}>{success}</p>}
       <form className={style.form} onSubmit={handleSubmit}>
         <div className={style.formGroup}>
