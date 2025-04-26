@@ -5,15 +5,15 @@ import { useParams, useSearchParams, useRouter } from "next/navigation";
 import styles from "./checkout.module.css";
 import NavBar from "@/app/components/NavBar/NavBar";
 
+
 interface Showtime {
   id?: number;
-  screentime: string;
-}
-
-interface Showdate {
-  id?: number;
-  screeningDay: string;
-  times: Showtime[];
+  showDate: string;
+  startTime: string;
+  showroom?: {
+    id: number;
+    name?: string;
+  };
 }
 
 interface Movie {
@@ -27,11 +27,11 @@ interface Movie {
   description: string;
   reviews?: string[];
   rating: string;
-  showTimes: Showdate[];
+  showTimes?: Showtime[];
 }
 
 const CheckoutPage = () => {
-  const { id } = useParams();
+  const { id: showtimeId } = useParams(); // This gives you the showtimeId from the URL
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -43,6 +43,8 @@ const CheckoutPage = () => {
   const showtime = searchParams.get("showtime") || "TBD";
 
 
+  const [showtimeDate, showtimeTime] = showtime.split(' ');
+
   const ADULT_PRICE = 10.0;
   const CHILD_PRICE = 6.0;
   const SENIOR_PRICE = 8.0;
@@ -52,11 +54,9 @@ const CheckoutPage = () => {
   const seniorSubtotal = seniorTickets * SENIOR_PRICE;
   const orderTotal = adultSubtotal + childSubtotal + seniorSubtotal;
 
-
   const [movie, setMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
 
   const [promoCode, setPromoCode] = useState("");
   const [cardNumber, setCardNumber] = useState("");
@@ -66,12 +66,43 @@ const CheckoutPage = () => {
 
   const [confirmationVisible, setConfirmationVisible] = useState(false);
 
+  // Function to format date for display (Weekday, MM-DD-YYYY)
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      const options: Intl.DateTimeFormatOptions = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: '2-digit', 
+        day: '2-digit' 
+      };
+      return date.toLocaleDateString('en-US', options);
+    } catch {
+      return dateString;
+    }
+  };
+
+
+  const formatTime = (time: string) => {
+    try {
+      // Parse hours and minutes from HH:MM:SS format
+      const [hours, minutes] = time.split(':');
+      const hourNum = parseInt(hours, 10);
+      
+      // Convert to 12-hour format
+      const period = hourNum >= 12 ? 'PM' : 'AM';
+      const hour12 = hourNum % 12 || 12;
+      
+      return `${hour12}:${minutes} ${period}`;
+    } catch {
+      return time;
+    }
+  };
+
   useEffect(() => {
-    fetch(`http://localhost:8080/api/movies/${id}`)
+    fetch(`http://localhost:8080/api/showtimes/${showtimeId}/movie`)
       .then((res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! Status: ${res.status}`);
-        }
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
         return res.json();
       })
       .then((data: Movie) => {
@@ -82,10 +113,56 @@ const CheckoutPage = () => {
         setError("Failed to fetch movie details.");
         setLoading(false);
       });
-  }, [id]);
+  }, [showtimeId]);
+  
+  
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+  
+    try {
+      // Send seat reservation request
+      const response = await fetch("http://localhost:8080/api/seats/reserve", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          seatIds: selectedSeats,
+          showtimeId: showtimeId
+        })
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to reserve seats.");
+      }
+  
+      // Log payment and order details (future implementation)
+      console.log("Payment Info:", {
+        promoCode,
+        cardNumber,
+        billingAddress,
+        email,
+      });
+      console.log("Order Summary:", {
+        adultTickets,
+        childTickets,
+        seniorTickets,
+        selectedSeats,
+        orderTotal,
+      });
+  
+      // Show confirmation
+      setConfirmationVisible(true);
+      
+      // Redirect after 3 seconds
+      setTimeout(() => {
+        router.push(`/`);
+      }, 3000);
+    } catch (err) {
+      alert("There was an error finalizing your order. Please try again.");
+      console.error(err);
+    }
     // Log payment and order details send to backend in future
     console.log("Payment Info:", {
       promoCode,
@@ -101,11 +178,12 @@ const CheckoutPage = () => {
       orderTotal,
     });
     setConfirmationVisible(true);
-    // After 3 seconds, navigate to the home page 
+
     setTimeout(() => {
       router.push(`/`);
     }, 3000);
   };
+  
 
   if (loading) return <div className={styles.loading}>Loading checkout details...</div>;
   if (error) return <div className={styles.error}>{error}</div>;
@@ -122,7 +200,8 @@ const CheckoutPage = () => {
               <img src={movie.poster} alt={movie.title} className={styles.poster} />
               <div className={styles.details}>
                 <h2>{movie.title}</h2>
-                <p><strong>Showtime:</strong> {showtime}</p>
+                <p><strong>Date:</strong> {formatDate(showtimeDate)}</p>
+                <p><strong>Time:</strong> {formatTime(showtimeTime)}</p>
               </div>
             </>
           )}

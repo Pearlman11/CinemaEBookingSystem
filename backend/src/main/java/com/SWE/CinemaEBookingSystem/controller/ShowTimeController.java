@@ -1,8 +1,9 @@
 package com.SWE.CinemaEBookingSystem.controller;
 
+import com.SWE.CinemaEBookingSystem.entity.Movie;
 import com.SWE.CinemaEBookingSystem.entity.Showtime;
-import com.SWE.CinemaEBookingSystem.repository.ShowTimeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.SWE.CinemaEBookingSystem.service.ShowTimeService;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,62 +12,59 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/showtimes")
+@CrossOrigin(origins = "*") // You can restrict this later
 public class ShowTimeController {
 
-    private final ShowTimeRepository showTimeRepository;
+    private final ShowTimeService showtimeService;
 
-    @Autowired
-    public ShowTimeController(ShowTimeRepository showTimeRepository) {
-        this.showTimeRepository = showTimeRepository;
-
+    public ShowTimeController(ShowTimeService showtimeService) {
+        this.showtimeService = showtimeService;
     }
-    // Get all showtimes
+
     @GetMapping
     public List<Showtime> getAllShowtimes() {
-        return showTimeRepository.findAll();
+        return showtimeService.getAllShowtimes();
     }
 
-    // Get a showtime by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Showtime> getShowtimeById(@PathVariable Long id) {
-        Optional<Showtime> showtime = showTimeRepository.findById(id);
-        return showtime.map(ResponseEntity::ok)
-                       .orElseGet(() -> ResponseEntity.notFound().build());
+    public Optional<Showtime> getShowtimeById(@PathVariable Long id) {
+        return showtimeService.getShowtimeById(id);
     }
 
-    // Add a new showtime
     @PostMapping
-    public ResponseEntity<Showtime> addShowtime(@RequestBody Showtime showtime) {
-        Showtime savedShowtime = showTimeRepository.save(showtime);
-        return ResponseEntity.ok(savedShowtime);
+    public Showtime createShowtime(@RequestBody Showtime showtime) {
+        return showtimeService.createOrUpdateShowtime(showtime);
     }
 
-    // Update an existing showtime
-    @PutMapping("/{id}")
-    public ResponseEntity<Showtime> updateShowtime(@PathVariable Long id, @RequestBody Showtime showtimeDetails) {
-        Optional<Showtime> optionalShowtime = showTimeRepository.findById(id);
-
-        if (optionalShowtime.isPresent()) {
-            Showtime showtime = optionalShowtime.get();
-            showtime.setMovie(showtimeDetails.getMovie());
-            showtime.setStartTime(showtimeDetails.getStartTime());
-            showtime.setShowroom(showtimeDetails.getShowroom());
-
-            Showtime updatedShowtime = showTimeRepository.save(showtime);
-            return ResponseEntity.ok(updatedShowtime);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    // Delete a showtime
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteShowtime(@PathVariable Long id) {
-        if (showTimeRepository.existsById(id)) {
-            showTimeRepository.deleteById(id);
-            return ResponseEntity.ok("Showtime deleted successfully");
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public void deleteShowtime(@PathVariable Long id) {
+        showtimeService.deleteShowtime(id);
     }
+
+    @GetMapping("/movie/{movieId}")
+    public List<Showtime> getShowtimesByMovieId(@PathVariable Long movieId) {
+        return showtimeService.getShowtimesByMovieId(movieId);
+    }
+
+    @GetMapping("/{showtimeId}/seats")
+public ResponseEntity<?> getSeatsForShowtime(@PathVariable Long showtimeId) {
+    Optional<Showtime> showtimeOpt = showtimeService.getShowtimeById(showtimeId);
+    if (showtimeOpt.isEmpty()) {
+        return ResponseEntity.notFound().build();
+    }
+
+    Showtime showtime = showtimeOpt.get();
+
+    // Assuming you have a List<Seat> in your Showtime entity
+    return ResponseEntity.ok(showtime.getSeats());
+}
+@GetMapping("/{showtimeId}/movie")
+public Movie getMovieForShowtime(@PathVariable Long showtimeId) {
+    Showtime showtime = showtimeService.getShowtimeById(showtimeId)
+        .orElseThrow(() -> new RuntimeException("Showtime not found"));
+    return showtime.getMovie();
+}
+
+
+
 }

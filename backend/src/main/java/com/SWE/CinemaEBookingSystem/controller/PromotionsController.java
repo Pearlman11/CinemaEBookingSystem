@@ -1,8 +1,9 @@
 package com.SWE.CinemaEBookingSystem.controller;
 
 import com.SWE.CinemaEBookingSystem.entity.Promotion;
-import com.SWE.CinemaEBookingSystem.repository.PromotionRepository;
+import com.SWE.CinemaEBookingSystem.service.PromotionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,60 +14,61 @@ import java.util.Optional;
 @RequestMapping("/api/promotions")
 public class PromotionsController {
 
-    private final PromotionRepository promotionRepository;
+    private final PromotionService promotionService;
 
     @Autowired
-    public PromotionsController(PromotionRepository promotionRepository) {
-        this.promotionRepository = promotionRepository;
+    public PromotionsController(PromotionService promotionService) {
+        this.promotionService = promotionService;
     }
 
     // Get all promotions
     @GetMapping
     public List<Promotion> getAllPromotions() {
-        return promotionRepository.findAll();
+        return promotionService.getAllPromotions();
     }
 
     // Get a promotion by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Promotion> getPromotionById(@PathVariable String promotionCode) {
-        Optional<Promotion> promotion = promotionRepository.findById(promotionCode);
+    public ResponseEntity<Promotion> getPromotionById(@PathVariable("id") String promotionCode) {
+        Optional<Promotion> promotion = promotionService.getPromotionById(promotionCode);
         return promotion.map(ResponseEntity::ok)
                         .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // Add a new promotion
     @PostMapping
-    public ResponseEntity<Promotion> addPromotion(@RequestBody Promotion promotion) {
-        Promotion savedPromotion = promotionRepository.save(promotion);
+public ResponseEntity<Promotion> addPromotion(@RequestBody Promotion promotion) {
+    try {
+        Promotion savedPromotion = promotionService.addPromotion(promotion);
+        System.out.println("Promotion created successfully: " + savedPromotion.getPromotionCode());
         return ResponseEntity.ok(savedPromotion);
+    } catch (Exception e) {
+        System.err.println("Error creating promotion: " + e.getMessage());
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
+}
+
 
     // Update an existing promotion
     @PutMapping("/{id}")
-    public ResponseEntity<Promotion> updatePromotion(@PathVariable String promotionCode, @RequestBody Promotion promotionDetails) {
-        Optional<Promotion> optionalPromotion = promotionRepository.findById(promotionCode);
-
-        if (optionalPromotion.isPresent()) {
-            Promotion promotion = optionalPromotion.get();
-            promotion.setPromotionCode(promotionDetails.getPromotionCode());
-            promotion.setDiscountPercentage(promotionDetails.getDiscountPercentage());
-            promotion.setEndDate(promotionDetails.getEndDate());
-
-            Promotion updatedPromotion = promotionRepository.save(promotion);
-            return ResponseEntity.ok(updatedPromotion);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Promotion> updatePromotion(
+            @PathVariable("id") String promotionCode,
+            @RequestBody Promotion promotionDetails) {
+        Optional<Promotion> updatedPromotion = promotionService.updatePromotion(promotionCode, promotionDetails);
+        return updatedPromotion.map(ResponseEntity::ok)
+                               .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // Delete a promotion
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePromotion(@PathVariable String promotionCode) {
-        if (promotionRepository.existsById(promotionCode)) {
-            promotionRepository.deleteById(promotionCode);
+    public ResponseEntity<String> deletePromotion(@PathVariable("id") String promotionCode) {
+        boolean deleted = promotionService.deletePromotion(promotionCode);
+        if (deleted) {
             return ResponseEntity.ok("Promotion deleted successfully");
         } else {
             return ResponseEntity.notFound().build();
         }
     }
+
+
 }

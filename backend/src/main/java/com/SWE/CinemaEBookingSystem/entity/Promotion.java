@@ -1,7 +1,7 @@
 package com.SWE.CinemaEBookingSystem.entity;
 import jakarta.persistence.*; 
 import javax.validation.constraints.AssertTrue;  
-import java.util.Date;
+import java.time.LocalDate;
 
 
 @Entity
@@ -14,24 +14,25 @@ public class Promotion {
     
     @Temporal(TemporalType.DATE)
     @Column(name = "start_date",nullable = false)
-    private Date startDate;
+    private LocalDate startDate;
 
     @Column(name = "discount_percentage", nullable = false)
     private double discountPercentage;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "end_date",nullable=false)
-    private Date endDate;
+    private LocalDate endDate;
 
     @AssertTrue(message = "Start date must be before or equal to end date")
-    public boolean isStartDateBeforeOrEqualToEndDate(){
-        return startDate == null || endDate == null || !startDate.after(endDate);
+    public boolean isStartDateBeforeOrEqualToEndDate() {
+        return startDate == null || endDate == null || !startDate.isAfter(endDate); // ✅ fixed
     }
 
 
 
+
     public Promotion(){};
-    public Promotion(String promotionCode,Date startDate,Date endDate){
+    public Promotion(String promotionCode, LocalDate startDate, LocalDate endDate){
        this.promotionCode = promotionCode;
        this.startDate = startDate;
        this.endDate = endDate;
@@ -41,10 +42,10 @@ public class Promotion {
    
     public String getPromotionCode() {return promotionCode;}
     public void setPromotionCode(String promotionCode) {this.promotionCode = promotionCode;}
-    public Date getStartDate() {return startDate;}
-    public void setStartDate(Date startDate) {this.startDate = startDate;}
-    public Date getEndDate() {return endDate;}
-    public void setEndDate(Date endDate) {this.endDate = endDate;}
+    public LocalDate getStartDate() {return startDate;}
+    public void setStartDate(LocalDate startDate) {this.startDate = startDate;}
+    public LocalDate getEndDate() {return endDate;}
+    public void setEndDate(LocalDate endDate) {this.endDate = endDate;}
     public void setDiscountPercentage(double discountPercentage) {this.discountPercentage = discountPercentage;}
     public double getDiscountPercentage() {return discountPercentage;}
 

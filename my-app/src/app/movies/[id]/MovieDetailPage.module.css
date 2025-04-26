@@ -1,175 +1,384 @@
 .container {
-  max-width: 90%;
+  max-width: 1000px;
   margin: 2rem auto 4rem;
-  padding: 0 2rem;
-  font-family: Arial, sans-serif;
-  background-color: transparent;
+  padding: 2rem;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  font-family: 'Roboto', Arial, sans-serif;
+  position: relative;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+
+.container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.02;
+  background-image: radial-gradient(#000 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+.topBar {
+ 
+  padding: 1.25rem;
+  
+  margin: -2rem -2rem 2rem -2rem;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  position: relative;
+
+  z-index: 1;
 }
 
 .title {
   font-size: 2.5rem;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
   color: #222;
   text-align: center;
+  font-weight: 700;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  letter-spacing: -0.5px;
+  position: relative;
+  z-index: 1;
 }
 
 .description {
   font-size: 1.2rem;
   line-height: 1.6;
-  margin-bottom: 20px;
-  margin-left: 2px;
-  font-weight: bold;
+  margin-bottom: 25px;
   color: #555;
   text-align: center;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  z-index: 1;
 }
 
+/* Trailer styling like formGroup in editMovie */
 .trailer {
-  margin-bottom: 20px;
-  padding: 15px;
+  margin-bottom: 30px;
+  padding: 20px;
   background-color: #f9f9f9;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   min-height: 150px;
-  max-width: 80vw;
-  margin: auto auto;
+  max-width: 85vw;
+  margin: 0 auto 40px;
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 1;
+  border: 1px solid #eee;
+}
+
+.trailer:hover {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
 }
 
 .noTrailer {
   color: #999;
   font-style: italic;
   text-align: center;
+  padding: 30px;
 }
+
+
+.showtimes h2,
+.cast h2,
+.reviews h2 {
+  margin: 1.5rem 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--highlight-color, #4a90e2);
+  color: #333;
+  font-size: 1.2rem;
+  font-weight: 600;
+  position: relative;
+  z-index: 1;
+}
+
 
 .showtimes {
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  animation: slideUp 0.6s ease-out;
+  animation-delay: 0.2s;
+  animation-fill-mode: both;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  overflow: visible;
+  padding-bottom: 15px;
 }
 
-.showtimes h2 {
-  margin-bottom: 10px;
-  color: #222;
-  border-bottom: 2px solid #ddd;
-  padding-bottom: 5px;
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* Showdate Card Styling */
+.showtimesContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
 .showdate {
-  margin-bottom: 20px;
-  padding: 15px;
   background-color: #f9f9f9;
-  border-left: 5px solid var(--hover-darken);
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  transition: all 0.2s ease;
+  border: none;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  width: 100%;
 }
 
-.showdate p:first-child {
-  font-weight: bold;
-  font-size: 1.2rem;
-  margin-bottom: 10px;
+.showdate:hover {
+  background-color: #f5f5f5;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
 }
 
-/* TimeSlot Badge Styling */
+.showdateHeader {
+  margin: 0 0 8px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.timeSlotContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+  width: 100%;
+}
+
 .timeSlot {
-  display: inline-block;
-  margin: 0 10px 10px 0;
-  padding: 5px 10px;
-  background-color: var(--highlight-color);
-  color: #fff;
-  border-radius: 20px;
   font-size: 0.9rem;
-  transition: background-color 0.3s ease;
+  margin: 0;
+  padding: 8px 12px;
+  background-color: #5C1212;
+  border: none;
+  border-radius: 20px;
+  color: whitesmoke;
+  transition: all 0.25s ease;
+  font-weight: 400;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
 }
 
 .timeSlot:hover {
-  background-color: var(--hover-darken);
+  background-color: #7A1818;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.timeSlot:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.theater {
+  font-size: 0.8rem;
+  font-weight: 400;
+  margin-left: 6px;
+  padding-left: 6px;
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+  line-height: 1;
+  display: inline-block;
+  opacity: 0.9;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .noTimes {
-  color: #999;
+  color: #777;
   font-style: italic;
-  padding-left: 10px;
+  margin: 0;
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  text-align: center;
 }
 
-/* Cast Section Card Styling */
+
 .cast {
-  margin-bottom: 20px;
-  padding: 15px;
+  margin-bottom: 30px;
+  padding: 1.25rem;
   background-color: #f9f9f9;
-  border-left: 5px solid var(--hover-darken);
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 1;
+  border: 1px solid #eee;
+  animation: slideUp 0.6s ease-out;
 }
 
-.cast h2 {
-  margin-bottom: 10px;
-  color: #222;
-  border-bottom: 2px solid #ddd;
-  padding-bottom: 5px;
+.cast:hover {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
 }
 
-/* Reviews Section Card Styling */
+.cast p {
+  line-height: 1.7;
+  color: #555;
+  margin: 0;
+  font-size: 1rem;
+}
+
+
 .reviews {
-  margin-bottom: 20px;
-  padding: 15px;
+  margin-bottom: 30px;
+  padding: 1.25rem;
   background-color: #f9f9f9;
-  border-left: 5px solid var(--hover-darken);
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 1;
+  border: 1px solid #eee;
+  animation: slideUp 0.6s ease-out;
+  animation-delay: 0.3s;
+  animation-fill-mode: both;
 }
 
-.reviews h2 {
-  margin-bottom: 10px;
-  color: #222;
-  border-bottom: 2px solid #ddd;
-  padding-bottom: 5px;
+.reviews:hover {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
 }
 
 .reviewList {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .reviewItem {
-  background-color: #f8f8f8;
-  padding: 10px;
-  margin-bottom: 5px;
+  background-color: white;
+  padding: 15px;
+  margin-bottom: 10px;
   border-radius: 4px;
   border: 1px solid #eee;
+  transition: all 0.2s ease;
+  position: relative;
 }
 
+.reviewItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+}
+
+.reviewItem:last-child {
+  margin-bottom: 0;
+}
+
+.reviewItem:before {
+  content: '"';
+  position: absolute;
+  top: 5px;
+  left: 10px;
+  font-size: 24px;
+  color: rgba(0,0,0,0.1);
+}
+
+
 .error {
-  color: red;
+  color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.1);
+  padding: 15px;
+  border-radius: 4px;
+  font-size: 0.95rem;
   text-align: center;
+  margin: 10px 0;
+  border-left: 4px solid #dc3545;
 }
 
 .loading {
   text-align: center;
   font-style: italic;
+  padding: 15px;
+  color: #555;
+  animation: pulse 1.5s infinite;
 }
 
-.topBar {
-  margin: 1rem 0 3rem;
-  text-align: center;
-  display: flex;
-  justify-content: center;
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
 }
+
 
 .bookTicketButton {
-  display: inline-block;
-  background-color: var(--highlight-color, #e94560);
-  color: #fff;
-  padding: 1rem 2.5rem;
+  padding: 16px;
+  font-size: 1.1rem;
+  background: linear-gradient(135deg, var(--hover-darken, #3a80d2), var(--highlight-color));
+  color: #ffffff;
+  border: none;
   border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
   text-decoration: none;
-  font-size: 1.2rem;
-  font-weight: 600;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 10px rgba(233, 69, 96, 0.2);
+  display: inline-block;
+  width: 100%;
+  max-width: 300px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .bookTicketButton:hover {
-  background-color: var(--hover-darken, #d73750);
+  background: linear-gradient(135deg, var(--highlight-color), var(--hover-darken));
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(233, 69, 96, 0.3);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.bookTicketButton::after {
+  content: "";
+  position: absolute;
+  width: 50px;
+  height: 100%;
+  top: 0;
+  left: -100px;
+  background-image: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transition: all 0.5s ease;
+}
+
+.bookTicketButton:hover::after {
+  left: 100%;
 }
 
 .cancelButtonContainer {
@@ -177,50 +386,124 @@
   text-align: center;
   display: flex;
   justify-content: center;
+  margin: 30px 0;
 }
 
-.cancelButton{
-  margin-top: 10px;
-  display: inline-block;
-  background-color: var(--hover-darken, #e94560);
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 4px;
-  text-decoration: none;
-  font-size: 1.2rem;
-  transition: background-color 0.3s ease;
-}
-.cancelButton:hover {
-  background-color: var(--highlight-color, #d73750);
-}
 
-.title {
-  font-size: 2.5rem;
-  margin-bottom: 10px;
-  color: #222;
-  text-align: center;
-}
-
-.description {
+.cancelButton {
+  padding: 16px;
   font-size: 1.1rem;
-  color: #555;
-  text-align: center;
-  margin-bottom: 20px;
+  background: linear-gradient(135deg, var(--hover-darken), var(--highlight-color));
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+  align-self: center;
+  width: 100%;
+  max-width: 300px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.poster {
-  display: block;
-  max-width: 100%;
-  height: auto;
-  margin: 0 auto;
+.cancelButton:hover {
+  background: linear-gradient(135deg, var(--highlight-color), var(--hover-darken));
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
-.error {
-  color: red;
-  text-align: center;
+.cancelButton::after {
+  content: "";
+  position: absolute;
+  width: 50px;
+  height: 100%;
+  top: 0;
+  left: -100px;
+  background-image: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transition: all 0.5s ease;
 }
 
-.loading {
-  text-align: center;
-  font-style: italic;
+.cancelButton:hover::after {
+  left: 100%;
+}
+
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+    max-width: 95%;
+    margin: 1rem auto;
+  }
+  
+  .topBar {
+    padding: 1rem;
+    margin: -1rem -1rem 1.5rem -1rem;
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  .description {
+    font-size: 1rem;
+  }
+  
+  .trailer {
+    padding: 15px;
+    max-width: 100%;
+  }
+  
+  .timeSlot {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .bookTicketButton {
+    padding: 12px;
+    font-size: 1rem;
+    max-width: 100%;
+  }
+  
+  .cast, 
+  .reviews, 
+  .showdate {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.75rem;
+  }
+  
+  .topBar {
+    padding: 0.75rem;
+    margin: -0.75rem -0.75rem 1.25rem -0.75rem;
+  }
+  
+  .title {
+    font-size: 1.8rem;
+  }
+  
+  .description {
+    font-size: 0.95rem;
+  }
+  
+  .timeSlotContainer {
+    justify-content: center;
+  }
+  
+  .bookTicketButton {
+    width: 100%;
+    padding: 0.8rem 1.5rem;
+  }
 }

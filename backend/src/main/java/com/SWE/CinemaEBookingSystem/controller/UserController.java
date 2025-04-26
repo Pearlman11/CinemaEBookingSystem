@@ -56,9 +56,6 @@ public class UserController {
     @Autowired
     private PaymentCardRepository paymentCardRepository;
 
-
-
-
     // Getting all users
     @GetMapping
     public ResponseEntity <List<User>> getAllUsers() {
@@ -86,11 +83,9 @@ public class UserController {
                 Map<String, String> response = Map.of("message", "User with this email already exists");
                 return new ResponseEntity<>(response, HttpStatus.CONFLICT);
             }
-
             // Encode password before saving
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             
-
             
             if (user.getPaymentCards() != null && !user.getPaymentCards().isEmpty() && user.getPaymentCards().get(0) != null) {
                 PaymentCards card = paymentCardService.addPaymentCardToUser(user.getId(), user.getPaymentCards().get(0));
@@ -103,10 +98,9 @@ public class UserController {
 
             User savedUser = userRepository.save(user);
             
-
-            
             
             return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+
         } catch(Exception e) {
             Map<String, String> response = Map.of("message", "Error creating user: " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -140,7 +134,6 @@ public class UserController {
     public ResponseEntity<User> editProfileUpdate(@PathVariable Integer id, @RequestBody User userDetails) {
         Optional<User> userData = userRepository.findById(id);
        
-        
         if (userData.isPresent()) {
             User user = userData.get();
             user.setFirstName(userDetails.getFirstName());
@@ -150,13 +143,10 @@ public class UserController {
             user.setHomeAddress(userDetails.getHomeAddress());
 
             List<PaymentCards> updatedCards = userDetails.getPaymentCards();
-            List<PaymentCards> existingCards = user.getPaymentCards();
-            
-           
+            List<PaymentCards> existingCards = user.getPaymentCards();            
 
             User savedUser = userRepository.save(user);
-           
-            
+             
             for(PaymentCards card:updatedCards){
                 AESUtil aesUtil = new AESUtil(); 
                 
@@ -179,14 +169,7 @@ public class UserController {
                     paymentCardRepository.save(card);
                    
                 }
-                
-                
-                
-               
-                
-
             }
-           
             
             return new ResponseEntity<>(savedUser, HttpStatus.OK);
             
@@ -194,10 +177,6 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-   
-
-
-
 
     @PostMapping("/{id}/payment-cards")
     public ResponseEntity<PaymentCards> addPaymentCardToUser(@PathVariable("id") Integer userId,@RequestBody PaymentCards card){
@@ -217,13 +196,6 @@ public class UserController {
         }
 
     }
-
-    
-
-
-
-
-
 
 
     //Delete a user
