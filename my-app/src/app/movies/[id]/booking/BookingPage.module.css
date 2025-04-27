@@ -1,3 +1,6 @@
+
+
+
 .container {
   max-width: 1000px;
   margin: 2rem auto 4rem;
@@ -15,6 +18,7 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Optional: subtle background pattern */
 .container::before {
   content: "";
   position: absolute;
@@ -37,7 +41,6 @@
   text-align: center;
   font-size: 2.2rem;
   position: relative;
-
   font-weight: 700;
   letter-spacing: -0.5px;
   z-index: 1;
@@ -46,7 +49,6 @@
   background-image: linear-gradient(135deg, var(--hover-darken), var(--highlight-color));
   -webkit-background-clip: text;
   background-clip: text;
-
 }
 
 .movieInfo {
@@ -68,6 +70,7 @@
 
 .poster {
   width: 50%;
+  max-width: 250px; /* Added max-width for better control */
   height: auto;
   border-radius: 8px;
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
@@ -88,8 +91,10 @@
   z-index: 1;
 }
 
+/* Section common styles */
 .ticketSection,
-.seatSection {
+.seatSection,
+.inputGroup {
   padding: 1.25rem;
   background-color: #f9f9f9;
   border-radius: 8px;
@@ -98,12 +103,17 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   border-left: 5px solid var(--highlight-color);
   animation: slideUp 0.6s ease-out;
-  animation-delay: 0.2s;
   animation-fill-mode: both;
 }
 
+.ticketSection { animation-delay: 0.2s; }
+.inputGroup { animation-delay: 0.3s; margin: 20px 0; } /* Keep margin for inputGroup */
+.seatSection { animation-delay: 0.4s; }
+
+
 .ticketSection:hover,
-.seatSection:hover {
+.seatSection:hover,
+.inputGroup:hover {
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
   transform: translateY(-2px);
 }
@@ -118,7 +128,7 @@
 }
 
 .input,
-.select {
+.select { /* Combined for consistency */
   padding: 12px;
   font-size: 1rem;
   border: 1px solid #ddd;
@@ -151,155 +161,263 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-top: 15px;
+  margin: 25px 0 15px 0; /* Adjusted margin */
+  padding: 15px; /* Add some padding */
+  border-radius: 8px;
+  background-color: #fff; /* Slightly different background for map area */
+  box-shadow: inset 0 1px 4px rgba(0,0,0,0.05);
   align-items: center;
+}
+
+/* --- ADDED: Style for Screen Indicator --- */
+.screen {
+  width: 70%;
+  max-width: 300px;
+  padding: 8px;
+  margin-bottom: 25px; /* Space between screen and seats */
+  text-align: center;
+  font-weight: 600;
+  color: #555;
+  background-color: #e0e0e0;
+  border-radius: 3px;
+  border-bottom: 3px solid #ccc;
+  letter-spacing: 2px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
 }
 
 .seatRow {
   display: flex;
   justify-content: center;
-  gap: 8px;
+  gap: 8px; /* Space between seats */
 }
 
+/* Base seat style */
 .seat {
   width: 40px;
   height: 40px;
-  background-color: #f5f5f5;
-  border: 1px solid #ddd;
+  border: 1px solid var(--available-border);
   border-radius: 4px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease; /* Faster transition */
   font-size: 0.9rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: var(--available-bg); /* Default available */
+  color: #666;
 }
 
-.seat:hover {
+/* --- ADDED: Explicit style for available seats (mostly inherits) --- */
+.availableSeat {
+  /* Inherits from .seat */
+}
+
+.availableSeat:hover:not(:disabled) {
   background-color: #e6e6e6;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px) scale(1.05); /* Subtle hover effect */
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  border-color: #ccc;
 }
 
+/* Selected seat style */
 .selectedSeat {
-  background-color: var(--hover-darken);
+  background-color: var(--highlight-color); /* Use variable */
   color: #fff;
-  border-color: var(--hover-darken);
-  box-shadow: 0 4px 8px rgba(var(--highlight-color-rgb, 74, 144, 226), 0.3);
+  border-color: var(--hover-darken); /* Darker border for selected */
+  box-shadow: 0 3px 8px rgba(var(--highlight-color-rgb, 74, 144, 226), 0.4);
+  transform: scale(1.05); /* Slightly larger when selected */
 }
+
+/* --- ADDED: Reserved seat style --- */
+.reservedSeat {
+  background-color: var(--reserved-color);
+  color: #bdbdbd; /* Lighter text color */
+  border-color: var(--reserved-border);
+  cursor: not-allowed;
+  opacity: 0.7; /* More faded */
+  box-shadow: none; /* Remove shadow for reserved */
+}
+
+.reservedSeat:hover {
+  /* No hover effect for reserved seats */
+  transform: none;
+  box-shadow: none;
+}
+
+/* --- ADDED: Instruction text styling --- */
+.instruction {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #555;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* --- ADDED: Seat Legend Styling --- */
+.seatLegend {
+  display: flex;
+  justify-content: center;
+  gap: 15px; /* Space between legend items */
+  margin-bottom: 20px;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  padding: 10px;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+.seatLegend > div {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* Space between square and text */
+  font-size: 0.9rem;
+  color: #444;
+}
+
+/* Common style for legend squares (using .seat for consistency but smaller) */
+.seatLegend .seat {
+  width: 18px;
+  height: 18px;
+  font-size: 0; /* Hide text in legend squares */
+  cursor: default;
+  pointer-events: none; /* Prevent clicking legend items */
+  box-shadow: none; /* No shadow on legend items */
+  margin: 0; /* Reset margin */
+}
+
+.availableLegend { background-color: var(--available-bg); border-color: var(--available-border); }
+.selectedLegend { background-color: var(--highlight-color); border-color: var(--hover-darken); }
+.reservedLegend { background-color: var(--reserved-color); border-color: var(--reserved-border); opacity: 0.7; }
+/* --- END Seat Legend Styling --- */
+
 
 .selectedInfo {
   margin-top: 15px;
   font-size: 1rem;
   color: #333;
-  background-color: #f9f9f9;
-  padding: 10px;
+  background-color: #f0f8ff; /* Light blue background */
+  padding: 12px 15px;
   border-radius: 4px;
   text-align: center;
-  border-left: 3px solid var(--highlight-color);
+  border-left: 4px solid var(--highlight-color); /* Thicker border */
+  font-weight: 500;
 }
 
-.confirmButton {
-  padding: 16px;
-  font-size: 1.1rem;
-  background: linear-gradient(135deg, var(--hover-darken), var(--highlight-color));
-  color: #ffffff;
+/* Base button style */
+.confirmButton,
+.backButton { /* Apply common styles */
+  padding: 14px 20px; /* Slightly adjusted padding */
+  font-size: 1.05rem; /* Adjusted font size */
   border: none;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-top: 1.5rem;
-  margin-bottom: 1rem;
+  margin-top: 1rem; /* Reduced top margin */
+  margin-bottom: 0; /* Removed bottom margin for group */
   font-weight: bold;
   letter-spacing: 0.5px;
   position: relative;
   overflow: hidden;
-  width: 100%;
-  max-width: 300px;
-  align-self: center;
+  width: auto; /* Allow button to size to content + padding */
+  min-width: 180px; /* Minimum width */
+  text-align: center;
+}
+
+/* Confirm Button specific styles */
+.confirmButton {
+  background: linear-gradient(135deg, var(--hover-darken), var(--highlight-color));
+  color: #ffffff;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.confirmButton:hover {
+.confirmButton:hover:not(:disabled) { /* Only apply hover when not disabled */
   background: linear-gradient(135deg, var(--highlight-color), var(--hover-darken));
   transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
+/* Confirm button shine effect */
 .confirmButton::after {
-  content: "";
-  position: absolute;
-  width: 50px;
-  height: 100%;
-  top: 0;
-  left: -100px;
-  background-image: linear-gradient(
-    120deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.4) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
+  content: ""; position: absolute; width: 50px; height: 100%; top: 0; left: -100px;
+  background-image: linear-gradient( 120deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0) 100% );
   transition: all 0.5s ease;
 }
+.confirmButton:hover::after { left: 120%; } /* Adjusted end position */
 
-.confirmButton:hover::after {
-  left: 100%;
+/* --- ADDED: Back Button Styling --- */
+.backButton {
+  background-color: var(--button-back-bg);
+  color: var(--button-back-text);
+  border: 1px solid var(--button-back-border);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
+
+.backButton:hover:not(:disabled) {
+  background-color: var(--button-back-hover-bg);
+  border-color: #bbb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* --- ADDED: Button Group Styling --- */
+.buttonGroup {
+    display: flex;
+    justify-content: center; /* Center buttons */
+    gap: 20px; /* Space between buttons */
+    margin-top: 1.5rem; /* Space above the button group */
+    flex-wrap: wrap; /* Allow buttons to wrap on small screens */
+}
+
+
+/* Disabled state for ALL buttons */
+.confirmButton:disabled,
+.backButton:disabled {
+    background: #ccc; /* Grey background */
+    color: #888; /* Lighter text */
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+    background-image: none; /* Remove gradient */
+    border-color: #bbb; /* Match border for disabled back button */
+}
+.confirmButton:disabled::after { display: none; } /* Hide shine on disabled */
+
 
 .loading {
   text-align: center;
   font-style: italic;
   padding: 15px;
   color: #555;
-  animation: pulse 1.5s infinite;
+  animation: pulse 1.5s infinite ease-in-out; /* Added ease */
   margin: 40px;
 }
 
 @keyframes pulse {
-  0% { opacity: 0.6; }
-  50% { opacity: 1; }
-  100% { opacity: 0.6; }
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.02); }
 }
 
 .error {
   color: #dc3545;
-  background-color: rgba(220, 53, 69, 0.1);
+  background-color: rgba(220, 53, 69, 0.05); /* Softer background */
   padding: 15px;
   border-radius: 4px;
   font-size: 0.95rem;
   text-align: center;
-  margin: 40px;
+  margin: 20px; /* Reduced margin */
   border-left: 4px solid #dc3545;
-}
-
-.inputGroup {
-  margin: 20px 0;
-  padding: 1.25rem;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-  border: 1px solid #eee;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  border-left: 5px solid var(--highlight-color);
-  animation: slideUp 0.6s ease-out;
-  animation-delay: 0.3s;
-  animation-fill-mode: both;
-}
-
-.inputGroup:hover {
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-  transform: translateY(-2px);
 }
 
 .sectionHeading {
   font-size: 1.5rem;
-  margin-bottom: 15px;
-  color: black;
-  font-weight: 550;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid var(--hover-darken);
-
+  margin-bottom: 20px; /* Increased space */
+  color: #333; /* Darker color */
+  font-weight: 600; /* Slightly bolder */
+  padding-bottom: 0.75rem; /* Increased padding */
+  border-bottom: 2px solid var(--highlight-color); /* Use highlight color */
+  display: inline-block; /* Fit border to text */
 }
 
 .selectGroup {
@@ -308,88 +426,144 @@
   gap: 20px;
 }
 
+/* Toast styling */
 .custom-toast {
   background: #fff;
-  border: 2px solid var(--hover-darken);
-  color: #222;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--highlight-color); /* Use highlight color */
+  color: #333;
+  border-radius: 8px; /* Less rounded */
+  padding: 16px 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   font-family: 'Roboto', Arial, sans-serif;
 }
 
 .customProgress {
   background: var(--highlight-color);
-  height: 6px;
-  border-radius: 2px;
-  opacity: 100;
+  height: 4px; /* Thinner bar */
+  border-radius: 0; /* Square bar */
+  opacity: 1;
 }
 
 .toastContainer {
-  font-size: 16px;
+  font-size: 1rem; /* Ensure consistency */
+  z-index: 9999; /* Ensure toasts are on top */
 }
+
+/* --- Responsive Adjustments --- */
 
 @media (max-width: 768px) {
   .container {
-    padding: 1rem;
-    margin: 1rem auto;
+    padding: 1.5rem; /* Slightly more padding */
+    margin: 1.5rem auto 3rem;
     max-width: 95%;
   }
 
   .heading {
     padding: 1rem;
-    margin: -1rem -1rem 1.5rem -1rem;
+    margin: -1.5rem -1.5rem 1.5rem -1.5rem;
     font-size: 1.8rem;
   }
 
   .selectGroup {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* Stack selects */
   }
 
   .input,
   .select {
-    font-size: 0.9rem;
-    padding: 10px;
+    font-size: 0.95rem; /* Slightly larger */
+    padding: 12px;
   }
 
-  .confirmButton {
+  .confirmButton, .backButton {
     font-size: 1rem;
-    padding: 12px;
-    max-width: 100%;
+    padding: 12px 15px;
+    min-width: 150px; /* Adjust min-width */
   }
 
   .seatRow {
-    gap: 5px;
+    gap: 6px; /* Adjust gap */
   }
 
   .seat {
-    width: 35px;
-    height: 35px;
+    width: 36px; /* Adjust size */
+    height: 36px;
     font-size: 0.8rem;
   }
-  
+
   .poster {
-    width: 180px;
+    width: 60%; /* Adjust poster size */
+    max-width: 200px;
+  }
+
+  .screen {
+     width: 80%;
+     font-size: 0.8rem;
+     padding: 6px;
+     margin-bottom: 20px;
+  }
+
+  .buttonGroup {
+    gap: 15px;
   }
 }
 
 @media (max-width: 480px) {
   .container {
-    padding: 0.75rem;
+    padding: 1rem;
+    margin: 1rem auto 2rem;
   }
-  
+
   .heading {
-    padding: 0.75rem;
-    margin: -0.75rem -0.75rem 1.25rem -0.75rem;
+    padding: 1rem;
+    margin: -1rem -1rem 1.25rem -1rem;
     font-size: 1.6rem;
   }
-  
+
   .poster {
-    width: 150px;
+    width: 70%;
+    max-width: 180px;
   }
-  
-  .confirmButton {
-    width: 100%;
-    padding: 0.8rem 1.5rem;
+
+  .confirmButton, .backButton {
+    width: 100%; /* Make buttons full width */
+    min-width: unset; /* Remove min-width */
+    padding: 12px; /* Adjust padding */
+    font-size: 0.95rem;
+  }
+
+  .buttonGroup {
+    flex-direction: column; /* Stack buttons */
+    gap: 10px;
+  }
+
+  .seatRow {
+    gap: 4px; /* Tighter gap */
+  }
+
+  .seat {
+    width: 32px; /* Smaller seats */
+    height: 32px;
+    font-size: 0.75rem;
+  }
+
+  .screen {
+     width: 90%;
+     font-size: 0.75rem;
+  }
+
+  .seatLegend > div {
+    font-size: 0.8rem; /* Smaller legend text */
+  }
+  .seatLegend .seat {
+    width: 16px;
+    height: 16px;
+  }
+
+  .ticketSection, .seatSection, .inputGroup {
+     padding: 1rem;
+  }
+
+  .sectionHeading {
+    font-size: 1.3rem;
   }
 }
