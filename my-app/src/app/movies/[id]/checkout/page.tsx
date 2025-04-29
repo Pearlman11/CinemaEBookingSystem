@@ -34,7 +34,7 @@ interface Movie {
 
 // --- ADDED: Interface for Selected Seats ---
 interface SelectedSeat {
-  id: number;
+  id: string;
   label: string;
 }
 
@@ -43,10 +43,18 @@ const CheckoutPage = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // --- CHANGED: Parse selectedSeats as JSON ---
-  const selectedSeats: SelectedSeat[] = searchParams.get("seats")
-    ? JSON.parse(decodeURIComponent(searchParams.get("seats")!))
-    : [];
+  const raw = searchParams.get("seats") ?? "";
+
+  const selectedSeats: SelectedSeat[] = raw
+    .split(",")                // ["A1","B2","C10"] or [""] if empty
+    .map(str => str.trim())    // fix whitespace
+    .filter(s => s.length)     // drop any empty strings
+    .map(label => {
+      return {
+        id: label,             // Use the full seat identifier (e.g., "A1", "B2")
+        label: label,          // Keep the same label for display
+      };
+    });
 
 
   const adultTickets = parseInt(searchParams.get("adult") || "0", 10);
@@ -159,6 +167,8 @@ const CheckoutPage = () => {
       showtimeId: parseInt(showtimeId, 10),
       seats: selectedSeats.map(seat => seat.id),
     };
+    console.log("Reservation Payload" + reservationPayload);
+    console.log(searchParams.get("seats"));
 
     try {
       const response = await fetch("http://localhost:8080/api/seats/reserve", {
@@ -200,9 +210,15 @@ const CheckoutPage = () => {
         router.push(`/`);
       }, 4000);
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Checkout failed:", err);
-      toast.error(err.message || "Could not complete booking. Please try again.", { className: 'custom-toast' });
+      
+      let errorMessage = "Could not complete booking. Please try again.";
+      if (err instanceof Error) {
+        errorMessage = err.message || errorMessage;
+      }
+      
+      toast.error(errorMessage, { className: 'custom-toast' });
       setIsSubmitting(false);
     }
   };
