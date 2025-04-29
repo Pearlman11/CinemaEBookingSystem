@@ -292,6 +292,50 @@
   box-shadow: 0 0 0 2px rgba(var(--highlight-color-rgb, 74, 144, 226), 0.25);
 }
 
+.readOnlyInput {
+  background-color: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.readOnlyInput:focus {
+  box-shadow: none;
+  border-color: #e0e0e0;
+}
+
+.emailNote {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: #666;
+  font-style: italic;
+}
+
+.promoContainer {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.selectedCardInfo {
+  background-color: #f8f8f8;
+  padding: 12px 15px;
+  border-radius: 6px;
+  margin: 10px 0 15px;
+  border-left: 3px solid var(--highlight-color);
+}
+
+.selectedCardInfo p {
+  margin: 6px 0;
+  color: #444;
+  font-size: 0.95rem;
+}
+
+.selectedCardInfo strong {
+  margin-right: 8px;
+  color: #333;
+}
+
 .submitButton {
   padding: 16px;
   font-size: 1.1rem;
@@ -362,6 +406,45 @@
   text-align: center;
   margin: 40px;
   border-left: 4px solid #dc3545;
+}
+
+.applyButton {
+  padding: 12px 20px;
+  background-color: var(--highlight-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.applyButton:hover {
+  background-color: var(--hover-darken);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.validPromo {
+  color: #2e7d32;
+  font-weight: 500;
+  padding: 8px;
+  background-color: rgba(46, 125, 50, 0.1);
+  border-radius: 4px;
+  margin-top: 8px;
+  border-left: 3px solid #2e7d32;
+}
+
+.invalidPromo {
+  color: var(--hover-darken);
+  font-weight: 500;
+  padding: 8px;
+  background-color: rgba(233, 69, 96, 0.1);
+  border-radius: 4px;
+  margin-top: 8px;
+  border-left: 3px solid var(--hover-darken);
 }
 
 @media (max-width: 768px) {
