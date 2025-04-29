@@ -45,9 +45,10 @@ const CheckoutPage = () => {
 
   // --- CHANGED: Parse selectedSeats as JSON ---
   const selectedSeats: SelectedSeat[] = searchParams.get("seats")
-    ? JSON.parse(decodeURIComponent(searchParams.get("seats")!))
-    : [];
-
+  ? decodeURIComponent(searchParams.get("seats")!)
+      .split(",")
+      .map((label, index) => ({ id: index, label }))
+  : [];
 
   const adultTickets = parseInt(searchParams.get("adult") || "0", 10);
   const childTickets = parseInt(searchParams.get("child") || "0", 10);
