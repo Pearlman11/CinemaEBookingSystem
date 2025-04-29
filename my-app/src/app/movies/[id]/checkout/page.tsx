@@ -63,14 +63,6 @@ const CheckoutPage = () => {
   const showtimeParam = searchParams.get("showtime") || " ";
   const [showtimeDate = "Invalid Date", showtimeTime = "Invalid Time"] = showtimeParam.split(' ');
 
-  const ADULT_PRICE = 10.0;
-  const CHILD_PRICE = 6.0;
-  const SENIOR_PRICE = 8.0;
-
-  const adultSubtotal = adultTickets * ADULT_PRICE;
-  const childSubtotal = childTickets * CHILD_PRICE;
-  const seniorSubtotal = seniorTickets * SENIOR_PRICE;
-  const orderTotal = adultSubtotal + childSubtotal + seniorSubtotal;
 
   const [movie, setMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -81,8 +73,48 @@ const CheckoutPage = () => {
   const [cardNumber, setCardNumber] = useState("");
   const [billingAddress, setBillingAddress] = useState("");
   const [email, setEmail] = useState("");
+  const [discountPercent, setDiscountPercent] = useState(0);
 
   const [confirmationVisible, setConfirmationVisible] = useState(false);
+
+  const ADULT_PRICE = 10.0;
+  const CHILD_PRICE = 6.0;
+  const SENIOR_PRICE = 8.0;
+
+  const adultSubtotal = adultTickets * ADULT_PRICE;
+  const childSubtotal = childTickets * CHILD_PRICE;
+  const seniorSubtotal = seniorTickets * SENIOR_PRICE;
+  const subtotal = adultSubtotal + childSubtotal + seniorSubtotal;
+  const discountAmount = subtotal * (discountPercent / 100);
+  const orderTotal = subtotal - discountAmount;
+
+  const [promoChecked, setPromoChecked] = useState(false);
+
+const handleApplyPromo = async () => {
+  if (!promoCode.trim()) {
+    setDiscountPercent(0);
+    setPromoChecked(true);
+    return;
+  }
+
+  try {
+    const res = await fetch(`http://localhost:8080/api/promotions/validate?code=${promoCode.trim()}`);
+    const data = await res.json();
+
+    if (data.valid) {
+      setDiscountPercent(data.discount);
+    } else {
+      setDiscountPercent(0);
+    }
+    setPromoChecked(true);
+  } catch (e) {
+    console.error("Failed to validate promo code", e);
+    setDiscountPercent(0);
+    setPromoChecked(true);
+  }
+};
+
+
 
   const formatDate = (dateString: string) => {
     try {
@@ -166,8 +198,9 @@ const CheckoutPage = () => {
     const reservationPayload = {
       showtimeId: parseInt(showtimeId, 10),
       seats: selectedSeats.map(seat => seat.id),
+      email: email,
     };
-    console.log("Reservation Payload" + reservationPayload);
+    console.log("Reservation Payload", reservationPayload);
     console.log(searchParams.get("seats"));
 
     try {
@@ -263,6 +296,13 @@ const CheckoutPage = () => {
               {seniorTickets > 0 && (<tr><td>Senior</td><td>{seniorTickets}</td><td>${SENIOR_PRICE.toFixed(2)}</td><td>${seniorSubtotal.toFixed(2)}</td></tr>)}
             </tbody>
             <tfoot>
+            {discountPercent > 0 && (
+  <tr>
+    <td colSpan={3}><strong>Promo Discount</strong></td>
+    <td style={{ color: 'green' }}>- ${discountAmount.toFixed(2)}</td>
+  </tr>
+)}
+
               <tr>
                 <td colSpan={3}><strong>Total</strong></td>
                 <td><strong>${orderTotal.toFixed(2)}</strong></td>
@@ -276,58 +316,74 @@ const CheckoutPage = () => {
           </div>
         </div>
 
-        {/* Payment Form */}
         <form className={styles.paymentForm} onSubmit={handleSubmit}>
-          <h2>Payment Details</h2>
-          <div className={styles.formGroup}>
-            <label htmlFor="promoCode">Promo Code:</label>
-            <input
-              type="text"
-              id="promoCode"
-              value={promoCode}
-              onChange={(e) => setPromoCode(e.target.value)}
-              className={styles.input}
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="cardNumber">Card Number:</label>
-            <input
-              type="text"
-              id="cardNumber"
-              value={cardNumber}
-              onChange={(e) => setCardNumber(e.target.value)}
-              className={styles.input}
-              placeholder="XXXX-XXXX-XXXX-XXXX"
-              required
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="billingAddress">Billing Address:</label>
-            <input
-              type="text"
-              id="billingAddress"
-              value={billingAddress}
-              onChange={(e) => setBillingAddress(e.target.value)}
-              className={styles.input}
-              required
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="email">Email:</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={styles.input}
-              required
-            />
-          </div>
-          <button type="submit" className={styles.submitButton} disabled={isSubmitting}>
-            {isSubmitting ? "Processing..." : "Confirm Payment & Reserve Seats"}
-          </button>
-        </form>
-      </div>
+  <h2>Payment Details</h2>
+
+  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+    <input
+      type="text"
+      id="promoCode"
+      value={promoCode}
+      onChange={(e) => {
+        setPromoCode(e.target.value);
+        setPromoChecked(false); // reset status on input
+      }}
+      className={styles.input}
+    />
+    <button type="button" onClick={handleApplyPromo} className={styles.applyButton}>
+      Apply
+    </button>
+  </div>
+
+  {promoChecked && promoCode && discountPercent > 0 && (
+    <p className={styles.validPromo}>✔ Promo code applied: {discountPercent}% off</p>
+  )}
+  {promoChecked && promoCode && discountPercent === 0 && (
+    <p className={styles.invalidPromo}>❌ Invalid or expired promo code</p>
+  )}
+
+  <div className={styles.formGroup}>
+    <label htmlFor="cardNumber">Card Number:</label>
+    <input
+      type="text"
+      id="cardNumber"
+      value={cardNumber}
+      onChange={(e) => setCardNumber(e.target.value)}
+      className={styles.input}
+      placeholder="XXXX-XXXX-XXXX-XXXX"
+      required
+    />
+  </div>
+
+  <div className={styles.formGroup}>
+    <label htmlFor="billingAddress">Billing Address:</label>
+    <input
+      type="text"
+      id="billingAddress"
+      value={billingAddress}
+      onChange={(e) => setBillingAddress(e.target.value)}
+      className={styles.input}
+      required
+    />
+  </div>
+
+  <div className={styles.formGroup}>
+    <label htmlFor="email">Email:</label>
+    <input
+      type="email"
+      id="email"
+      value={email}
+      onChange={(e) => setEmail(e.target.value)}
+      className={styles.input}
+      required
+    />
+  </div>
+
+  <button type="submit" className={styles.submitButton} disabled={isSubmitting}>
+    {isSubmitting ? "Processing..." : "Confirm Payment & Reserve Seats"}
+  </button>
+</form>
+
 
       {/* Confirmation Modal */}
       {confirmationVisible && (
@@ -340,6 +396,7 @@ const CheckoutPage = () => {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };

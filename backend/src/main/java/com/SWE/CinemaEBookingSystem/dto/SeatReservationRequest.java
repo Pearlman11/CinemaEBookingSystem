@@ -8,7 +8,7 @@ public class SeatReservationRequest {
     private List<String> seats; // Change from seatIds to seats to match frontend
 
     private Integer showtimeId; // Use Integer for flexibility
-
+    private String email;
     // Getters and Setters...
 
     public List<String> getSeats() {
@@ -26,4 +26,12 @@ public class SeatReservationRequest {
     public void setShowtimeId(Integer showtimeId) {
         this.showtimeId = showtimeId;
     }
+    public String getEmail() {
+        return email;
+    }
+    
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    
 }

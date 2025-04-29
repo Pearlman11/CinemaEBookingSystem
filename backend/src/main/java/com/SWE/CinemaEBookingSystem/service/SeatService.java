@@ -6,18 +6,27 @@ import com.SWE.CinemaEBookingSystem.repository.SeatRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import com.SWE.CinemaEBookingSystem.service.EmailService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SeatService {
 
     @Autowired
     private SeatRepository seatRepository;
+  
+    private final EmailService emailService; // <-- inject EmailService
+
+    public SeatService(SeatRepository seatRepository, EmailService emailService) {
+        this.seatRepository = seatRepository;
+        this.emailService = emailService;
+    }
+
 
     @Transactional
-    public void reserveSeats(List<String> seatIds, Long showtimeId) {
+    public void reserveSeats(List<String> seatIds, Long showtimeId, String userEmail) {
         // Use the new repository method that handles A1, B2 format
         List<Seat> seats = seatRepository.findByRowAndNumberWithShowtime(seatIds, showtimeId);
         
@@ -34,7 +43,23 @@ public class SeatService {
             seat.setReserved(true);
         }
         seatRepository.saveAll(seats);
+        String seatList = seats.stream()
+                .map(seat -> (char)(seat.getRowNumber() + 64) + String.valueOf(seat.getSeatNumber()))
+                .collect(Collectors.joining(", "));
+
+        String subject = "Cinema Booking Confirmation";
+        String body = "Dear Customer,<br><br>" +
+                      "Your seats have been successfully reserved!<br><br>" +
+                      "<strong>Seats:</strong> " + seatList + "<br>" +
+                      "<strong>Showtime ID:</strong> " + showtimeId + "<br><br>" +
+                      "Enjoy the movie! 🍿<br><br>" +
+                      "Best regards,<br>" +
+                      "Cinema E-Booking System";
+
+        emailService.sendEmail(userEmail, subject, body);
     }
+
+    
     
     /**
      * Get a list of reserved seat labels (e.g., "A1", "B2") for a specific showtime

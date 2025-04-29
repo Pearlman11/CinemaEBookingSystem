@@ -25,6 +25,7 @@ public class SeatController {
     public ResponseEntity<Map<String, Object>> reserveSeats(@RequestBody SeatReservationRequest request) {
         List<String> seats = request.getSeats();
         Integer showtimeIdInt = request.getShowtimeId();
+        String userEmail = request.getEmail();
 
         if (seats == null || seats.isEmpty()) {
              throw new IllegalArgumentException("Seats cannot be null or empty.");
@@ -36,7 +37,7 @@ public class SeatController {
         Long showtimeIdLong = showtimeIdInt.longValue();
         
         try {
-            seatService.reserveSeats(seats, showtimeIdLong);
+            seatService.reserveSeats(seats, showtimeIdLong, userEmail);
             
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Seats reserved successfully");
