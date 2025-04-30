@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState, FormEvent } from "react";
+import { useEffect, useState, FormEvent, ChangeEvent } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import styles from "./checkout.module.css";
 import NavBar from "@/app/components/NavBar/NavBar";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useAuth } from "@/app/context/AuthContext";
 
 // Interfaces
 interface Showtime {
@@ -38,10 +39,18 @@ interface SelectedSeat {
   label: string;
 }
 
+interface PaymentCard {
+  id: number;
+  cardNumber: string;
+  billingAddress: string;
+  expirationDate: string;
+}
+
 const CheckoutPage = () => {
   const { id: showtimeId } = useParams<{ id: string }>();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { user } = useAuth(); // Get current user from AuthContext
 
   const raw = searchParams.get("seats") ?? "";
 
@@ -74,6 +83,9 @@ const CheckoutPage = () => {
   const [billingAddress, setBillingAddress] = useState("");
   const [email, setEmail] = useState("");
   const [discountPercent, setDiscountPercent] = useState(0);
+  const [savedCards, setSavedCards] = useState<PaymentCard[]>([]);
+  const [selectedCardId, setSelectedCardId] = useState<string>("new");
+  const [isNewCard, setIsNewCard] = useState(true);
 
   const [confirmationVisible, setConfirmationVisible] = useState(false);
 
@@ -90,31 +102,84 @@ const CheckoutPage = () => {
 
   const [promoChecked, setPromoChecked] = useState(false);
 
-const handleApplyPromo = async () => {
-  if (!promoCode.trim()) {
-    setDiscountPercent(0);
-    setPromoChecked(true);
-    return;
-  }
-
-  try {
-    const res = await fetch(`http://localhost:8080/api/promotions/validate?code=${promoCode.trim()}`);
-    const data = await res.json();
-
-    if (data.valid) {
-      setDiscountPercent(data.discount);
+  // Handle card selection
+  const handleCardSelection = (e: ChangeEvent<HTMLSelectElement>) => {
+    const cardId = e.target.value;
+    setSelectedCardId(cardId);
+    
+    if (cardId === "new") {
+      // User wants to enter a new card
+      setIsNewCard(true);
+      setCardNumber("");
+      setBillingAddress("");
     } else {
-      setDiscountPercent(0);
+      // User selected a saved card
+      setIsNewCard(false);
+      const card = savedCards.find(c => c.id.toString() === cardId);
+      if (card) {
+        setCardNumber(card.cardNumber);
+        setBillingAddress(card.billingAddress);
+      }
     }
-    setPromoChecked(true);
-  } catch (e) {
-    console.error("Failed to validate promo code", e);
-    setDiscountPercent(0);
-    setPromoChecked(true);
-  }
-};
+  };
 
+  // Fetch user's saved payment cards
+  useEffect(() => {
+    if (user?.id) {
+      setLoading(true);
+      fetch(`http://localhost:8080/api/users/${user.id}/payment-cards`)
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to fetch payment cards');
+          return res.json();
+        })
+        .then((data: PaymentCard[]) => {
+          setSavedCards(data);
+        })
+        .catch(err => {
+          console.error("Error fetching saved cards:", err);
+          toast.error("Could not load your saved payment cards.");
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [user]);
 
+  // Mask card number for display
+  const maskCardNumber = (number: string): string => {
+    if (!number) return "";
+    const last4 = number.slice(-4);
+    return `•••• •••• •••• ${last4}`;
+  };
+
+  const formatCardNumberForDisplay = (cardNumber: string): string => {
+    // Format: XXXX-XXXX-XXXX-1234 (last 4 digits visible)
+    if (!cardNumber) return "";
+    const last4 = cardNumber.slice(-4);
+    return `****-****-****-${last4}`;
+  };
+
+  const handleApplyPromo = async () => {
+    if (!promoCode.trim()) {
+      setDiscountPercent(0);
+      setPromoChecked(true);
+      return;
+    }
+
+    try {
+      const res = await fetch(`http://localhost:8080/api/promotions/validate?code=${promoCode.trim()}`);
+      const data = await res.json();
+
+      if (data.valid) {
+        setDiscountPercent(data.discount);
+      } else {
+        setDiscountPercent(0);
+      }
+      setPromoChecked(true);
+    } catch (e) {
+      console.error("Failed to validate promo code", e);
+      setDiscountPercent(0);
+      setPromoChecked(true);
+    }
+  };
 
   const formatDate = (dateString: string) => {
     try {
@@ -175,30 +240,57 @@ const handleApplyPromo = async () => {
       });
   }, [showtimeId]);
 
+  useEffect(() => {
+    // Set the email from the authenticated user
+    if (user && user.email) {
+      setEmail(user.email);
+      
+      // Try to find user's primary card in saved cards
+      const primaryCard = savedCards.find(card => 
+        // Logic to identify the primary card - this depends on your backend
+        // You might have a flag or use the first card as primary
+        savedCards.indexOf(card) === 0
+      );
+      
+      if (primaryCard) {
+        setSelectedCardId(primaryCard.id.toString());
+        setCardNumber(primaryCard.cardNumber);
+        setBillingAddress(primaryCard.billingAddress);
+        setIsNewCard(false);
+      }
+    }
+  }, [user, savedCards]);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (isSubmitting) return;
 
-    if (!cardNumber.trim() || !billingAddress.trim() || !email.trim()) {
-      toast.error("Please fill in Card Number, Billing Address, and Email.", { className: 'custom-toast' });
+    // Email validation is still needed for guest users or fallback
+    if (isNewCard && (!cardNumber.trim() || !billingAddress.trim() || !email.trim())) {
+      toast.error("Please fill in all required fields.", { className: 'custom-toast' });
       return;
     }
     if (!/^\S+@\S+\.\S+$/.test(email)) {
       toast.error("Please enter a valid email address.", { className: 'custom-toast' });
       return;
     }
-    if (!/^\d{4}-?\d{4}-?\d{4}-?\d{4}$/.test(cardNumber.replace(/\s/g, ''))) {
+    if (isNewCard && !/^\d{4}-?\d{4}-?\d{4}-?\d{4}$/.test(cardNumber.replace(/\s/g, ''))) {
       toast.error("Please enter a valid 16-digit card number.", { className: 'custom-toast' });
       return;
     }
 
     setIsSubmitting(true);
 
-    // --- CHANGED: Only send seat IDs ---
+    // Ensure email is included in the payload even though the field is readonly
     const reservationPayload = {
       showtimeId: parseInt(showtimeId, 10),
       seats: selectedSeats.map(seat => seat.id),
-      email: email,
+      email: email, // Use the email from state, which comes from user context or manual input
+      paymentDetails: {
+        cardId: isNewCard ? null : parseInt(selectedCardId),
+        cardNumber: isNewCard ? cardNumber : null,
+        billingAddress: isNewCard ? billingAddress : null
+      }
     };
     console.log("Reservation Payload", reservationPayload);
     console.log(searchParams.get("seats"));
@@ -226,7 +318,7 @@ const handleApplyPromo = async () => {
       console.log("Reservation successful!");
       console.log("Payment Info (Masked):", {
         promoCode: promoCode || "None",
-        cardNumber: `****-****-****-${cardNumber.slice(-4)}`,
+        cardNumber: formatCardNumberForDisplay(cardNumber),
         billingAddress,
         email,
       });
@@ -317,86 +409,143 @@ const handleApplyPromo = async () => {
         </div>
 
         <form className={styles.paymentForm} onSubmit={handleSubmit}>
-  <h2>Payment Details</h2>
-
-  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-    <input
-      type="text"
-      id="promoCode"
-      value={promoCode}
-      onChange={(e) => {
-        setPromoCode(e.target.value);
-        setPromoChecked(false); // reset status on input
-      }}
-      className={styles.input}
-    />
-    <button type="button" onClick={handleApplyPromo} className={styles.applyButton}>
-      Apply
-    </button>
-  </div>
-
-  {promoChecked && promoCode && discountPercent > 0 && (
-    <p className={styles.validPromo}>✔ Promo code applied: {discountPercent}% off</p>
-  )}
-  {promoChecked && promoCode && discountPercent === 0 && (
-    <p className={styles.invalidPromo}>❌ Invalid or expired promo code</p>
-  )}
-
-  <div className={styles.formGroup}>
-    <label htmlFor="cardNumber">Card Number:</label>
-    <input
-      type="text"
-      id="cardNumber"
-      value={cardNumber}
-      onChange={(e) => setCardNumber(e.target.value)}
-      className={styles.input}
-      placeholder="XXXX-XXXX-XXXX-XXXX"
-      required
-    />
-  </div>
-
-  <div className={styles.formGroup}>
-    <label htmlFor="billingAddress">Billing Address:</label>
-    <input
-      type="text"
-      id="billingAddress"
-      value={billingAddress}
-      onChange={(e) => setBillingAddress(e.target.value)}
-      className={styles.input}
-      required
-    />
-  </div>
-
-  <div className={styles.formGroup}>
-    <label htmlFor="email">Email:</label>
-    <input
-      type="email"
-      id="email"
-      value={email}
-      onChange={(e) => setEmail(e.target.value)}
-      className={styles.input}
-      required
-    />
-  </div>
-
-  <button type="submit" className={styles.submitButton} disabled={isSubmitting}>
-    {isSubmitting ? "Processing..." : "Confirm Payment & Reserve Seats"}
-  </button>
-</form>
-
-
-      {/* Confirmation Modal */}
-      {confirmationVisible && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <div className={styles.checkmark}>✅</div>
-            <h2>Reservation Confirmed!</h2>
-            <p>Your seats are reserved. A confirmation email has been sent to <strong>{email}</strong>.</p>
-            <p>Redirecting shortly...</p>
+          <h2>Payment Details</h2>
+          
+          <div className={styles.formGroup}>
+            <label htmlFor="promocode">Promo Code:</label>
+            <div className={styles.promoContainer}>
+              <input
+                type="text"
+                id="promoCode"
+                value={promoCode}
+                onChange={(e) => {
+                  setPromoCode(e.target.value);
+                  setPromoChecked(false); // reset status on input
+                }}
+                className={styles.input}
+              />
+              <button type="button" onClick={handleApplyPromo} className={styles.applyButton}>
+                Apply
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+
+          {promoChecked && promoCode && discountPercent > 0 && (
+            <p className={styles.validPromo}>✔ Promo code applied: {discountPercent}% off</p>
+          )}
+          {promoChecked && promoCode && discountPercent === 0 && (
+            <p className={styles.invalidPromo}>❌ Invalid or expired promo code</p>
+          )}
+
+          {/* Payment Method Section */}
+          {user && savedCards.length > 0 && (
+            <div className={styles.formGroup}>
+              <label htmlFor="paymentMethod">Payment Method:</label>
+              <select 
+                id="paymentMethod" 
+                value={selectedCardId}
+                onChange={handleCardSelection}
+                className={styles.input}
+              >
+                <option value="new">Add New Card</option>
+                {savedCards.map(card => (
+                  <option key={card.id} value={card.id.toString()}>
+                    {maskCardNumber(card.cardNumber)} - Expires: {card.expirationDate}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {isNewCard && (
+            <>
+              <div className={styles.formGroup}>
+                <label htmlFor="cardNumber">Card Number:</label>
+                <input
+                  type="text"
+                  id="cardNumber"
+                  value={cardNumber}
+                  onChange={(e) => setCardNumber(e.target.value)}
+                  className={styles.input}
+                  placeholder="XXXX-XXXX-XXXX-XXXX"
+                  required={isNewCard}
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="billingAddress">Billing Address:</label>
+                <input
+                  type="text"
+                  id="billingAddress"
+                  value={billingAddress}
+                  onChange={(e) => setBillingAddress(e.target.value)}
+                  className={styles.input}
+                  required={isNewCard}
+                />
+              </div>
+            </>
+          )}
+
+          {!isNewCard && (
+            <div className={styles.selectedCardInfo}>
+              <p>
+                <strong>Card Number:</strong> {formatCardNumberForDisplay(cardNumber)}
+              </p>
+              <p>
+                <strong>Billing Address:</strong> {billingAddress}
+              </p>
+            </div>
+          )}
+
+          <div className={styles.formGroup}>
+            <label htmlFor="email">Email:</label>
+            {user ? (
+              /* For logged-in users, show read-only email field */
+              <input
+                type="email"
+                id="email"
+                value={email}
+                className={`${styles.input} ${styles.readOnlyInput}`}
+                readOnly
+                aria-readonly="true"
+                title="Email address from your profile is used for booking confirmation"
+              />
+            ) : (
+              /* For guests, show editable email field */
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={styles.input}
+                placeholder="Enter your email for booking confirmation"
+                required
+              />
+            )}
+            {!user && (
+              <p className={styles.emailNote}>
+                Login to use your profile email, or continue as guest
+              </p>
+            )}
+          </div>
+
+          <button type="submit" className={styles.submitButton} disabled={isSubmitting}>
+            {isSubmitting ? "Processing..." : "Confirm Payment & Reserve Seats"}
+          </button>
+        </form>
+
+        {/* Confirmation Modal */}
+        {confirmationVisible && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.modalContent}>
+              <div className={styles.checkmark}>✅</div>
+              <h2>Reservation Confirmed!</h2>
+              <p>Your seats are reserved. A confirmation email has been sent to <strong>{email}</strong>.</p>
+              <p>Redirecting shortly...</p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
