@@ -11,8 +11,11 @@ import com.SWE.CinemaEBookingSystem.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 @Service
 public class PaymentCardService{
@@ -116,6 +119,58 @@ public class PaymentCardService{
             throw new IllegalArgumentException("Card number cannot be null");
         }
     }
+    @Transactional
+    public void deletePaymentCards(PaymentCards card){
+        Optional<PaymentCards> foundOptional = paymentCardRepository.findById(card.getId());
+        if (foundOptional.isPresent()) {
+            PaymentCards found = foundOptional.get();
+            paymentCardRepository.delete(found);
+            
+            
+            
+        } else {
+            throw new RuntimeException("Payment card not found");
+        }
+    
+    }
+    @Transactional
+    public void deletePaymentCardForUser(Integer userId, Integer cardId) {
+        Optional<User> foundUserOptional = userRepository.findById(userId);
+        if (foundUserOptional.isPresent()) {
+            User foundUser = foundUserOptional.get(); 
+            List<PaymentCards> paymentCards = foundUser.getPaymentCards(); 
+            System.out.println("User Found: " + foundUser.getId());
+            System.out.println("Payment Cards before removal: " + paymentCards.size());
+            boolean removed = paymentCards.removeIf(card -> card.getId().equals(cardId));
+            System.out.println("Payment Cards after removal: " + paymentCards.size());
+
+            if (!removed) {
+             throw new RuntimeException("Payment card not found for this user");
+            }
+
+            foundUser.setPaymentCards(paymentCards);
+            userRepository.save(foundUser);
+
+
+            
+            
+            
+        } else {
+            System.out.println("User with ID " + userId + " not found.");
+            throw new RuntimeException("User not found");
+
+        }
+       
+    }
+
+
+
+
+
+
+
+    
+
 
 
 

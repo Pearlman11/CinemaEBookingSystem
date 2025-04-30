@@ -219,6 +219,8 @@ public class UserController {
 
     }
 
+
+
     
 
 
@@ -270,7 +272,21 @@ public class UserController {
 
         return ResponseEntity.ok(paymentCards);
     }
-   
+    @DeleteMapping("/{userId}/payment-cards/{cardId}")
+    public ResponseEntity<Void> deletePaymentCards(@PathVariable Integer userId,@PathVariable Integer cardId) {
+        System.out.println("Deleting Payment Card for User ID: " + userId + ", Card ID: " + cardId);
+        try {
+            
+            paymentCardService.deletePaymentCardForUser(userId, cardId);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+        
+    }
+
+    
+
 
 
 }
