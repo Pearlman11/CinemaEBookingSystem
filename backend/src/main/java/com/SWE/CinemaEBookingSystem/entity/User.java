@@ -49,7 +49,7 @@ public class User {
     @Column(name = "home_address")
     private String homeAddress;
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonIgnore 
     private List<PaymentCards> cards = new ArrayList<>();
 
