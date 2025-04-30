@@ -49,9 +49,14 @@ public class User {
     @Column(name = "home_address")
     private String homeAddress;
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonIgnore 
     private List<PaymentCards> cards = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
+    @JsonIgnore
+    private List<Order> orders = new ArrayList<>();
+
 
 
     @Column(name = "reset_token_used")
@@ -67,7 +72,7 @@ public class User {
     private String resetToken; // ✅ Reset password token
 
     @Column(name = "promotion_opt_in", nullable = false)
-    private boolean promotionOptIn = false;
+    private boolean promotionOptIn;
 
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -146,7 +151,12 @@ public class User {
     public void setResetToken(String resetToken) { this.resetToken = resetToken; }
     public boolean isResetTokenUsed() { return resetTokenUsed; }
     public void setResetTokenUsed(boolean resetTokenUsed) { this.resetTokenUsed = resetTokenUsed; }
-
+    public List<Order> getOrders() {
+        return orders;
+    }
+    public void setorders(List<Order> orders){
+        this.orders = orders;
+    }
 
 
     public void addPaymentCard(PaymentCards card){

@@ -21,7 +21,6 @@ const EditProfile = () => {
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
-  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,8 +28,7 @@ const EditProfile = () => {
   const [isPromotionsOptedIn, setIsPromotionsOptedIn] = useState(false);
   
 
-  // Placeholder for payment cards (add your logic)
-  const [showOptionalPayment, setShowOptionalPayment] = useState(false);
+  // Payment cards state
   const [cards, setCards] = useState<PaymentCard[]>([]);
   const [cardNumber,setCardNumber] = useState('');
   const [expDate,setExpDate] = useState('');
@@ -53,6 +51,7 @@ interface PaymentCard {
       setLastName(user.lastName || '');
       setPhone(user.phone || '');
       setEmail(user.email || '');
+      setIsPromotionsOptedIn(user.promotionOptIn);
       const fetchPaymentCards = async () => {
         try {
           console.log('User ID:', user.id); 
@@ -78,16 +77,6 @@ interface PaymentCard {
       router.push('/login');
     }
   }, [isAuthenticated, router]);
-
-  // Placeholder for handling card changes (add your logic)
-  const handleCardChange = (index: number, field: keyof PaymentCard, value: string) => {
-    const updatedCards = [...cards];
-    updatedCards[index] = {
-      ...updatedCards[index], 
-      [field]: value, 
-    };
-    setCards(updatedCards);
-  };
 
   // Add this state for validation errors
   const [cardFormErrors, setCardFormErrors] = useState({
@@ -129,7 +118,6 @@ interface PaymentCard {
     setCardNumber('');
     setExpDate('');
     setBillingAddress('');
-    setShowOptionalPayment(true);
     
     // Hide the add card form after successful addition
     setShowAddCardForm(false);
@@ -159,9 +147,30 @@ interface PaymentCard {
   };
 
   // Add this function to handle card removal
-  const handleRemoveCard = (indexToRemove: number) => {
+  const handleRemoveCard = async (indexToRemove: number) => {
     setCards(cards.filter((_, index) => index !== indexToRemove));
-  };
+    const cardToRemove = cards[indexToRemove];
+    if (!cardToRemove?.id) {
+      console.error("Card ID not found");
+      return;
+    }
+    if (!user) throw new Error('User not found');
+    const url = `http://localhost:8080/api/users/${user.id}/payment-cards/${cardToRemove.id}`;
+    try {
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to delete card: ${response.statusText}`);
+    }
+    setCards(prevCards => prevCards.filter((_, index) => index !== indexToRemove));
+  } catch (error) {
+    console.error("Error removing card:", error);
+    }
+  }
 
   // Update the form submission to validate existing cards
   const handleSubmit = async (e: FormEvent) => {
@@ -188,12 +197,6 @@ interface PaymentCard {
 
     try {
       if (!user) throw new Error('User not found');
-      const paymentCard: PaymentCard = {
-        cardNumber,
-        billingAddress,
-        expirationDate: expDate,
-        
-      };
 
       const updateData = {
         
@@ -203,11 +206,13 @@ interface PaymentCard {
         phone,
         password: newPassword || user.password, // Only updating if new password is provided
         role: user.role,
+        promotionOptIn:isPromotionsOptedIn,
         paymentCards:cards.map(card =>({
         id:card.id || null,  
         cardNumber: card.cardNumber,
         billingAddress: card.billingAddress,
         expirationDate: card.expirationDate,
+        
       })),
 
       };

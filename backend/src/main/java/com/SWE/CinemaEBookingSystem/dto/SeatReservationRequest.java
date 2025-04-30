@@ -1,25 +1,37 @@
-// src/main/java/com/SWE/CinemaEBookingSystem/dto/SeatReservationRequest.java
 package com.SWE.CinemaEBookingSystem.dto;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public class SeatReservationRequest {
-    private List<String> seatIds;
-    private Long showtimeId;
 
-    public List<String> getSeatIds() {
-        return seatIds;
+    @JsonProperty("seats") // Map JSON key "seats" to this field
+    private List<String> seats; // Change from seatIds to seats to match frontend
+
+    private Integer showtimeId; // Use Integer for flexibility
+    private String email;
+    // Getters and Setters...
+
+    public List<String> getSeats() {
+        return seats;
     }
 
-    public void setSeatIds(List<String> seatIds) {
-        this.seatIds = seatIds;
+    public void setSeats(List<String> seats) {
+        this.seats = seats;
     }
 
-    public Long getShowtimeId() {
+    public Integer getShowtimeId() {
         return showtimeId;
     }
 
-    public void setShowtimeId(Long showtimeId) {
+    public void setShowtimeId(Integer showtimeId) {
         this.showtimeId = showtimeId;
     }
+    public String getEmail() {
+        return email;
+    }
+    
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    
 }

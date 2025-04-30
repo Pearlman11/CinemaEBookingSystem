@@ -21,6 +21,10 @@ body, html {
   --text-color: #ffffff; /* White text */
   --dark-bg-color: #1c1c1c; /* Dark background for navbar and footer */
   --hover-darken: #70001c; /* Darker burgundy for hover */
+  --available-bg: #a3d4ff;
+  --available-border: #6ab0e5;
+  --reserved-color: #999;
+  --reserved-border: #777;
 }
 
 

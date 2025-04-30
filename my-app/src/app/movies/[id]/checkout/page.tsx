@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect, useState, FormEvent } from "react";
+import { useEffect, useState, FormEvent, ChangeEvent } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import styles from "./checkout.module.css";
 import NavBar from "@/app/components/NavBar/NavBar";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useAuth } from "@/app/context/AuthContext";
 
-
+// Interfaces
 interface Showtime {
   id?: number;
   showDate: string;
@@ -18,32 +21,73 @@ interface Showtime {
 
 interface Movie {
   title: string;
-  category: string;
-  cast: string[];
-  director: string;
-  producer: string;
-  trailer: string;
+  category?: string;
+  cast?: string[];
+  director?: string;
+  producer?: string;
+  trailer?: string;
   poster: string;
-  description: string;
+  description?: string;
   reviews?: string[];
-  rating: string;
+  rating?: string;
   showTimes?: Showtime[];
 }
 
+// --- ADDED: Interface for Selected Seats ---
+interface SelectedSeat {
+  id: string;
+  label: string;
+}
+
+interface PaymentCard {
+  id: number;
+  cardNumber: string;
+  billingAddress: string;
+  expirationDate: string;
+}
+
 const CheckoutPage = () => {
-  const { id: showtimeId } = useParams(); // This gives you the showtimeId from the URL
+  const { id: showtimeId } = useParams<{ id: string }>();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { user } = useAuth(); // Get current user from AuthContext
 
-  // Parse ticket counts and seat selection from search params
+  const raw = searchParams.get("seats") ?? "";
+
+  const selectedSeats: SelectedSeat[] = raw
+    .split(",")                // ["A1","B2","C10"] or [""] if empty
+    .map(str => str.trim())    // fix whitespace
+    .filter(s => s.length)     // drop any empty strings
+    .map(label => {
+      return {
+        id: label,             // Use the full seat identifier (e.g., "A1", "B2")
+        label: label,          // Keep the same label for display
+      };
+    });
+
+
   const adultTickets = parseInt(searchParams.get("adult") || "0", 10);
   const childTickets = parseInt(searchParams.get("child") || "0", 10);
   const seniorTickets = parseInt(searchParams.get("senior") || "0", 10);
-  const selectedSeats = searchParams.get("seats")?.split(",") || [];
-  const showtime = searchParams.get("showtime") || "TBD";
+  const showtimeParam = searchParams.get("showtime") || " ";
+  const [showtimeDate = "Invalid Date", showtimeTime = "Invalid Time"] = showtimeParam.split(' ');
 
 
-  const [showtimeDate, showtimeTime] = showtime.split(' ');
+  const [movie, setMovie] = useState<Movie | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  const [promoCode, setPromoCode] = useState("");
+  const [cardNumber, setCardNumber] = useState("");
+  const [billingAddress, setBillingAddress] = useState("");
+  const [email, setEmail] = useState("");
+  const [discountPercent, setDiscountPercent] = useState(0);
+  const [savedCards, setSavedCards] = useState<PaymentCard[]>([]);
+  const [selectedCardId, setSelectedCardId] = useState<string>("new");
+  const [isNewCard, setIsNewCard] = useState(true);
+
+  const [confirmationVisible, setConfirmationVisible] = useState(false);
 
   const ADULT_PRICE = 10.0;
   const CHILD_PRICE = 6.0;
@@ -52,161 +96,281 @@ const CheckoutPage = () => {
   const adultSubtotal = adultTickets * ADULT_PRICE;
   const childSubtotal = childTickets * CHILD_PRICE;
   const seniorSubtotal = seniorTickets * SENIOR_PRICE;
-  const orderTotal = adultSubtotal + childSubtotal + seniorSubtotal;
+  const subtotal = adultSubtotal + childSubtotal + seniorSubtotal;
+  const discountAmount = subtotal * (discountPercent / 100);
+  const orderTotal = subtotal - discountAmount;
 
-  const [movie, setMovie] = useState<Movie | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [promoChecked, setPromoChecked] = useState(false);
 
-  const [promoCode, setPromoCode] = useState("");
-  const [cardNumber, setCardNumber] = useState("");
-  const [billingAddress, setBillingAddress] = useState("");
-  const [email, setEmail] = useState("");
+  // Handle card selection
+  const handleCardSelection = (e: ChangeEvent<HTMLSelectElement>) => {
+    const cardId = e.target.value;
+    setSelectedCardId(cardId);
+    
+    if (cardId === "new") {
+      // User wants to enter a new card
+      setIsNewCard(true);
+      setCardNumber("");
+      setBillingAddress("");
+    } else {
+      // User selected a saved card
+      setIsNewCard(false);
+      const card = savedCards.find(c => c.id.toString() === cardId);
+      if (card) {
+        setCardNumber(card.cardNumber);
+        setBillingAddress(card.billingAddress);
+      }
+    }
+  };
 
+  // Fetch user's saved payment cards
+  useEffect(() => {
+    if (user?.id) {
+      setLoading(true);
+      fetch(`http://localhost:8080/api/users/${user.id}/payment-cards`)
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to fetch payment cards');
+          return res.json();
+        })
+        .then((data: PaymentCard[]) => {
+          setSavedCards(data);
+        })
+        .catch(err => {
+          console.error("Error fetching saved cards:", err);
+          toast.error("Could not load your saved payment cards.");
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [user]);
 
-  const [confirmationVisible, setConfirmationVisible] = useState(false);
+  // Mask card number for display
+  const maskCardNumber = (number: string): string => {
+    if (!number) return "";
+    const last4 = number.slice(-4);
+    return `•••• •••• •••• ${last4}`;
+  };
 
-  // Function to format date for display (Weekday, MM-DD-YYYY)
+  const formatCardNumberForDisplay = (cardNumber: string): string => {
+    // Format: XXXX-XXXX-XXXX-1234 (last 4 digits visible)
+    if (!cardNumber) return "";
+    const last4 = cardNumber.slice(-4);
+    return `****-****-****-${last4}`;
+  };
+
+  const handleApplyPromo = async () => {
+    if (!promoCode.trim()) {
+      setDiscountPercent(0);
+      setPromoChecked(true);
+      return;
+    }
+
+    try {
+      const res = await fetch(`http://localhost:8080/api/promotions/validate?code=${promoCode.trim()}`);
+      const data = await res.json();
+
+      if (data.valid) {
+        setDiscountPercent(data.discount);
+      } else {
+        setDiscountPercent(0);
+      }
+      setPromoChecked(true);
+    } catch (e) {
+      console.error("Failed to validate promo code", e);
+      setDiscountPercent(0);
+      setPromoChecked(true);
+    }
+  };
+
   const formatDate = (dateString: string) => {
     try {
+      if (!dateString || !/^\d{4}-\d{2}-\d{2}$/.test(dateString) || isNaN(new Date(dateString).getTime())) {
+        return "Invalid date";
+      }
       const date = new Date(dateString);
-      const options: Intl.DateTimeFormatOptions = { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: '2-digit', 
-        day: '2-digit' 
+      const utcDate = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+      const options: Intl.DateTimeFormatOptions = {
+        weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'UTC'
       };
-      return date.toLocaleDateString('en-US', options);
-    } catch {
+      return utcDate.toLocaleDateString('en-US', options);
+    } catch (e) {
+      console.error("Error formatting checkout date:", dateString, e);
       return dateString;
     }
   };
 
-
   const formatTime = (time: string) => {
     try {
-      // Parse hours and minutes from HH:MM:SS format
+      if (!time || !/^\d{2}:\d{2}$/.test(time)) {
+        return "Invalid time";
+      }
       const [hours, minutes] = time.split(':');
       const hourNum = parseInt(hours, 10);
-      
-      // Convert to 12-hour format
+      if (isNaN(hourNum) || isNaN(parseInt(minutes, 10))) return "Invalid time";
+
       const period = hourNum >= 12 ? 'PM' : 'AM';
       const hour12 = hourNum % 12 || 12;
-      
       return `${hour12}:${minutes} ${period}`;
-    } catch {
+    } catch (e) {
+      console.error("Error formatting checkout time:", time, e);
       return time;
     }
   };
 
   useEffect(() => {
+    if (!showtimeId || isNaN(parseInt(showtimeId, 10))) {
+      setError("Invalid Showtime ID provided.");
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
     fetch(`http://localhost:8080/api/showtimes/${showtimeId}/movie`)
       .then((res) => {
-        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status} - Failed to fetch movie details.`);
         return res.json();
       })
       .then((data: Movie) => {
         setMovie(data);
-        setLoading(false);
       })
-      .catch(() => {
-        setError("Failed to fetch movie details.");
+      .catch((err) => {
+        console.error("Error fetching movie details for checkout:", err);
+        setError(err.message || "Failed to fetch movie details.");
+      })
+      .finally(() => {
         setLoading(false);
       });
   }, [showtimeId]);
-  
-  
+
+  useEffect(() => {
+    // Set the email from the authenticated user
+    if (user && user.email) {
+      setEmail(user.email);
+      
+      // Try to find user's primary card in saved cards
+      const primaryCard = savedCards.find(card => 
+        // Logic to identify the primary card - this depends on your backend
+        // You might have a flag or use the first card as primary
+        savedCards.indexOf(card) === 0
+      );
+      
+      if (primaryCard) {
+        setSelectedCardId(primaryCard.id.toString());
+        setCardNumber(primaryCard.cardNumber);
+        setBillingAddress(primaryCard.billingAddress);
+        setIsNewCard(false);
+      }
+    }
+  }, [user, savedCards]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-  
+    if (isSubmitting) return;
+
+    // Email validation is still needed for guest users or fallback
+    if (isNewCard && (!cardNumber.trim() || !billingAddress.trim() || !email.trim())) {
+      toast.error("Please fill in all required fields.", { className: 'custom-toast' });
+      return;
+    }
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      toast.error("Please enter a valid email address.", { className: 'custom-toast' });
+      return;
+    }
+    if (isNewCard && !/^\d{4}-?\d{4}-?\d{4}-?\d{4}$/.test(cardNumber.replace(/\s/g, ''))) {
+      toast.error("Please enter a valid 16-digit card number.", { className: 'custom-toast' });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    // Ensure email is included in the payload even though the field is readonly
+    const reservationPayload = {
+      showtimeId: parseInt(showtimeId, 10),
+      seats: selectedSeats.map(seat => seat.id),
+      email: email, // Use the email from state, which comes from user context or manual input
+      paymentDetails: {
+        cardId: isNewCard ? null : parseInt(selectedCardId),
+        cardNumber: isNewCard ? cardNumber : null,
+        billingAddress: isNewCard ? billingAddress : null
+      }
+    };
+    console.log("Reservation Payload", reservationPayload);
+    console.log(searchParams.get("seats"));
+
     try {
-      // Send seat reservation request
       const response = await fetch("http://localhost:8080/api/seats/reserve", {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          seatIds: selectedSeats,
-          showtimeId: showtimeId
-        })
+        body: JSON.stringify(reservationPayload),
       });
-  
+
       if (!response.ok) {
-        throw new Error("Failed to reserve seats.");
+        let errorMsg = `Failed to reserve seats (Status: ${response.status}). They might have been taken.`;
+        try {
+          const errorData = await response.json();
+          errorMsg = errorData.message || errorMsg;
+        } catch (jsonError) {
+          console.error("Could not parse error response JSON:", jsonError);
+        }
+        throw new Error(errorMsg);
       }
-  
-      // Log payment and order details (future implementation)
-      console.log("Payment Info:", {
-        promoCode,
-        cardNumber,
+
+      console.log("Reservation successful!");
+      console.log("Payment Info (Masked):", {
+        promoCode: promoCode || "None",
+        cardNumber: formatCardNumberForDisplay(cardNumber),
         billingAddress,
         email,
       });
       console.log("Order Summary:", {
-        adultTickets,
-        childTickets,
-        seniorTickets,
-        selectedSeats,
-        orderTotal,
+        movie: movie?.title || "N/A",
+        showtime: `${formatDate(showtimeDate)} ${formatTime(showtimeTime)}`,
+        adultTickets, childTickets, seniorTickets,
+        selectedSeats: selectedSeats.map(seat => seat.label).join(", "),
+        orderTotal: `$${orderTotal.toFixed(2)}`,
       });
-  
-      // Show confirmation
+
       setConfirmationVisible(true);
-      
-      // Redirect after 3 seconds
       setTimeout(() => {
         router.push(`/`);
-      }, 3000);
-    } catch (err) {
-      alert("There was an error finalizing your order. Please try again.");
-      console.error(err);
-    }
-    // Log payment and order details send to backend in future
-    console.log("Payment Info:", {
-      promoCode,
-      cardNumber,
-      billingAddress,
-      email,
-    });
-    console.log("Order Summary:", {
-      adultTickets,
-      childTickets,
-      seniorTickets,
-      selectedSeats,
-      orderTotal,
-    });
-    setConfirmationVisible(true);
+      }, 4000);
 
-    setTimeout(() => {
-      router.push(`/`);
-    }, 3000);
+    } catch (err: unknown) {
+      console.error("Checkout failed:", err);
+      
+      let errorMessage = "Could not complete booking. Please try again.";
+      if (err instanceof Error) {
+        errorMessage = err.message || errorMessage;
+      }
+      
+      toast.error(errorMessage, { className: 'custom-toast' });
+      setIsSubmitting(false);
+    }
   };
-  
 
   if (loading) return <div className={styles.loading}>Loading checkout details...</div>;
-  if (error) return <div className={styles.error}>{error}</div>;
+  if (error) return <div className={styles.error}>{error} <button onClick={() => router.back()} className={styles.backButtonOnError}>Go Back</button></div>;
+  if (!movie) return <div className={styles.error}>Could not load movie details for checkout. <button onClick={() => router.back()} className={styles.backButtonOnError}>Go Back</button></div>;
 
   return (
     <div>
       <NavBar />
+      <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="light" limit={3} aria-label="Notifications" />
       <div className={styles.container}>
         <h1 className={styles.heading}>Checkout</h1>
 
+        {/* Movie Info */}
         <div className={styles.movieInfo}>
-          {movie && (
-            <>
-              <img src={movie.poster} alt={movie.title} className={styles.poster} />
-              <div className={styles.details}>
-                <h2>{movie.title}</h2>
-                <p><strong>Date:</strong> {formatDate(showtimeDate)}</p>
-                <p><strong>Time:</strong> {formatTime(showtimeTime)}</p>
-              </div>
-            </>
-          )}
+          <img src={movie.poster} alt={`${movie.title} poster`} className={styles.poster} />
+          <div className={styles.details}>
+            <h2>{movie.title}</h2>
+            <p><strong>Date:</strong> {formatDate(showtimeDate)}</p>
+            <p><strong>Time:</strong> {formatTime(showtimeTime)}</p>
+            {movie.rating && <p><strong>Rating:</strong> {movie.rating}</p>}
+          </div>
         </div>
 
+        {/* Order Summary */}
         <div className={styles.orderSummary}>
           <h2>Order Summary</h2>
           <table className={styles.summaryTable}>
@@ -219,105 +383,169 @@ const CheckoutPage = () => {
               </tr>
             </thead>
             <tbody>
-              {adultTickets > 0 && (
-                <tr>
-                  <td>Adult</td>
-                  <td>{adultTickets}</td>
-                  <td>${ADULT_PRICE.toFixed(2)}</td>
-                  <td>${adultSubtotal.toFixed(2)}</td>
-                </tr>
-              )}
-              {childTickets > 0 && (
-                <tr>
-                  <td>Child</td>
-                  <td>{childTickets}</td>
-                  <td>${CHILD_PRICE.toFixed(2)}</td>
-                  <td>${childSubtotal.toFixed(2)}</td>
-                </tr>
-              )}
-              {seniorTickets > 0 && (
-                <tr>
-                  <td>Senior</td>
-                  <td>{seniorTickets}</td>
-                  <td>${SENIOR_PRICE.toFixed(2)}</td>
-                  <td>${seniorSubtotal.toFixed(2)}</td>
-                </tr>
-              )}
+              {adultTickets > 0 && (<tr><td>Adult</td><td>{adultTickets}</td><td>${ADULT_PRICE.toFixed(2)}</td><td>${adultSubtotal.toFixed(2)}</td></tr>)}
+              {childTickets > 0 && (<tr><td>Child</td><td>{childTickets}</td><td>${CHILD_PRICE.toFixed(2)}</td><td>${childSubtotal.toFixed(2)}</td></tr>)}
+              {seniorTickets > 0 && (<tr><td>Senior</td><td>{seniorTickets}</td><td>${SENIOR_PRICE.toFixed(2)}</td><td>${seniorSubtotal.toFixed(2)}</td></tr>)}
             </tbody>
             <tfoot>
+            {discountPercent > 0 && (
+  <tr>
+    <td colSpan={3}><strong>Promo Discount</strong></td>
+    <td style={{ color: 'green' }}>- ${discountAmount.toFixed(2)}</td>
+  </tr>
+)}
+
               <tr>
                 <td colSpan={3}><strong>Total</strong></td>
                 <td><strong>${orderTotal.toFixed(2)}</strong></td>
               </tr>
             </tfoot>
           </table>
+
+          {/* --- CHANGED: Display Seat Labels --- */}
           <div className={styles.seatsInfo}>
-            <p><strong>Selected Seats:</strong> {selectedSeats.join(", ")}</p>
+            <p><strong>Selected Seats:</strong> {selectedSeats.length > 0 ? selectedSeats.map(seat => seat.label).join(", ") : "None"}</p>
           </div>
         </div>
 
         <form className={styles.paymentForm} onSubmit={handleSubmit}>
           <h2>Payment Details</h2>
+          
           <div className={styles.formGroup}>
-            <label htmlFor="promoCode">Promo Code:</label>
-            <input
-              type="text"
-              id="promoCode"
-              value={promoCode}
-              onChange={(e) => setPromoCode(e.target.value)}
-              className={styles.input}
-            />
+            <label htmlFor="promocode">Promo Code:</label>
+            <div className={styles.promoContainer}>
+              <input
+                type="text"
+                id="promoCode"
+                value={promoCode}
+                onChange={(e) => {
+                  setPromoCode(e.target.value);
+                  setPromoChecked(false); // reset status on input
+                }}
+                className={styles.input}
+              />
+              <button type="button" onClick={handleApplyPromo} className={styles.applyButton}>
+                Apply
+              </button>
+            </div>
           </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="cardNumber">Card Number:</label>
-            <input
-              type="text"
-              id="cardNumber"
-              value={cardNumber}
-              onChange={(e) => setCardNumber(e.target.value)}
-              className={styles.input}
-              placeholder="XXXX-XXXX-XXXX-XXXX"
-              required
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="billingAddress">Billing Address:</label>
-            <input
-              type="text"
-              id="billingAddress"
-              value={billingAddress}
-              onChange={(e) => setBillingAddress(e.target.value)}
-              className={styles.input}
-              required
-            />
-          </div>
+
+          {promoChecked && promoCode && discountPercent > 0 && (
+            <p className={styles.validPromo}>✔ Promo code applied: {discountPercent}% off</p>
+          )}
+          {promoChecked && promoCode && discountPercent === 0 && (
+            <p className={styles.invalidPromo}>❌ Invalid or expired promo code</p>
+          )}
+
+          {/* Payment Method Section */}
+          {user && savedCards.length > 0 && (
+            <div className={styles.formGroup}>
+              <label htmlFor="paymentMethod">Payment Method:</label>
+              <select 
+                id="paymentMethod" 
+                value={selectedCardId}
+                onChange={handleCardSelection}
+                className={styles.input}
+              >
+                <option value="new">Add New Card</option>
+                {savedCards.map(card => (
+                  <option key={card.id} value={card.id.toString()}>
+                    {maskCardNumber(card.cardNumber)} - Expires: {card.expirationDate}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {isNewCard && (
+            <>
+              <div className={styles.formGroup}>
+                <label htmlFor="cardNumber">Card Number:</label>
+                <input
+                  type="text"
+                  id="cardNumber"
+                  value={cardNumber}
+                  onChange={(e) => setCardNumber(e.target.value)}
+                  className={styles.input}
+                  placeholder="XXXX-XXXX-XXXX-XXXX"
+                  required={isNewCard}
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="billingAddress">Billing Address:</label>
+                <input
+                  type="text"
+                  id="billingAddress"
+                  value={billingAddress}
+                  onChange={(e) => setBillingAddress(e.target.value)}
+                  className={styles.input}
+                  required={isNewCard}
+                />
+              </div>
+            </>
+          )}
+
+          {!isNewCard && (
+            <div className={styles.selectedCardInfo}>
+              <p>
+                <strong>Card Number:</strong> {formatCardNumberForDisplay(cardNumber)}
+              </p>
+              <p>
+                <strong>Billing Address:</strong> {billingAddress}
+              </p>
+            </div>
+          )}
+
           <div className={styles.formGroup}>
             <label htmlFor="email">Email:</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={styles.input}
-              required
-            />
+            {user ? (
+              /* For logged-in users, show read-only email field */
+              <input
+                type="email"
+                id="email"
+                value={email}
+                className={`${styles.input} ${styles.readOnlyInput}`}
+                readOnly
+                aria-readonly="true"
+                title="Email address from your profile is used for booking confirmation"
+              />
+            ) : (
+              /* For guests, show editable email field */
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={styles.input}
+                placeholder="Enter your email for booking confirmation"
+                required
+              />
+            )}
+            {!user && (
+              <p className={styles.emailNote}>
+                Login to use your profile email, or continue as guest
+              </p>
+            )}
           </div>
-          <button type="submit" className={styles.submitButton}>
-            Confirm Payment
+
+          <button type="submit" className={styles.submitButton} disabled={isSubmitting}>
+            {isSubmitting ? "Processing..." : "Confirm Payment & Reserve Seats"}
           </button>
         </form>
-      </div>
 
-      {/* Confirmation */}
-      {confirmationVisible && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <div className={styles.checkmark}>✅</div>
-            <h2>Confirmation Sent!</h2>
-            <p>A confirmation has been sent to your email.</p>
+        {/* Confirmation Modal */}
+        {confirmationVisible && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.modalContent}>
+              <div className={styles.checkmark}>✅</div>
+              <h2>Reservation Confirmed!</h2>
+              <p>Your seats are reserved. A confirmation email has been sent to <strong>{email}</strong>.</p>
+              <p>Redirecting shortly...</p>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

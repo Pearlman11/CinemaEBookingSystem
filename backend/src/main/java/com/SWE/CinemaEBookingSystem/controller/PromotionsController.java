@@ -1,13 +1,17 @@
 package com.SWE.CinemaEBookingSystem.controller;
 
 import com.SWE.CinemaEBookingSystem.entity.Promotion;
+import com.SWE.CinemaEBookingSystem.repository.PromotionRepository;
 import com.SWE.CinemaEBookingSystem.service.PromotionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -15,10 +19,12 @@ import java.util.Optional;
 public class PromotionsController {
 
     private final PromotionService promotionService;
+    private final PromotionRepository promotionRepository;
 
     @Autowired
-    public PromotionsController(PromotionService promotionService) {
+    public PromotionsController(PromotionService promotionService, PromotionRepository promotionRepository) {
         this.promotionService = promotionService;
+        this.promotionRepository = promotionRepository;
     }
 
     // Get all promotions
@@ -69,6 +75,28 @@ public ResponseEntity<Promotion> addPromotion(@RequestBody Promotion promotion) 
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/validate")
+public ResponseEntity<?> validatePromo(@RequestParam String code) {
+    Optional<Promotion> promo = promotionRepository.findByPromotionCodeIgnoreCase(code.trim());
+
+    if (promo.isPresent()) {
+        Promotion p = promo.get();
+        LocalDate today = LocalDate.now();
+        if ((p.getStartDate().isEqual(today) || p.getStartDate().isBefore(today)) &&
+            (p.getEndDate().isEqual(today) || p.getEndDate().isAfter(today))) {
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("valid", true);
+            result.put("discount", p.getDiscountPercentage());
+            return ResponseEntity.ok(result);
+        }
+    }
+
+    return ResponseEntity.ok(Map.of("valid", false));
+}
+
+
 
 
 }

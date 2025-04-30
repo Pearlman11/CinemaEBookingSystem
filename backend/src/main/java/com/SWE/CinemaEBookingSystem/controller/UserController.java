@@ -23,6 +23,7 @@ import com.SWE.CinemaEBookingSystem.entity.User;
 import com.SWE.CinemaEBookingSystem.entity.UserRole;
 import com.SWE.CinemaEBookingSystem.config.AESUtil;
 import com.SWE.CinemaEBookingSystem.entity.PaymentCards;
+import com.SWE.CinemaEBookingSystem.entity.Order;
 import com.SWE.CinemaEBookingSystem.repository.UserRepository;
 import com.SWE.CinemaEBookingSystem.repository.PaymentCardRepository;
 import com.SWE.CinemaEBookingSystem.service.PaymentCardService;
@@ -141,7 +142,7 @@ public class UserController {
             user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
             user.setPhone(userDetails.getPhone());
             user.setHomeAddress(userDetails.getHomeAddress());
-
+            user.setPromotionOptIn(userDetails.getPromotionOptIn());
             List<PaymentCards> updatedCards = userDetails.getPaymentCards();
             List<PaymentCards> existingCards = user.getPaymentCards();            
 
@@ -241,6 +242,45 @@ public class UserController {
 
         return ResponseEntity.ok(paymentCards);
     }
+    @DeleteMapping("/{userId}/payment-cards/{cardId}")
+    public ResponseEntity<Void> deletePaymentCards(@PathVariable Integer userId,@PathVariable Integer cardId) {
+        System.out.println("Deleting Payment Card for User ID: " + userId + ", Card ID: " + cardId);
+        try {
+
+            paymentCardService.deletePaymentCardForUser(userId, cardId);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+
+    }
+    @PostMapping("/{userId}/order")
+    public ResponseEntity<Order> addOrderToUser(@PathVariable Integer userId,@RequestBody Order order){
+        System.out.println("User ID: " + userId);
+        System.out.println("Received Order: " + order);
+        if (order == null) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        try{
+            ResponseEntity<Order> response =  addOrderToUser(userId, order);
+            Order savedorder = response.getBody();
+            return new ResponseEntity<>(savedorder, HttpStatus.CREATED);
+
+            
+        }catch(IllegalArgumentException ex){
+            ex.printStackTrace();
+           return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+
+    }
+    // @GetMapping("/{id}/order/{orderId}")
+    // public ResponseEntity <List<Order>> getOrderForUser(@PathVariable("id") Integer userId) {
+        
+    // }
+
+
+
    
 
 
