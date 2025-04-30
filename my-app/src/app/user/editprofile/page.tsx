@@ -159,9 +159,30 @@ interface PaymentCard {
   };
 
   // Add this function to handle card removal
-  const handleRemoveCard = (indexToRemove: number) => {
+  const handleRemoveCard = async (indexToRemove: number) => {
     setCards(cards.filter((_, index) => index !== indexToRemove));
-  };
+    const cardToRemove = cards[indexToRemove];
+    if (!cardToRemove?.id) {
+      console.error("Card ID not found");
+      return;
+    }
+    if (!user) throw new Error('User not found');
+    const url = `http://localhost:8080/api/users/${user.id}/payment-cards/${cardToRemove.id}`;
+    try {
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to delete card: ${response.statusText}`);
+    }
+    setCards(prevCards => prevCards.filter((_, index) => index !== indexToRemove));
+  } catch (error) {
+    console.error("Error removing card:", error);
+    }
+  }
 
   // Update the form submission to validate existing cards
   const handleSubmit = async (e: FormEvent) => {
