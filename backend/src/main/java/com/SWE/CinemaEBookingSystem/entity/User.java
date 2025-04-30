@@ -151,7 +151,12 @@ public class User {
     public void setResetToken(String resetToken) { this.resetToken = resetToken; }
     public boolean isResetTokenUsed() { return resetTokenUsed; }
     public void setResetTokenUsed(boolean resetTokenUsed) { this.resetTokenUsed = resetTokenUsed; }
-
+    public List<Order> getOrders() {
+        return orders;
+    }
+    public void setorders(List<Order> orders){
+        this.orders = orders;
+    }
 
 
     public void addPaymentCard(PaymentCards card){

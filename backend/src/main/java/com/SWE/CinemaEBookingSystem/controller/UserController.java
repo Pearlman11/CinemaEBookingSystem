@@ -23,6 +23,7 @@ import com.SWE.CinemaEBookingSystem.entity.User;
 import com.SWE.CinemaEBookingSystem.entity.UserRole;
 import com.SWE.CinemaEBookingSystem.config.AESUtil;
 import com.SWE.CinemaEBookingSystem.entity.PaymentCards;
+import com.SWE.CinemaEBookingSystem.entity.Order;
 import com.SWE.CinemaEBookingSystem.repository.UserRepository;
 import com.SWE.CinemaEBookingSystem.repository.PaymentCardRepository;
 import com.SWE.CinemaEBookingSystem.service.PaymentCardService;
@@ -253,6 +254,31 @@ public class UserController {
         }
 
     }
+    @PostMapping("/{userId}/order")
+    public ResponseEntity<Order> addOrderToUser(@PathVariable Integer userId,@RequestBody Order order){
+        System.out.println("User ID: " + userId);
+        System.out.println("Received Order: " + order);
+        if (order == null) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        try{
+            ResponseEntity<Order> response =  addOrderToUser(userId, order);
+            Order savedorder = response.getBody();
+            return new ResponseEntity<>(savedorder, HttpStatus.CREATED);
+
+            
+        }catch(IllegalArgumentException ex){
+            ex.printStackTrace();
+           return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+
+    }
+    // @GetMapping("/{id}/order/{orderId}")
+    // public ResponseEntity <List<Order>> getOrderForUser(@PathVariable("id") Integer userId) {
+        
+    // }
+
 
 
    
