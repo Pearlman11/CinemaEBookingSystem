@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -44,6 +45,8 @@ public class User {
     private Boolean isVerified = false;  // Default to false for new users
 
 
+    
+
     @Column(name = "verification_token")
     private String verificationToken;
     @Column(name = "home_address")
@@ -53,9 +56,7 @@ public class User {
     @JsonIgnore 
     private List<PaymentCards> cards = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
-    @JsonIgnore
-    private List<Order> orders = new ArrayList<>();
+    
 
 
 
@@ -151,13 +152,7 @@ public class User {
     public void setResetToken(String resetToken) { this.resetToken = resetToken; }
     public boolean isResetTokenUsed() { return resetTokenUsed; }
     public void setResetTokenUsed(boolean resetTokenUsed) { this.resetTokenUsed = resetTokenUsed; }
-    public List<Order> getOrders() {
-        return orders;
-    }
-    public void setorders(List<Order> orders){
-        this.orders = orders;
-    }
-
+    
 
     public void addPaymentCard(PaymentCards card){
 

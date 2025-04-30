@@ -40,10 +40,6 @@ public class Ticket {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "order_id") 
-    @JsonBackReference
-    private Order order;
     
     public Ticket() {}
 
