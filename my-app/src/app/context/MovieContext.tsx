@@ -8,11 +8,6 @@ interface Showtime {
   screentime: string;
 }
 
-interface Showdate {
-  id: number;
-  screeningDay: string;
-  times: Showtime[];
-}
 
 interface Movie {
   id: number;
@@ -26,8 +21,8 @@ interface Movie {
   description: string;
   reviews?: string[];
   rating: string;
-  showTimes: Showtime[]; // or Showdate[]
-  durationInMinutes: number; // ✅ add this!
+  showTimes: Showtime[]; 
+  durationInMinutes: number; 
 }
 
 
