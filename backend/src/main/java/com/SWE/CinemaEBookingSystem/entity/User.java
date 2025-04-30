@@ -67,7 +67,7 @@ public class User {
     private String resetToken; // ✅ Reset password token
 
     @Column(name = "promotion_opt_in", nullable = false)
-    private boolean promotionOptIn = false;
+    private boolean promotionOptIn;
 
 
     @OneToOne(cascade = CascadeType.ALL)

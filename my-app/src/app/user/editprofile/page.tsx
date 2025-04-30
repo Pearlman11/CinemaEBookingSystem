@@ -53,6 +53,7 @@ interface PaymentCard {
       setLastName(user.lastName || '');
       setPhone(user.phone || '');
       setEmail(user.email || '');
+      setIsPromotionsOptedIn(user.promotionOptIn);
       const fetchPaymentCards = async () => {
         try {
           console.log('User ID:', user.id); 
@@ -224,11 +225,13 @@ interface PaymentCard {
         phone,
         password: newPassword || user.password, // Only updating if new password is provided
         role: user.role,
+        promotionOptIn:isPromotionsOptedIn,
         paymentCards:cards.map(card =>({
         id:card.id || null,  
         cardNumber: card.cardNumber,
         billingAddress: card.billingAddress,
         expirationDate: card.expirationDate,
+        
       })),
 
       };

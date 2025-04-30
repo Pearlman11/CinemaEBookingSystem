@@ -141,7 +141,7 @@ public class UserController {
             user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
             user.setPhone(userDetails.getPhone());
             user.setHomeAddress(userDetails.getHomeAddress());
-
+            user.setPromotionOptIn(userDetails.getPromotionOptIn());
             List<PaymentCards> updatedCards = userDetails.getPaymentCards();
             List<PaymentCards> existingCards = user.getPaymentCards();            
 
