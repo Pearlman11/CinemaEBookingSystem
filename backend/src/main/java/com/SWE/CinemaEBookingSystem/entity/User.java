@@ -53,6 +53,11 @@ public class User {
     @JsonIgnore 
     private List<PaymentCards> cards = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
+    @JsonIgnore
+    private List<Order> orders = new ArrayList<>();
+
+
 
     @Column(name = "reset_token_used")
     private Boolean resetTokenUsed = false;

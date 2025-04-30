@@ -3,6 +3,8 @@ package com.SWE.CinemaEBookingSystem.entity;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 @Table(name = "tickets")
 public class Ticket {
@@ -38,7 +40,11 @@ public class Ticket {
     @JoinColumn(name = "user_id")
     private User user;
 
-    // Constructors
+    @ManyToOne
+    @JoinColumn(name = "order_id") 
+    @JsonBackReference
+    private Order order;
+    
     public Ticket() {}
 
     public Ticket(Showtime showtimes, Booking bookings, Seat seats, SeatType seatType, BigDecimal price, TicketStatus status) {
