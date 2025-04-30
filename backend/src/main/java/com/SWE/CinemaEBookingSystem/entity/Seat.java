@@ -26,10 +26,7 @@ public class Seat {
     @JsonBackReference
     private Showtime showtime;
 
-    @ManyToOne
-    @JoinColumn(name = "order_id")
-    @JsonBackReference
-    private Order order;
+   
 
     public Seat() {}
 

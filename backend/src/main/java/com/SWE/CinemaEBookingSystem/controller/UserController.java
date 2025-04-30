@@ -25,7 +25,9 @@ import com.SWE.CinemaEBookingSystem.config.AESUtil;
 import com.SWE.CinemaEBookingSystem.entity.PaymentCards;
 import com.SWE.CinemaEBookingSystem.entity.Order;
 import com.SWE.CinemaEBookingSystem.repository.UserRepository;
+import com.SWE.CinemaEBookingSystem.repository.OrderRepository;
 import com.SWE.CinemaEBookingSystem.repository.PaymentCardRepository;
+import com.SWE.CinemaEBookingSystem.service.OrderService;
 import com.SWE.CinemaEBookingSystem.service.PaymentCardService;
 import com.SWE.CinemaEBookingSystem.service.UserService;
 import jakarta.persistence.EntityManager;
@@ -39,13 +41,17 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private OrderRepository orderRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @PersistenceContext
     private EntityManager entityManager;
-
+    
+    @Autowired
+    private OrderService orderService;
 
 
     @Autowired
@@ -262,9 +268,9 @@ public class UserController {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
         try{
-            ResponseEntity<Order> response =  addOrderToUser(userId, order);
-            Order savedorder = response.getBody();
-            return new ResponseEntity<>(savedorder, HttpStatus.CREATED);
+            Order orders =  orderService.addOrderToUser(userId, order);
+           
+            return new ResponseEntity<>(orders, HttpStatus.CREATED);
 
             
         }catch(IllegalArgumentException ex){
@@ -274,10 +280,19 @@ public class UserController {
 
 
     }
-    // @GetMapping("/{id}/order/{orderId}")
-    // public ResponseEntity <List<Order>> getOrderForUser(@PathVariable("id") Integer userId) {
-        
-    // }
+    @GetMapping("/{userId}/order")
+    public ResponseEntity <List<Order>> getOrdersForUser( Integer userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+    
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            List<Order> orders = user.ge
+            
+            return ResponseEntity.ok(orders); 
+        } else {
+            return ResponseEntity.notFound().build(); 
+        }
+    }
 
 
 
