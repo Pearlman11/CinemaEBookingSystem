@@ -130,13 +130,19 @@ const ProfilePage = () => {
           )}
         </div>
 
-       
-
-        <Link href="/user/editprofile">
-          <button type="button" className={styles.editButton}>
-            Edit Profile
-          </button>
-        </Link>
+        <div className={styles.buttonContainer}>
+          <Link href="/user/editprofile">
+            <button type="button" className={styles.editButton}>
+              Edit Profile
+            </button>
+          </Link>
+          
+          <Link href="/user/OrderHistory">
+            <button type="button" className={styles.editButton}>
+              View Order History
+            </button>
+          </Link>
+        </div>
       </div>
     </div>
   );
