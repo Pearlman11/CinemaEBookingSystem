@@ -21,27 +21,44 @@ public class SeatController {
     @Autowired
     private SeatService seatService;
 
-// Inside SeatController
-@PutMapping("/reserve")
-public ResponseEntity<Map<String, Object>> reserveSeats(@RequestBody SeatReservationRequest request) {
-    List<String> seatIds = request.getSeatIds();
-    Integer showtimeIdInt = request.getShowtimeId();
+    @PutMapping("/reserve")
+    public ResponseEntity<Map<String, Object>> reserveSeats(@RequestBody SeatReservationRequest request) {
+        List<String> seats = request.getSeats();
+        Integer showtimeIdInt = request.getShowtimeId();
+        String userEmail = request.getEmail();
 
-    if (seatIds == null || seatIds.isEmpty()) {
-         throw new IllegalArgumentException("Seat IDs cannot be null or empty.");
-    }
-    if (showtimeIdInt == null) {
-         throw new IllegalArgumentException("Showtime ID cannot be null.");
-    }
+        if (seats == null || seats.isEmpty()) {
+             throw new IllegalArgumentException("Seats cannot be null or empty.");
+        }
+        if (showtimeIdInt == null) {
+             throw new IllegalArgumentException("Showtime ID cannot be null.");
+        }
 
-    Long showtimeIdLong = showtimeIdInt.longValue();
+        Long showtimeIdLong = showtimeIdInt.longValue();
+        
+        try {
+            seatService.reserveSeats(seats, showtimeIdLong, userEmail);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Seats reserved successfully");
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+    }
     
-    seatService.reserveSeats(seatIds, showtimeIdLong); // no Booking object expected anymore
-
-    Map<String, Object> response = new HashMap<>();
-    response.put("message", "Seats reserved successfully");
-    return ResponseEntity.ok(response);
-}
-
-
+    /**
+     * Get a list of reserved seats for a specific showtime
+     */
+    @GetMapping("/reserved/{showtimeId}")
+    public ResponseEntity<List<String>> getReservedSeats(@PathVariable Long showtimeId) {
+        try {
+            List<String> reservedSeats = seatService.getReservedSeatsForShowtime(showtimeId);
+            return ResponseEntity.ok(reservedSeats);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

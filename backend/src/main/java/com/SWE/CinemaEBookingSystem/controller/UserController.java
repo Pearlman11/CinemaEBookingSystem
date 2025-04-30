@@ -141,7 +141,7 @@ public class UserController {
             user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
             user.setPhone(userDetails.getPhone());
             user.setHomeAddress(userDetails.getHomeAddress());
-
+            user.setPromotionOptIn(userDetails.getPromotionOptIn());
             List<PaymentCards> updatedCards = userDetails.getPaymentCards();
             List<PaymentCards> existingCards = user.getPaymentCards();            
 
@@ -241,6 +241,20 @@ public class UserController {
 
         return ResponseEntity.ok(paymentCards);
     }
+    @DeleteMapping("/{userId}/payment-cards/{cardId}")
+    public ResponseEntity<Void> deletePaymentCards(@PathVariable Integer userId,@PathVariable Integer cardId) {
+        System.out.println("Deleting Payment Card for User ID: " + userId + ", Card ID: " + cardId);
+        try {
+
+            paymentCardService.deletePaymentCardForUser(userId, cardId);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+
+    }
+
+
    
 
 

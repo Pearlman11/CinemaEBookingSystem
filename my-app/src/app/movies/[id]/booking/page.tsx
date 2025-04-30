@@ -142,8 +142,8 @@ const CombinedBookingPage = () => {
           if (!res.ok) throw new Error(`HTTP error! Status: ${res.status} - Failed to load showtimes.`);
           return res.json();
       })
-      .then((data: any[]) => {
-        const groupedById: Record<string, Showtime[]> = data.reduce((acc, show) => {
+      .then((data: { id: number; showDate: string; startTime: string }[]) => {
+        const groupedById: Record<string, Showtime[]> = data.reduce((acc: Record<string, Showtime[]>, show) => {
           const date = show.showDate;
           const time = show.startTime?.match(/^(\d{2}:\d{2})/)?.[1];
           if (!date || !time) { console.warn("Skipping showtime:", show); return acc; };
@@ -151,10 +151,9 @@ const CombinedBookingPage = () => {
           acc[date].push({
               showtimeId: show.id, screentime: time, showDate: date, startTime: show.startTime
           });
-          // --- FIX 1: Add type annotation here ---
           acc[date].sort((a: Showtime, b: Showtime) => a.screentime.localeCompare(b.screentime));
           return acc;
-        }, {});
+        }, {} as Record<string, Showtime[]>);
 
         const formatted: Showdate[] = Object.entries(groupedById)
             .sort(([dateA], [dateB]) => dateA.localeCompare(dateB))
@@ -212,7 +211,9 @@ const CombinedBookingPage = () => {
     if (selectedShowtime?.showtimeId) {
       setLoading(true);
       setSelectedSeats([]);
-      fetch(`http://localhost:8080/api/showtimes/${selectedShowtime.showtimeId}/seats`)
+      
+      // Use the new dedicated endpoint for reserved seats
+      fetch(`http://localhost:8080/api/seats/reserved/${selectedShowtime.showtimeId}`)
         .then((res) => {
             if (!res.ok) throw new Error(`HTTP error! Status: ${res.status} - Could not fetch reserved seats.`);
             return res.json();
@@ -230,13 +231,16 @@ const CombinedBookingPage = () => {
   }, [selectedDate, selectedTime, showTimes]); // Dependencies are correct
 
   // Event Handlers (Unchanged logic, just formatting)
-  const toggleSeat = (seat: string) => {
-    if (reservedSeats.includes(seat)) { return; }
-    if (selectedSeats.includes(seat)) {
-      setSelectedSeats(selectedSeats.filter((s) => s !== seat));
+  const toggleSeat = (seatId: string) => {
+    if (reservedSeats.includes(seatId)) {
+      toast.error(`Seat ${seatId} is already reserved.`, { className: styles['custom-toast'] });
+      return;
+    }
+    if (selectedSeats.includes(seatId)) {
+      setSelectedSeats(selectedSeats.filter((s) => s !== seatId));
     } else {
       if (selectedSeats.length < totalTickets) {
-        setSelectedSeats([...selectedSeats, seat]);
+        setSelectedSeats([...selectedSeats, seatId]);
       } else {
         toast.error(`You can only select ${totalTickets} seat${totalTickets !== 1 ? 's' : ''}. Deselect a seat first.`, { className: styles['custom-toast'] });
       }
@@ -360,7 +364,12 @@ const CombinedBookingPage = () => {
                               onClick={() => toggleSeat(seatId)}
                               disabled={isReserved || loading}
                               aria-label={`Seat ${seatId} ${isReserved ? '(Reserved)' : isSelected ? '(Selected)' : '(Available)'}`}
-                              aria-disabled={isReserved || loading}> {seatId} </button>
+                              aria-pressed={isSelected}
+                              aria-disabled={isReserved || loading}
+                              title={isReserved ? "This seat is already reserved" : ""}
+                            > 
+                              {seatId} 
+                            </button>
                           );
                         })}
                       </div>
