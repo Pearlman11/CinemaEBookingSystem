@@ -2,9 +2,14 @@ package com.SWE.CinemaEBookingSystem.entity;
 
 import jakarta.persistence.*;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
@@ -15,29 +20,34 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "date_created", updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date dateCreated;
+    @CreationTimestamp
+    @Column(name = "created_date", updatable = false)
+    private LocalDate createdDate;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @CreationTimestamp
+    @Column(name = "created_time", updatable = false)
+    private LocalTime createdTime;
+
+    @Column(name = "show_date", updatable = false)
+    private LocalDate showDate;
+
+
+    @Column(name = "show_time", updatable = false)
+    private LocalTime showTime;
+
+
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = true)
+    @JsonIgnore 
     private User user;
 
     private String showtimeString;
+    @Column(name = "order_total")
     private Double total;
+    
     private String movieName;
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Order> orders = new ArrayList<>();
-
-    // Getters and Setters
-    public List<Order> getOrders() {
-        return orders;
-    }
-
-    public void setOrders(List<Order> orders) {
-        this.orders = orders;
-    }
-    // Getter and Setter for id
+    
+    
     public Long getId() {
         return id;
     }
@@ -46,16 +56,39 @@ public class Order {
         this.id = id;
     }
 
-    // Getter and Setter for dateCreated
-    public Date getDateCreated() {
-        return dateCreated;
+   
+    public LocalDate getCreatedDate() {
+        return createdDate;
+    }
+    
+    public void setCreatedDate(LocalDate createdDate) {
+        this.createdDate = createdDate;
+    }
+    
+    public LocalTime getCreatedTime() {
+        return createdTime;
+    }
+    
+    public void setCreatedTime(LocalTime createdTime) {
+        this.createdTime = createdTime;
+    }
+    public LocalDate getShowDate() {
+        return showDate;
+    }
+    
+    public void setShowDate(LocalDate showDate) {
+        this.showDate = showDate;
+    }
+    
+    public LocalTime getShowTime() {
+        return showTime;
+    }
+    
+    public void setShowTime(LocalTime showTime) {
+        this.showTime = showTime;
     }
 
-    public void setDateCreated(Date dateCreated) {
-        this.dateCreated = dateCreated;
-    }
-
-    // Getter and Setter for user
+  
     public User getUser() {
         return user;
     }
@@ -64,7 +97,7 @@ public class Order {
         this.user = user;
     }
 
-    // Getter and Setter for showtimeString
+  
     public String getShowtimeString() {
         return showtimeString;
     }
@@ -73,7 +106,7 @@ public class Order {
         this.showtimeString = showtimeString;
     }
 
-    // Getter and Setter for total
+    
     public Double getTotal() {
         return total;
     }
@@ -82,7 +115,7 @@ public class Order {
         this.total = total;
     }
 
-    // Getter and Setter for movieName
+   
     public String getMovieName() {
         return movieName;
     }
@@ -91,6 +124,6 @@ public class Order {
         this.movieName = movieName;
     }
 
-    // Getter and Setter for paymentCardNumber
+    
     
 }
