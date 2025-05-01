@@ -315,6 +315,40 @@ const CheckoutPage = () => {
         throw new Error(errorMsg);
       }
 
+      // After successful seat reservation, create an order if user is logged in
+      if (user?.id) {
+        const orderPayload = {
+          movieTitle: movie?.title,
+          orderDate: new Date().toISOString().split('T')[0],
+          totalPrice: orderTotal,
+          seats: selectedSeats.map(seat => seat.label).join(", "),
+          showDate: showtimeDate,
+          showTime: showtimeTime,
+          adultTickets: adultTickets,
+          childTickets: childTickets,
+          seniorTickets: seniorTickets
+        };
+
+        try {
+          const orderResponse = await fetch(`http://localhost:8080/api/users/${user.id}/order`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(orderPayload),
+          });
+
+          if (!orderResponse.ok) {
+            console.warn("Order creation failed, but seat reservation was successful");
+          } else {
+            console.log("Order created successfully");
+          }
+        } catch (orderError) {
+          console.error("Error creating order:", orderError);
+          // Don't fail the overall process if order creation fails but seat reservation succeeded
+        }
+      }
+
       console.log("Reservation successful!");
       console.log("Payment Info (Masked):", {
         promoCode: promoCode || "None",
