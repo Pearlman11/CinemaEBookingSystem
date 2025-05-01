@@ -118,4 +118,3 @@ For any questions, feedback, or suggestions, feel free to reach out:
 
 ---
 
-Let me know if you'd like to customize this further!
