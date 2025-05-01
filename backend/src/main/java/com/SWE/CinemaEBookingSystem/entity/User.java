@@ -45,7 +45,7 @@ public class User {
     private Boolean isVerified = false;  // Default to false for new users
 
 
-    
+
 
     @Column(name = "verification_token")
     private String verificationToken;
@@ -79,6 +79,17 @@ public class User {
     @OneToOne(cascade = CascadeType.ALL)
     private PaymentCards primaryCard;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Order> orders = new ArrayList<>();
+
+    
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
+    }
 
     public User() {}
 

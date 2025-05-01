@@ -281,12 +281,12 @@ public class UserController {
 
     }
     @GetMapping("/{userId}/order")
-    public ResponseEntity <List<Order>> getOrdersForUser( Integer userId) {
+    public ResponseEntity <List<Order>> getOrdersForUser(@PathVariable Integer userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
     
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            List<Order> orders = user.ge
+            List<Order> orders = user.getOrders();
             
             return ResponseEntity.ok(orders); 
         } else {
