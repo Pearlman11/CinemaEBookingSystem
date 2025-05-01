@@ -313,6 +313,7 @@ interface PaymentCard {
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder="Enter your first name"
                     className={styles.input}
+                    required
                   />
                 </div>
                 <div className={styles.field}>
@@ -324,6 +325,7 @@ interface PaymentCard {
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder="Enter your last name"
                     className={styles.input}
+                    required
                   />
                 </div>
                 <div className={styles.field}>
