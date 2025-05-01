@@ -318,15 +318,11 @@ const CheckoutPage = () => {
       // After successful seat reservation, create an order if user is logged in
       if (user?.id) {
         const orderPayload = {
-          movieTitle: movie?.title,
-          orderDate: new Date().toISOString().split('T')[0],
-          totalPrice: orderTotal,
-          seats: selectedSeats.map(seat => seat.label).join(", "),
-          showDate: showtimeDate,
+          movieName: movie?.title,
+          showDate: showtimeDate, 
           showTime: showtimeTime,
-          adultTickets: adultTickets,
-          childTickets: childTickets,
-          seniorTickets: seniorTickets
+          showtimeString: `${showtimeDate} ${showtimeTime}`,
+          total: orderTotal
         };
 
         try {
@@ -349,20 +345,6 @@ const CheckoutPage = () => {
         }
       }
 
-      console.log("Reservation successful!");
-      console.log("Payment Info (Masked):", {
-        promoCode: promoCode || "None",
-        cardNumber: formatCardNumberForDisplay(cardNumber),
-        billingAddress,
-        email,
-      });
-      console.log("Order Summary:", {
-        movie: movie?.title || "N/A",
-        showtime: `${formatDate(showtimeDate)} ${formatTime(showtimeTime)}`,
-        adultTickets, childTickets, seniorTickets,
-        selectedSeats: selectedSeats.map(seat => seat.label).join(", "),
-        orderTotal: `$${orderTotal.toFixed(2)}`,
-      });
 
       setConfirmationVisible(true);
       setTimeout(() => {
